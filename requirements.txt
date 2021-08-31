@@ -1,0 +1,6 @@
+unidecode
+pymarc
+fuzzywuzzy
+xlsxwriter
+openpyxl
+requests

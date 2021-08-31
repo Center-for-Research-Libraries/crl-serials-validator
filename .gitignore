@@ -1,0 +1,202 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# project-specific stuff goes below
+input/*log
+input/*tsv
+input/*csv
+input/*txt
+input/*xlsx
+input/*mrk
+input/*mrc
+input/*dat
+input/*bout
+output/*txt
+output/*tsv
+output/*xlsx
+output/*mrk
+output/*mrc
+logs/*txt
+logs/*tsv
+logs/*xlsx
+logs/*log
+old_output
+input_backup
+*.docx#
+.idea/*
+*#
+*.~lock*
+.vscode/
+input.zip
+*.ini
+DATA*.txt
+backup/
+data/Quick Scan.txt
+z_test.py
+
+# Visual Studio directory
+.vs/*
+Quick\ Scan.txt
+old_input/*
+old_output/*
+data/papr.sqlite3
+*.sqlite3
+.idea/
+data/failed_oclcs.txt
+data/*ini
+
+# CRL libraries not relevant to this project
+api_hits_database.py
+api_key_tracker.py
+assemble_86x_holdings_from_marc.py
+check_completeness.py
+config_file_reader.py
+crl_data_paths.py
+crl_marc_reader.py
+crl_members.py
+crl_shared_print_api.py
+crl_shared_print_reader.py
+crl_tests.py
+crl_timekeeper.py
+fetch_from_api.py
+fetch_holders_from_api.py
+file_utilities.py
+hathi_api.py
+hathi_file_reader.py
+hathi.py
+holders_db.py
+legacy_marc_fields.py
+list_utilities.py
+local_holders_database.py
+normalizer_regexes.py
+number_transform.py
+simple_file_reader.py
+spreadsheet_reader.py
+volume_transform.py

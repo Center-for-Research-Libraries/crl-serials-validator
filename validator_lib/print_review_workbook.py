@@ -1,0 +1,304 @@
+from collections import defaultdict, Counter
+import os
+from pprint import pprint
+import sys
+
+
+from crl_lib.crl_xlsxwriter import CRLXlsxWriter
+import validator_lib.utilities
+
+
+class ReviewWorkbookPrinter:
+    def __init__(self, title_dicts, line_583_validation_output, print_errors_only=False):
+        self.title_dicts = title_dicts
+        self.print_errors_only = print_errors_only
+
+        self.line_583_validation_output = line_583_validation_output
+        self.print_line_583_output = set()
+        self.check_for_583s_in_files()
+
+        self.checklist_cats = [
+            'error_category', 'has_disqualifying_error', 'seqnum', 'bib_id', 'holdings_id', 'local_oclc', 'wc_oclc', 
+            'oclc_mismatch',
+            'local_oclc_repeated', 'wc_oclc_repeated', 'oclcs_019', 'local_issn', 'invalid_local_issn', 'wc_issn_a',
+            'local_issn_does_not_match_wc_issn_a', 'issn_l', 'local_title', 'wc_title', 'title_mismatch',
+            'uniform_title',
+            'title_h', 'publisher', 'form', 'bib_lvl', 'serial_type', 'carrier_type', 'media_type', 'place', 'lang',
+            'govt_pub', 'authentication_code', 'cat_agent', 'cat_lang', 'lc_class', 'dewey', '008_year_1', '008_year_2',
+            'start_including_362', 'end_including_362', 'holdings_start', 'holdings_end', 'start_problem',
+            'end_problem', 'holdings_out_of_range', 'holdings_have_no_years', 'local_holdings', 
+            'nonpublic_notes',  'public_notes',
+            'completeness_words_in_holdings', 'binding_words_in_holdings', 'nonprint_words_in_holdings', 
+            'wc_line_362', 'current_freq', 'former_freq', 
+            'preceding_oclcs',
+            'succeeding_oclcs', 'other_oclcs', 'numbering_peculiarities', 'issn_db_issn',
+            'local_issn_mismatches_issn_db_issn', 'wc_issn_mismatches_issn_db_issn', 'issn_db_title', 'issn_db_format',
+            'issn_db_serial_type', 'issn_db_year_1', 'issn_db_year_2', 'holdings_out_of_issn_db_date_range'
+            ]
+
+        self.for_review_header = ['Record ID',
+                                  'Reason for Review',
+                                  'Local OCLC#',
+                                  'WorldCat OCLC#',
+                                  'Local ISSN',
+                                  'WorldCat ISSN',
+                                  'WorldCat Title',
+                                  'MARC Serial Type',
+                                  'MARC Form of Item',
+                                  'MARC Bib Level',
+                                  'Publication Date1',
+                                  'Publication Date2',
+                                  'Managing Library',
+                                  'Location',
+                                  'Holdings',
+                                  'WorldCat MARC 362'
+                                  ]
+
+        self.originally_from_header = ['Load Status', 'Reasons for Review', 'HoldingID', 'OCLC Number', 'Print ISSN',
+                                       'Title', 'OCLC Symbol', 'OCLC HLC', 'Summary Holdings/Materials Specified']
+
+        dirs = validator_lib.utilities.get_file_location_dict()
+        self.get_disqualifying_issue_categories = validator_lib.utilities.get_disqualifying_issue_categories()
+        self.error_counter = defaultdict(Counter)
+        self.disqualifying_error_counter = defaultdict(Counter)
+        self.count_errors(title_dicts)
+        self.count_disqualifying_errors(title_dicts)
+        self.checklist_outputs = defaultdict(list)
+        self.get_checklist_data_for_output()
+
+        self.output_folder = dirs['output']
+        self.error_category_map = self.make_error_category_map()
+
+        self.outputs = {}
+
+        self.make_notes_worksheet()
+
+        for title_dict in self.title_dicts:
+            self.organize_by_errors(title_dict)
+        self.make_originally_from_outputs()
+        self.make_workbooks()
+
+    @staticmethod
+    def make_error_category_map():
+        error_category_map = {
+            'bib_lvl_not_serial': 'Bib level of title is not serial',
+            'binding_words_in_holdings': 'Binding statements in holdings or notes',
+            'completeness_words_in_holdings': 'Completeness or reprint statement in holdings or notes',
+            'duplicate_holdings_id': 'Duplicate holdings ID',
+            'duplicate_local_oclc': 'Duplicate local OCLC #',
+            'duplicate_wc_oclc': 'Duplicate WorldCat OCLC #',
+            'form_not_print': 'Form of title is not hard copy',
+            'holdings_out_of_issn_db_date_range': 'Holdings are outside the ISSN database expected publication dates',
+            'holdings_out_of_range': 'Holdings are outside the expected publication dates',
+            'holdings_have_no_years': 'No years found in holdings statement',
+            'invalid_carrier_type': 'Carrier type of title is not hard copy',
+            'invalid_local_issn': 'Local ISSN is not in a valid format',
+            'invalid_media_type': 'Media type of title is not hard copy',
+            'issn_db_form_not_print': 'ISSN database record has does not have hard copy form',
+            'issn_db_serial_type_not_periodical': 'ISSN database record does not have periodical serial type',
+            'issn_mismatch': 'ISSN mismatch with WorldCat and ISSN database',
+            'local_issn_does_not_match_wc_issn_a': 'Local ISSN mismatch with WorldCat ISSN',
+            'local_issn_does_not_match_issn_db': 'Local ISSN mismatch with ISSN database',
+            'line_583_error': 'One of more errors in 583 line(s)',
+            'local_issn_does_not_match_issn_db': 'ISSN does not match with ISSN database',
+            'marc_validation_error': 'MARC record does not validate successfully',
+            'missing_field_852a': 'No field 852 $a in MARC input',
+            'nonprint_words_in_holdings': 'Nonprint statement in holdings',
+            'no_oclc_number': 'No OCLC number in original record',
+            'oclc_mismatch': 'OCLC number mismatch with WorldCat',
+            'record_type_not_language_material': 'Record type of title is not a language item',
+            'serial_type_not_periodical': 'Serial type of title is not periodical',
+            'title_mismatch': 'Title mismatch with WorldCat',
+            'wc_issn_does_not_match_issn_db': 'WorldCat ISSN does not match with ISSN database',
+            'no_worldcat_record': 'Title not found in WorldCat'
+        }
+        return error_category_map
+
+    def count_errors(self, title_dicts):
+        """Tally the issues in the input files."""
+        for title_dict in title_dicts:
+            inst = self.get_inst_from_dict(title_dict)
+            if not title_dict['error_category']:
+                self.error_counter[inst]['No errors'] += 1
+            else:
+                self.error_counter[inst][title_dict['error_category']] += 1
+
+    def count_disqualifying_errors(self, title_dicts):
+        """Tally the issues in the input files."""
+        for title_dict in title_dicts:
+            inst = self.get_inst_from_dict(title_dict)
+            if not title_dict['disqualifying_error_category']:
+                self.disqualifying_error_counter[inst]['No errors'] += 1
+            else:
+                self.disqualifying_error_counter[inst][title_dict['disqualifying_error_category']] += 1
+
+    def organize_by_errors(self, title_dict):
+        inst = self.get_inst_from_dict(title_dict)
+        if 'for_review' not in self.outputs[inst]:
+            self.outputs[inst]['for_review'] = defaultdict(list)
+        if not title_dict['errors']:
+            return
+        for error_cat in title_dict['errors']:
+            try:
+                error_str = self.error_category_map[error_cat]
+            except:
+                raise Exception('Unknown error Validator error category seen. Category is {}'.format(error_cat))
+            output_row = [
+                title_dict['record_id'],
+                error_str,
+                title_dict['local_oclc'],
+                title_dict['wc_oclc'],
+                title_dict['local_issn'],
+                title_dict['wc_issn_a'],
+                title_dict['wc_title'],
+                title_dict['serial_type'],
+                title_dict['form'],
+                title_dict['bib_lvl'],
+                title_dict['start_including_362'],
+                title_dict['end_including_362'],
+                inst,
+                title_dict['location'],
+                title_dict['local_holdings'],
+                title_dict['wc_line_362']
+            ]
+            self.outputs[inst]['for_review'][error_cat].append(output_row)
+
+    @staticmethod
+    def get_inst_from_dict(title_dict):
+        if title_dict['institution']:
+            return title_dict['institution']
+        abbrev = validator_lib.utilities.get_abbrev_from_input_filename(title_dict['filename'])
+        return abbrev
+
+    def make_notes_worksheet(self):
+        overview_dict = defaultdict(Counter)
+        for title_dict in self.title_dicts:
+            inst = self.get_inst_from_dict(title_dict)
+            overview_dict[inst]['total'] += 1
+            if not title_dict['invalid_record'] == '1':
+                overview_dict[inst]['no_issues'] += 1
+            else:
+                overview_dict[inst]['for_review'] += 1
+        for inst in overview_dict:
+            overview_output = [['{} records'.format(inst), ''],
+                               ['Supplied by {}'.format(inst), overview_dict[inst]['total']], ['', ''],
+                               ['No issues preventing ingestion', overview_dict[inst]['no_issues']], ['', ''],
+                               ['For review', overview_dict[inst]['for_review']]]
+            self.outputs[inst] = {
+                'All issues': overview_output,
+                'originally_from': [self.originally_from_header]
+            }
+
+    def make_error_worksheet(self, inst_data):
+        output_list = [self.for_review_header]
+        special_rows = []
+        for error_cat in inst_data:
+            output_list.append([''])
+            special_rows.append(len(output_list))
+            output_list.append([error_cat])
+            for error_line in inst_data[error_cat]:
+                output_list.append(error_line)
+        return output_list, special_rows
+
+    def make_error_counts_output(self, inst):
+        blank_line = ['', '']
+        output = [
+            [inst, ''],
+            blank_line,
+            ['errors', 'count']
+        ]
+        for error_tuple in self.error_counter[inst].most_common():
+            output.append(list(error_tuple))
+        return output
+
+    def make_disqualifying_error_counts_output(self, inst):
+        blank_line = ['', '']
+        output = [
+            [inst, ''],
+            blank_line,
+            ['errors', 'count']
+        ]
+        for disqualifying_error_tuple in self.disqualifying_error_counter[inst].most_common():
+            output.append(list(disqualifying_error_tuple))
+        return output
+
+    def make_originally_from_outputs(self):
+        for title_dict in self.title_dicts:
+            inst = self.get_inst_from_dict(title_dict)
+
+            if 'field_852a' not in title_dict:
+                title_dict['field_852a'] = title_dict['oclc_symbol']
+
+            load_status = 'review'
+            if not title_dict['invalid_record'] == '1' and not title_dict['disqualifying_errors']:
+                load_status = 'loaded'
+            if title_dict['local_title']:
+                title = title_dict['local_title']
+            else:
+                title = title_dict['wc_title']
+            output_row = [
+                load_status,
+                title_dict['error_category'],
+                title_dict['holdings_id'],
+                title_dict['local_oclc'],
+                title_dict['local_issn'],
+                title,
+                title_dict['field_852a'],
+                title_dict['location'],
+                title_dict['local_holdings']
+            ]
+            self.outputs[inst]['originally_from'].append(output_row)
+
+    def check_for_583s_in_files(self):
+        seen_insts = set()
+        for title_dict in self.title_dicts:
+            inst = self.get_inst_from_dict(title_dict)
+            if inst in seen_insts:
+                continue
+            if '583_in_file' in title_dict and title_dict['583_in_file']:
+                self.print_line_583_output.add(inst)
+
+    def get_checklist_data_for_output(self):
+        insts = set()
+        for title_dict in self.title_dicts:
+            inst = self.get_inst_from_dict(title_dict)
+            insts.add(inst)
+            output_list = []
+            for cat in self.checklist_cats:
+                output_list.append(title_dict[cat])
+            if self.print_errors_only is True and not output_list[0]:
+                continue
+            self.checklist_outputs[inst].append(output_list)
+        for inst in insts:
+            self.checklist_outputs[inst].insert(0, self.checklist_cats)
+
+    def make_workbooks(self):
+        for inst in self.outputs:
+            output_filename = '{} for review.xlsx'.format(inst)
+            output_file_location = os.path.join(self.output_folder, output_filename)
+            output_file_location = validator_lib.utilities.get_unused_filename(output_file_location)
+
+            for_review_list, for_review_special_rows = self.make_error_worksheet(self.outputs[inst]['for_review'])
+            error_count_output = self.make_error_counts_output(inst)
+            disqualifying_error_count_output = self.make_disqualifying_error_counts_output(inst)
+
+            for_review_special_formats = [
+                ({'bold': True, 'bg_color': '#D8D8D8', 'text_wrap': True}, [0]),
+                ({'bold': True, 'bg_color': '#FBE5D6', 'font_size': '14'}, for_review_special_rows)
+            ]
+
+            output_pages = {
+                'Notes': {'data': self.outputs[inst]['All issues']},
+                'All issues': {'data': error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True},
+                                                                                [2])]},
+                'Disqualifying issues': {'data': disqualifying_error_count_output,
+                                         'special_formats': [({'bold': True, 'text_wrap': True}, [2])]},
+                'Checklist': {'data': self.checklist_outputs[inst]},
+                'For review': {'data': for_review_list, 'special_formats': for_review_special_formats},
+                'Orig from {}'.format(inst): {'data': self.outputs[inst]['originally_from']}
+            }
+            if inst in self.print_line_583_output:
+                if self.line_583_validation_output and self.print_errors_only is False:
+                    output_pages['Line 583 validation'] = {'data': self.line_583_validation_output}
+
+            CRLXlsxWriter(output_file_location, output_pages)

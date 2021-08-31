@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>PAPR Validator Instructions</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+      html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }  body { color: #444; font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif; font-size: 12px; line-height: 1.7; padding: 1em; margin: auto; max-width: 42em; background: #fefefe; }  a { color: #0645ad; text-decoration: none; }  a:visited { color: #0b0080; }  a:hover { color: #06e; }  a:active { color: #faa700; }  a:focus { outline: thin dotted; }  *::-moz-selection { background: rgba(255, 255, 0, 0.3); color: #000; }  *::selection { background: rgba(255, 255, 0, 0.3); color: #000; }  a::-moz-selection { background: rgba(255, 255, 0, 0.3); color: #0645ad; }  a::selection { background: rgba(255, 255, 0, 0.3); color: #0645ad; }  p { margin: 1em 0; }  img { max-width: 100%; }  h1, h2, h3, h4, h5, h6 { color: #111; line-height: 125%; margin-top: 2em; font-weight: normal; }  h4, h5, h6 { font-weight: bold; }  h1 { font-size: 2.5em; }  h2 { font-size: 2em; }  h3 { font-size: 1.5em; }  h4 { font-size: 1.2em; }  h5 { font-size: 1em; }  h6 { font-size: 0.9em; }  blockquote { color: #666666; margin: 0; padding-left: 3em; border-left: 0.5em #EEE solid; }  hr { display: block; height: 2px; border: 0; border-top: 1px solid #aaa; border-bottom: 1px solid #eee; margin: 1em 0; padding: 0; }  pre, code, kbd, samp { color: #000; font-family: monospace, monospace; _font-family: 'courier new', monospace; font-size: 0.98em; }  pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; }  b, strong { font-weight: bold; }  dfn { font-style: italic; }  ins { background: #ff9; color: #000; text-decoration: none; }  mark { background: #ff0; color: #000; font-style: italic; font-weight: bold; }  sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }  sup { top: -0.5em; }  sub { bottom: -0.25em; }  ul, ol { margin: 1em 0; padding: 0 0 0 2em; }  li p:last-child { margin-bottom: 0; }  ul ul, ol ol { margin: .3em 0; }  dl { margin-bottom: 1em; }  dt { font-weight: bold; margin-bottom: .8em; }  dd { margin: 0 0 .8em 2em; }  dd:last-child { margin-bottom: 0; }  img { border: 0; -ms-interpolation-mode: bicubic; vertical-align: middle; }  figure { display: block; text-align: center; margin: 1em 0; }  figure img { border: none; margin: 0 auto; }  figcaption { font-size: 0.8em; font-style: italic; margin: 0 0 .8em; }  table { margin-bottom: 2em; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd; border-spacing: 0; border-collapse: collapse; }  table th { padding: .2em 1em; background-color: #eee; border-top: 1px solid #ddd; border-left: 1px solid #ddd; }  table td { padding: .2em 1em; border-top: 1px solid #ddd; border-left: 1px solid #ddd; vertical-align: top; }  .author { font-size: 1.2em; text-align: center; }  @media only screen and (min-width: 480px) { body { font-size: 14px; } } @media only screen and (min-width: 768px) { body { font-size: 16px; } } @media print { * { background: transparent !important; color: black !important; filter: none !important; -ms-filter: none !important; }  body { font-size: 12pt; max-width: 100%; }  a, a:visited { text-decoration: underline; }  hr { height: 1px; border: 0; border-bottom: 1px solid black; }  a[href]:after { content: " (" attr(href) ")"; }  abbr[title]:after { content: " (" attr(title) ")"; }  .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; }  pre, blockquote { border: 1px solid #999; padding-right: 1em; page-break-inside: avoid; }  tr, img { page-break-inside: avoid; }  img { max-width: 100% !important; }  @page :left { margin: 15mm 20mm 15mm 10mm; }  @page :right { margin: 15mm 10mm 15mm 20mm; }  p, h2, h3 { orphans: 3; widows: 3; }  h2, h3 { page-break-after: avoid; } } 
+  </style>
+</head>
+<body>
+<h1 id="glossary-of-error-categories">Glossary of Error Categories</h1>
+<p><strong><em>bib_lvl_not_serial</em></strong></p>
+<p>The bib_lvl in the WorldCat MARC LDR is not <code>s</code>.</p>
+<p><strong><em>form_not_print</em></strong></p>
+<p>The form in the WorldCat MARC 008 is not a blank space, a backslash, <code>r</code>, or <code>-</code>.</p>
+<p><strong><em>record_type_not_language_material</em></strong></p>
+<p>The record_type in the WorldCat MARC LDR is not <code>a</code>.</p>
+<p><strong><em>serial_type_not_periodical</em></strong></p>
+<p>The serial_type in the WorldCat MARC 008 is not a blank space, a backslash, <code>m</code>, <code>p</code>, <code>-</code>, or <code>|</code>.</p>
+<p><strong><em>invalid_carrier_type</em></strong></p>
+<p>The WorldCat MARC 338 contains a carriertype that is not consistent with a hard copy record.</p>
+<p><strong><em>invalid_media_type</em></strong></p>
+<p>The WorldCat MARC 337 contains a media type that is not consistent with a hard copy record.</p>
+<p><strong><em>issn_db_form_not_print</em></strong></p>
+<p>The form in the ISSN database MARC 008 is not a blank space, a backslash, <code>r</code>, or <code>-</code>.</p>
+<p><strong><em>issn_db_serial_type_not_periodical</em></strong></p>
+<p>The serial_type in the ISSN database MARC 008 is not a blank space, a backslash, <code>m</code>, <code>p</code>, <code>-</code>, or <code>|</code>.</p>
+<p><strong><em>no_oclc_number</em></strong></p>
+<p>Nothing that looks like an OCLC number was found in the original input data.</p>
+<p><strong><em>no_worldcat_record</em></strong></p>
+<p>No MARC record was returned from the WorldCat Search API.</p>
+<p><strong><em>binding_words_in_holdings</em></strong></p>
+<p>A word or fragment was found in the holdings that might indicate that the holdings segment might be a binding note (“Bound with vol. 26 1988”) rather than an actual holdings statement. The scripts currently search for “bound” or the fragment “bd w”.</p>
+<p><strong><em>completeness_words_in_holdings</em></strong></p>
+<p>A word or fragment that might indicate incomplete or partial holdings was found in the input file holdings statements. Currently the scripts search for the following: “inc”, “compl”, “miss”, “lack”, “without”, “w/o”, or “repr”.</p>
+<p><strong><em>nonprint_words_in_holdings</em></strong></p>
+<p>A term was found in the holdings indicating that they might be audiovisual materials instead of hard copy. The scripts currently search for ‘DVD’ and ‘CD’.</p>
+<p><strong><em>duplicate_holdings_id</em></strong></p>
+<p>The holdings_id appears more than once in the input set.</p>
+<p><strong><em>duplicate_local_oclc</em></strong></p>
+<p>The local OCLC number appears more than once in the input file.</p>
+<p><strong><em>duplicate_wc_oclc</em></strong></p>
+<p>The WorldCat OCLC number is mapped to by more than once OCLC number in the local input file.</p>
+<p><strong><em>holdings_out_of_range</em></strong></p>
+<p>A year was found in the holdings data outside of the publication years as determined by the 008 date_1 and date_2 and any 362 lines in the WorldCat MARC.</p>
+<p><strong><em>holdings_out_of_issn_db_date_range</em></strong></p>
+<p>A year was found in the holdings data outside of the publication years as determined by the 008 date_1 and date_2 and any 362 lines in the ISSN database MARC.</p>
+<p><strong><em>invalid_local_issn</em></strong></p>
+<p>The ISSN in the local input data fails the algorithm for checking for valid ISSNs.</p>
+<p><strong><em>issn_mismatch</em></strong></p>
+<p>The ISSN from the local input file mismatches both the ISSN in the WorldCat MARC and the ISSN database.</p>
+<p><strong><em>local_issn_does_not_match_wc_issn_a</em></strong></p>
+<p>If the ISSN from the WorldCat MARC and the ISSN from the ISSN database don’t match. This will include situations where the WorldCat ISSN did not produce any results from the ISSN database, as well as when the local ISSN does not match the ISSN database ISSN (because the WorldCat ISSN is an ISSN-y or ISSN-z in the ISSN database).</p>
+<p><strong><em>local_issn_does_not_match_issn_db</em></strong></p>
+<p>If the ISSN from the local input file and the ISSN from the ISSN database don’t match. This will include situations where the local ISSN did not produce any results from the ISSN database, as well as when the local ISSN does not match the ISSN database ISSN (because the local ISSN is an ISSN-y or ISSN-z in the ISSN database).</p>
+<p><strong><em>oclc_mismatch</em></strong></p>
+<p>The OCLC number from the local input file does not match the OCLC number from the WorldCat MARC 001. This is almost always due to a superseded OCLC number.</p>
+<p><strong><em>title_mismatch</em></strong></p>
+<p>The title in the local input file is significantly different from the title in the WorldCat MARC. As of now this uses Levenshtein Distance, and titles are considered as matched if 90% of the characters in whichever is shorter of the local and WorldCat titles matches the longer title.</p>
+<p><strong><em>line_583_error</em></strong></p>
+<p>A 583 line in an input LHR is invalid in some way.</p>
+<p><strong><em>marc_validation_error</em></strong></p>
+<p>A MARC input file is invalid in some way.</p>
+<p><strong><em>missing_field_852a</em></strong></p>
+<p>An input LHR does not contain an 852 $a.</p>
+</body>
+</html>
