@@ -15,6 +15,8 @@ from validator_lib.process_input_data import InputDataProcessor
 class ChecksRunner:
     def __init__(self, running_headless=False):
 
+        self.logger = logging.getLogger('validator.ChecksRunner')
+
         self.running_headless = running_headless
 
         dirs = get_file_location_dict()
@@ -35,7 +37,7 @@ class ChecksRunner:
         for input_file in all_input_files:
             if input_file in completed_files:
                 continue
-            logging.info('Processing {}'.format(input_file))
+            self.logger.info('Processing {}'.format(input_file))
             completed_files.add(input_file)
             if input_file.endswith('mrk'):
                 mrk_runner = MrkProcessRunner(input_file)
@@ -51,7 +53,7 @@ class ChecksRunner:
             ReviewWorkbookPrinter(input_file_data, line_583_validation_output)
 
     def add_worldcat_data_to_input_file_data_dicts(self, input_file_data, input_file):
-        logging.info("Getting WorldCat data for records in {}.".format(input_file))
+        self.logger.info("Getting WorldCat data for records in {}.".format(input_file))
         for i in range(0, len(input_file_data)):
             sys.stdout.write('\r{0:.1%}'.format(i/len(input_file_data)))
             sys.stdout.flush()
@@ -73,11 +75,11 @@ class ChecksRunner:
                     print("I didn't understand that.\n")
         output_files = os.listdir(self.output_dir)
         for output_file in output_files:
-            logging.info('Clearing output folder; deleting {}'.format(output_file))
+            self.logger.info('Clearing output folder; deleting {}'.format(output_file))
             output_file_loc = os.path.join(self.output_dir, output_file)
             if not os.path.isfile(output_file_loc):
                 continue
             try:
                 os.remove(output_file_loc)
             except PermissionError:
-                logging.warning("Could not delete file {} due to permissions error".format(output_file))
+                self.logger.warning("Could not delete file {} due to permissions error".format(output_file))
