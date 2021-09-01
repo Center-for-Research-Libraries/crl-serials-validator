@@ -2,7 +2,6 @@ import logging
 import os
 import datetime
 
-from validator_lib.validator_logger import set_validator_logger
 from validator_lib.utilities import get_input_files, initialize_folders, get_directory_location
 from crl_lib.api_key_setter import ApiKeySetter
 from crl_lib.issn_db import IssnDb
