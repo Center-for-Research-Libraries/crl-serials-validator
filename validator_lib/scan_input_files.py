@@ -23,31 +23,32 @@ from validator_lib.utilities import get_input_files, get_file_location_dict
 
 
 class InputFileScanner:
-    def __init__(self, print_to_screen=False):
-        self.print_to_screen = print_to_screen
+    def __init__(self):
+
+        self.logger = logging.getLogger('validator.InputFileScanner')
 
         self.data = {}
         dirs = get_file_location_dict()
         self.input_dir = dirs['input']
-        logging.debug("Scanning input files.")
+        self.logger.debug("Scanning input files.")
         all_input_files = get_input_files()
         output_location = os.path.join(dirs['data'], "Quick Scan.txt")
         self.fout = open(output_location, "w", encoding="utf8")
         self.cout = csv.writer(self.fout, delimiter="\t")
         for input_file in all_input_files:
             if input_file.endswith(".mrk"):
-                logging.debug("Scanning {}".format(input_file))
+                self.logger.debug("Scanning {}".format(input_file))
                 self.marc_scanner(input_file)
                
             elif input_file.endswith(".xlsx"):
-                logging.info("Skipping {}".format(input_file))
+                self.logger.info("Skipping {}".format(input_file))
             elif input_file.endswith(".txt") or input_file.endswith(".tsv") or input_file.endswith(".csv"):
-                logging.info("Skipping {}".format(input_file))
+                self.logger.info("Skipping {}".format(input_file))
             else:
-                logging.warning("Unkown file type in input directory: {}".format(input_file))
+                self.logger.warning("Unkown file type in input directory: {}".format(input_file))
 
         self.fout.close()
-        logging.info('Finished scanning input files. Output is in "Quick Scan.txt" in the data folder.')
+        self.logger.info('Finished scanning input files. Output is in "Quick Scan.txt" in the data folder.')
 
     def __del__(self):
         self.fout.close()
@@ -80,21 +81,16 @@ class InputFileScanner:
 
         # skip blank file
         if file_data["Total records"] == 0:
-            logging.warning('No records found in {}. Blank file?'.format(input_file))
+            self.logger.warning('No records found in {}. Blank file?'.format(input_file))
             return
         
-        if self.print_to_screen is True:
-            print('---------')
-            print('Quick scan of file {}'.format(input_file))
+        self.logger.info('Quick scan of file {}'.format(input_file))
         for cat in cats:
             output = [cat, file_data[cat], "{:.1%}".format(file_data[cat]/file_data["Total records"])]
             self.cout.writerow(output)
-            if self.print_to_screen is True:
-                output_string = '{}{}\t{}'.format(str(output[0]).ljust(16), str(output[1]).rjust(5), str(output[2]).rjust(7))
-                print(output_string)        
+            output_string = '{}{}\t{}'.format(str(output[0]).ljust(16), str(output[1]).rjust(5), str(output[2]).rjust(7))
+            self.logger.info(output_string)        
         self.cout.writerow(["", "", ""])
-        if self.print_to_screen is True:
-            print('---------')
         return file_data
 
     def text_scanner(self, input_file):
