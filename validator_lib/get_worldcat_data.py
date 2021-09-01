@@ -14,6 +14,7 @@ class WorldCatMarcDataExtractor:
     Note that there's no analysis in this object, just pure data gathering.
     """
     def __init__(self):
+        self.logger = logging.getLogger('validator.WorldCatMarcDataExtractor')
         self.wc_api = WcApi()
 
     def get_worldcat_marc_data(self, oclc):
@@ -21,7 +22,7 @@ class WorldCatMarcDataExtractor:
         return_dummy_data = False
         if not marc:
             # if no MARC get a dummy MARC record to run the process. We'll later erase all of the extracted data.
-            logging.info('No MARC returned from OCLC {}'.format(oclc))
+            self.logger.info('No MARC returned from OCLC {}'.format(oclc))
             marc = self.get_dummy_marc()
             return_dummy_data = True
         mf = WorldCatMarcFields(marc)
