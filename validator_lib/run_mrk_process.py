@@ -16,7 +16,10 @@ from validator_lib.supplements_and_indexs_functions import remove_supplements_fr
 
 class MrkProcessRunner:
     def __init__(self, input_file):
-        logging.info('Checking original data in {}'.format(input_file))
+
+        self.logger = logging.getLogger('validator.MrkProcessRunner')
+        
+        self.logger.info('Checking original data in {}'.format(input_file))
 
         self.input_file = input_file
         dirs = get_file_location_dict()
@@ -46,7 +49,7 @@ class MrkProcessRunner:
         for record in mfr:
             seqnum += 1
             if seqnum % 5000 == 0:
-                logging.info('   ...reached record {} in {}'.format(seqnum, self.input_file))
+                self.logger.info('   ...reached record {} in {}'.format(seqnum, self.input_file))
             record_dict = self.get_data_from_record(record, seqnum)
             if '583' in self.input_fields and self.input_fields['583']:
                 record_dict['583_in_file'] = True
