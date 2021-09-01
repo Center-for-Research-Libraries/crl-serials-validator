@@ -1,8 +1,7 @@
 from collections import defaultdict, Counter
 import os
 from pprint import pprint
-import sys
-
+import logging
 
 from crl_lib.crl_xlsxwriter import CRLXlsxWriter
 import validator_lib.utilities
@@ -10,6 +9,9 @@ import validator_lib.utilities
 
 class ReviewWorkbookPrinter:
     def __init__(self, title_dicts, line_583_validation_output, print_errors_only=False):
+
+        self.logger = logging.getLogger('validator.ReviewWorkbookPrinter')
+
         self.title_dicts = title_dicts
         self.print_errors_only = print_errors_only
 
