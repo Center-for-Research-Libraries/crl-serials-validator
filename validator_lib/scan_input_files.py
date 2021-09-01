@@ -23,7 +23,9 @@ from validator_lib.utilities import get_input_files, get_file_location_dict
 
 
 class InputFileScanner:
-    def __init__(self):
+    def __init__(self, print_to_screen=False):
+        self.print_to_screen = print_to_screen
+
         self.data = {}
         dirs = get_file_location_dict()
         self.input_dir = dirs['input']
@@ -63,7 +65,7 @@ class InputFileScanner:
                 file_data["Have 004 field"] += 1
             if mf.oclc_035:
                 file_data["Have 035"] += 1
-                file_data["Have obvious OCLC in 035"] += 1
+                file_data["OCLC in 035"] += 1
             elif "=035  " in marc:
                 file_data["Have 035"] += 1
             if "=863  " in marc or "=864  " in marc or "=865  " in marc:
@@ -71,7 +73,7 @@ class InputFileScanner:
             if "=866  " in marc or "=867  " in marc or "=868  " in marc:
                 file_data["Have 866/867/868"] += 1
 
-        cats = ["Total records", "Have 001 field", "Have 004 field", "Have 035", "Have obvious OCLC in 035",
+        cats = ["Total records", "Have 001 field", "Have 004 field", "Have 035", "OCLC in 035",
                 "Have 863/864/865", "Have 866/867/868"]
 
         self.cout.writerow(["FILE: {}".format(input_file)])
@@ -80,11 +82,19 @@ class InputFileScanner:
         if file_data["Total records"] == 0:
             logging.warning('No records found in {}. Blank file?'.format(input_file))
             return
-
+        
+        if self.print_to_screen is True:
+            print('---------')
+            print('Quick scan of file {}'.format(input_file))
         for cat in cats:
             output = [cat, file_data[cat], "{:.1%}".format(file_data[cat]/file_data["Total records"])]
             self.cout.writerow(output)
+            if self.print_to_screen is True:
+                output_string = '{}{}\t{}'.format(str(output[0]).ljust(16), str(output[1]).rjust(5), str(output[2]).rjust(7))
+                print(output_string)        
         self.cout.writerow(["", "", ""])
+        if self.print_to_screen is True:
+            print('---------')
         return file_data
 
     def text_scanner(self, input_file):
