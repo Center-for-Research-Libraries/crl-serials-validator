@@ -2,6 +2,7 @@ from collections import defaultdict, Counter
 from fuzzywuzzy import fuzz
 from unidecode import unidecode
 from pprint import pprint
+import logging
 
 from crl_lib.crl_utilities import check_for_valid_issn
 from crl_lib.date_utilities import check_year_between
@@ -11,6 +12,7 @@ import validator_lib.utilities
 
 class InputDataProcessor:
     def __init__(self, title_dicts, input_fields):
+        self.logger = logging.getLogger('validator.InputDataProcessor')
         self.title_dicts = title_dicts
         self.input_fields = input_fields
         self.disqualifying_issue_categories = validator_lib.utilities.get_disqualifying_issue_categories()
