@@ -34,6 +34,7 @@ import sqlite3
 import os
 import argparse
 from pprint import pprint
+import logging
 
 # Set the following variable to identify a specific path for a local install of the ISSN db.
 # Leave it as None if the crl_prefs module is installed locally and the db is at an expected location.
@@ -46,6 +47,8 @@ class IssnDb:
         self.found_issn_db = False
         self.__issn_db_location = None
 
+        self.logger = logging.getLogger()
+
         if LOCAL_ISSN_DB_FILE_LOCATION:
             self.__issn_db_location = LOCAL_ISSN_DB_FILE_LOCATION
         else:
@@ -54,7 +57,7 @@ class IssnDb:
             except ModuleNotFoundError or ImportError:
                 msg = 'local_issn_db_file_location variable not set and crl_prefs module not found.\n'
                 msg += 'ISSN database cannot be found. Quitting.'
-                print(msg, file=sys.stderr)
+                self.logger.error(msg)
                 sys.exit()
 
             crl_files = CrlFileLocations()
@@ -75,7 +78,8 @@ class IssnDb:
             self.conn = sqlite3.connect(self.__issn_db_location)
 
         if error_message:
-            sys.exit('Error: {}'.format(error_message))
+            self.logger.error(error_message)
+            sys.exit()
 
     def __del__(self):
         """

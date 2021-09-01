@@ -90,8 +90,7 @@ class WcApi:
         self.http = urllib3.PoolManager()
         self.counter = Counter()
 
-        logging.basicConfig(
-            format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S", level=logging.WARNING)
+        self.logger = logging.getLogger()
 
     @property
     def name(self):
@@ -163,13 +162,13 @@ class WcApi:
 
     def _pause_on_issue(self, issue_type):
         self.counter[issue_type] += 1
-        logging.warning('WorldCat API download encountered {} issue.'.format(issue_type))
+        self.logger.warning('WorldCat API download encountered {} issue.'.format(issue_type))
         if self.counter[issue_type] >= 5:
             # TODO: log the issue
             issue_msg = 'MARC fetch is quitting after 5th instance of issue {}'.format(issue_type)
             # in case the outer script wants to keep trying, reset the error counter.
             self.counter[issue_type] = 0
-            logging.error('WorldCat API download failed due to 5 instances of {} issue.'.format(issue_type))
+            self.logger.error('WorldCat API download failed due to 5 instances of {} issue.'.format(issue_type))
             raise WorldCatApiFailureError(issue_msg)
         issue_msg = 'MARC fetch is pausing 20 seconds after instance {} of issue {}.\n'.format(
             self.counter[issue_type], issue_type)
