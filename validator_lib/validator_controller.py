@@ -100,7 +100,7 @@ class ValidatorController:
         ApiKeySetter()
     
     def scan_input_files(self):
-        InputFileScanner(print_to_screen=self.log_to_screen)
+        InputFileScanner()
 
     def choose_input_fields(self):
         self.print_popunder_window_warning()
