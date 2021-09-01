@@ -1,5 +1,6 @@
 import re
 from crl_lib.marc_utilities import get_field_subfield, get_fields_subfields
+import logging
 
 
 class Line583Validator:
@@ -10,6 +11,8 @@ class Line583Validator:
 
 
     def __init__(self):
+
+        self.logger = logging.getLogger('validator.Line583Validator')
 
         header = ['filename', 'seqnum', 'holdings_id', 'field_852a', 'line_583_errors', 'subfield_3', 'subfield_a',
                   'subfield_c',
