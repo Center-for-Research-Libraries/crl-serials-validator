@@ -24,6 +24,7 @@ class SimpleValidatorInterface:
     """
 
     def __init__(self):
+
         self.args = parse_command_line_args()
         self.controller = ValidatorController(log_to_screen=True, headless_mode=False)
 
