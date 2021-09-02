@@ -13,7 +13,8 @@ import sys
 import os
 import argparse
 
-from validator_lib.validator_controller import ValidatorController
+from validator_lib.validator_controller import ValidatorController, set_validator_logger
+from validator_lib.utilities import get_directory_location
 
 
 class SimpleValidatorInterface:
