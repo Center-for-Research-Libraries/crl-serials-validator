@@ -15,7 +15,7 @@ from validator_lib.process_input_data import InputDataProcessor
 class ChecksRunner:
     def __init__(self, running_headless=False):
 
-        self.logger = logging.getLogger('validator')
+        self.logger = logging.getLogger('validator.ChecksRunner')
 
         self.running_headless = running_headless
 

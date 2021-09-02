@@ -14,7 +14,7 @@ class WorldCatMarcDataExtractor:
     Note that there's no analysis in this object, just pure data gathering.
     """
     def __init__(self):
-        self.logger = logging.getLogger('validator')
+        self.logger = logging.getLogger('validator.WorldCatMarcDataExtractor')
         self.logger.info('Getting WorldCat data.')
         self.wc_api = WcApi()
 
