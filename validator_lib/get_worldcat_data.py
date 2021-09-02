@@ -61,7 +61,7 @@ class WorldCatMarcDataExtractor:
             'preceding_oclcs': '; '.join(mf.preceding_oclcs),
             'succeeding_oclcs': '; '.join(mf.succeeding_oclcs),
             'other_oclcs': '; '.join(mf.other_oclcs),
-            'numbering_peculiarities': '; '.join(mf.numbering_peculiarities),
+            'numbering_peculiarities': mf.numbering_peculiarities,
         }
 
         # if there isn't a WorldCat record to work with, return everything as blank
