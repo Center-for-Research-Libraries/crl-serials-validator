@@ -20,9 +20,11 @@ class WorldCatMarcDataExtractor:
     def get_worldcat_marc_data(self, oclc):
         marc = self.wc_api.fetch_marc_from_api(oclc, recent_only=True)
         return_dummy_data = False
-        if not marc:
+        if marc:
+            self.logger.debug('Got WorldCat MARC from OCLC {}'.format(oclc))
+        else:
             # if no MARC get a dummy MARC record to run the process. We'll later erase all of the extracted data.
-            self.logger.info('No MARC returned from OCLC {}'.format(oclc))
+            self.logger.info('No WorldCat MARC returned from OCLC {}'.format(oclc))
             marc = self.get_dummy_marc()
             return_dummy_data = True
         mf = WorldCatMarcFields(marc)
