@@ -13,7 +13,7 @@ import sys
 import os
 import argparse
 
-from validator_lib.validator_controller import ValidatorController, set_validator_logger
+from validator_lib.validator_controller import ValidatorController
 from validator_lib.utilities import get_directory_location
 
 
@@ -114,8 +114,8 @@ def parse_command_line_args():
 
 
 def headless_app():
-    ValidatorController(headless_mode=True, log_to_screen=False)
-
+    vc = ValidatorController(headless_mode=True, log_to_screen=False)
+    vc.run_checks_process()
 
 def command_line_app():
     SimpleValidatorInterface()

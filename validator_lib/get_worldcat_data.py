@@ -14,15 +14,17 @@ class WorldCatMarcDataExtractor:
     Note that there's no analysis in this object, just pure data gathering.
     """
     def __init__(self):
-        self.logger = logging.getLogger('validator.WorldCatMarcDataExtractor')
+        self.logger = logging.getLogger('validator')
+        self.logger.info('Getting WorldCat data.')
         self.wc_api = WcApi()
 
     def get_worldcat_marc_data(self, oclc):
-        marc = self.wc_api.fetch_marc_from_api(oclc, recent_only=True)
-        return_dummy_data = False
-        if marc:
-            self.logger.debug('Got WorldCat MARC from OCLC {}'.format(oclc))
+        if oclc or str(oclc) != 'None':
+            marc = self.wc_api.fetch_marc_from_api(oclc, recent_only=True)
         else:
+            marc = None
+        return_dummy_data = False
+        if not marc:
             # if no MARC get a dummy MARC record to run the process. We'll later erase all of the extracted data.
             self.logger.info('No WorldCat MARC returned from OCLC {}'.format(oclc))
             marc = self.get_dummy_marc()
@@ -97,7 +99,7 @@ class WorldCatMarcDataExtractor:
             '=110  2\\$aCenter for Research Libraries (U.S.)',
             '=210  0\\$aCent. Res. Libr. cat., Ser., Suppl.',
             '=222  \\4$aThe Center For Research Libraries catalogue. Serials. Supplement',
-            '=245  14$aThe Center for Research Libraries catalogue, serials.$pSupplement.',
+            '=245  1\\$aFailed title',
             '=260  \\\\$aChicago,$bCenter for Research Libraries,$c1978.',
             '=300  \\\\$a1 volume$c29 cm',
             '=336  \\\\$atext$btxt$2rdacontent',

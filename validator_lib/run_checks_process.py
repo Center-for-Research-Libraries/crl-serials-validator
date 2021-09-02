@@ -15,7 +15,7 @@ from validator_lib.process_input_data import InputDataProcessor
 class ChecksRunner:
     def __init__(self, running_headless=False):
 
-        self.logger = logging.getLogger('validator.ChecksRunner')
+        self.logger = logging.getLogger('validator')
 
         self.running_headless = running_headless
 
@@ -60,8 +60,13 @@ class ChecksRunner:
             sys.stdout.write('\r{0:.1%}'.format(i/len(input_file_data)))
             sys.stdout.flush()
             worldcat_data = self.worldcat_data_getter.get_worldcat_marc_data(input_file_data[i]['local_oclc'])
+            if worldcat_data['wc_title'] == 'Failed title':
+                self.logger.info('No WorldCat data found for OCLC {}'.format(input_file_data[i]['local_oclc']))
+
             for data_cat in worldcat_data:
                 input_file_data[i][data_cat] = worldcat_data[data_cat]
+        sys.stdout.write('\n')
+        sys.stdout.flush()
 
     def clear_output_folder(self):
         if self.running_headless is not True:

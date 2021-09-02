@@ -32,16 +32,18 @@ def set_validator_logger(log_to_screen):
         ch.setLevel(logging.INFO)
 
     fh_formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+        '%(asctime)s\t%(name)s\t%(levelname)s\t%(message)s', datefmt="%Y-%m-%d %H:%M:%S")
     ch_formatter = logging.Formatter('%(message)s')
 
     if log_to_screen is True:
-        print('LOG TO SCREEN')
         ch.setFormatter(ch_formatter)
         logger.addHandler(ch)
 
     fh.setFormatter(fh_formatter)
     logger.addHandler(fh)
+
+    if DEBUG_MODE is True:
+        logger.debug('Debug mode is on.')
 
 
 class ValidatorController:
@@ -55,11 +57,8 @@ class ValidatorController:
         self.headless_mode = headless_mode
         self.log_to_screen = log_to_screen
 
-        # self.set_validator_logger()
-        set_validator_logger(self.log_to_screen)
+        set_validator_logger(log_to_screen)
         self.logger = logging.getLogger('validator')
-
-        self.logger.debug('DEBUGGUBG')
 
         if DEBUG_MODE is True:
             self.log_to_screen = True
@@ -75,13 +74,9 @@ class ValidatorController:
         self.check_input_folder()
         self.check_issn_db()
         
-        if self.headless_mode is True:
+        if self.headless_mode is True and DEBUG_MODE is False:
+            self.log_to_screen = False
             self.logger.info('Running in headless mode.')
-            self.run_headless()
-
-    def run_headless(self):
-        self.download_api_data()
-        self.run_checks_process()
 
     def check_issn_db(self):
         issn_db = IssnDb(ignore_missing_db=True)
@@ -116,7 +111,7 @@ class ValidatorController:
         IssuesChooser()
     
     def run_checks_process(self):
-        ChecksRunner()
+        ChecksRunner(running_headless=self.headless_mode)
 
     def print_popunder_window_warning(self):
         """
