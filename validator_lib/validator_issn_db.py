@@ -14,7 +14,10 @@ from validator_lib.utilities import get_valid_forms, get_valid_serial_types
 
 class ValidatorIssnDb:
     def __init__(self):
-        self.issn_db = IssnDb()
+
+        self.logger = logging.getLogger('validator.ValidatorIssnDb')
+
+        self.issn_db = IssnDb(ignore_missing_db=True)
         self.issn_type_order = ['issn_l', 'issn_z', 'issn_y', 'issn_m']
 
         self.valid_forms = get_valid_forms()
@@ -22,6 +25,9 @@ class ValidatorIssnDb:
 
     def process_title_dicts(self, title_dicts, input_file):
         logging.debug("Getting ISSN database data for " + input_file)
+        if self.issn_db.found_issn_db is False:
+            logging.debug("ISSN database does not exist. Skipping.")
+            return
         n = 0
         for title_dict in title_dicts:
             n += 1
