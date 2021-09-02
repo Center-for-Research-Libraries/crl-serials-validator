@@ -12,6 +12,9 @@ class ReviewWorkbookPrinter:
 
         self.logger = logging.getLogger('validator.ReviewWorkbookPrinter')
 
+        # if we have KeyErrors with dict keys containing "issn_db" we'll know the database isn't installed
+        self.issn_db_not_seen = False
+
         self.title_dicts = title_dicts
         self.print_errors_only = print_errors_only
 
@@ -68,6 +71,9 @@ class ReviewWorkbookPrinter:
         self.checklist_outputs = defaultdict(list)
         self.get_checklist_data_for_output()
 
+        if self.issn_db_not_seen is True:
+            self.remove_issn_db_from_checklist_cats()
+
         self.output_folder = dirs['output']
         self.error_category_map = self.make_error_category_map()
 
@@ -79,6 +85,13 @@ class ReviewWorkbookPrinter:
             self.organize_by_errors(title_dict)
         self.make_originally_from_outputs()
         self.make_workbooks()
+
+    def remove_issn_db_from_checklist_cats(self):
+        new_checklist_cats = []
+        for cat in self.checklist_cats:
+            if 'issn_db' not in cat:
+                new_checklist_cats.append(cat)
+        self.checklist_cats = new_checklist_cats
 
     @staticmethod
     def make_error_category_map():
@@ -267,10 +280,20 @@ class ReviewWorkbookPrinter:
             insts.add(inst)
             output_list = []
             for cat in self.checklist_cats:
-                output_list.append(title_dict[cat])
+                try:
+                    output_list.append(title_dict[cat])
+                except KeyError:
+                    if 'issn_db' in cat:
+                        if self.issn_db_not_seen is False:
+                            self.issn_db_not_seen = True
+                            self.logger.info('Skipping output of ISSN db related categories.')
+                    else:
+                        self.logger.error('Category {} not seen in checklist data.'.format(cat))
             if self.print_errors_only is True and not output_list[0]:
                 continue
             self.checklist_outputs[inst].append(output_list)
+        if self.issn_db_not_seen is True:
+            self.remove_issn_db_from_checklist_cats()
         for inst in insts:
             self.checklist_outputs[inst].insert(0, self.checklist_cats)
 

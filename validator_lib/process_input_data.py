@@ -1,4 +1,4 @@
-from collections import defaultdict, Counter
+from collections import defaultdict
 from fuzzywuzzy import fuzz
 from unidecode import unidecode
 from pprint import pprint
@@ -11,24 +11,15 @@ import validator_lib.utilities
 
 
 class InputDataProcessor:
-    def __init__(self, title_dicts, input_fields):
+    def __init__(self, title_dicts, input_fields, found_issn_db):
         self.logger = logging.getLogger('validator.InputDataProcessor')
+        self.found_issn_db = found_issn_db
         self.title_dicts = title_dicts
         self.input_fields = input_fields
         self.disqualifying_issue_categories = validator_lib.utilities.get_disqualifying_issue_categories()
         self.errors = []
 
-        self.issues_to_check = [
-            'holdings_out_of_range', 'holdings_have_no_years', 
-            'completeness_words_in_holdings', 'binding_words_in_holdings', 'nonprint_words_in_holdings',
-            'issn_db_form_not_print', 'issn_db_serial_type_not_periodical', 'holdings_out_of_issn_db_date_range',
-            'oclc_mismatch', 'invalid_local_issn', 
-            'local_issn_does_not_match_wc_issn_a', 'local_issn_does_not_match_issn_db', 'issn_mismatch', 
-            'title_mismatch', 'form_not_print',
-            'record_type_not_language_material', 'bib_lvl_not_serial', 'serial_type_not_periodical',
-            'invalid_carrier_type',
-            'invalid_media_type'
-        ]
+        self.issues_to_check = self.get_issues_to_check()
 
         self.unique_cats = ['local_oclc', 'wc_oclc', 'holdings_id']
 
@@ -47,7 +38,6 @@ class InputDataProcessor:
             self.check_issns(title_dict)
             self.match_titles(title_dict)
             self.run_holdings_checks(title_dict)
-            self.set_title_dict_print_issn(title_dict)
             self.check_record_type(title_dict)
             self.check_bib_lvl(title_dict)
             self.check_type_of_continuing_resource(title_dict)
@@ -55,6 +45,21 @@ class InputDataProcessor:
             self.check_carrier_type(title_dict)
             self.check_media_type(title_dict)
             self.assemble_errors_in_dict(title_dict)
+
+    def get_issues_to_check(self):
+        issues_to_check = [
+            'bib_lvl_not_serial', 'binding_words_in_holdings', 'completeness_words_in_holdings', 'form_not_print', 
+            'holdings_have_no_years', 'holdings_out_of_range', 
+            'invalid_carrier_type', 'invalid_local_issn', 'invalid_media_type', 'issn_mismatch', 
+            'nonprint_words_in_holdings', 'oclc_mismatch', 'record_type_not_language_material', 
+            'serial_type_not_periodical', 'title_mismatch' ]
+        if self.found_issn_db:
+            issn_db_issues = [
+                'holdings_out_of_issn_db_date_range',
+                'issn_db_form_not_print', 'issn_db_serial_type_not_periodical', 'local_issn_does_not_match_issn_db', 
+                'local_issn_does_not_match_wc_issn_a']
+            issues_to_check.extend(issn_db_issues)
+        return issues_to_check
 
     def assemble_errors_in_dict(self, title_dict):
         """
@@ -150,8 +155,7 @@ class InputDataProcessor:
         else:
             title_dict['oclc_mismatch'] = ''
 
-    @staticmethod
-    def check_issns(title_dict):
+    def check_issns(self, title_dict):
         """
         Check for local ISSN that fits he ISSN algorithm.
 
@@ -166,12 +170,14 @@ class InputDataProcessor:
         if title_dict['local_issn']:
             if check_for_valid_issn(title_dict['local_issn']) is False:
                 title_dict['invalid_local_issn'] = '1'
-            if title_dict['local_issn'] != title_dict['issn_db_issn']:
-                title_dict['local_issn_does_not_match_issn_db'] = '1'
+            if self.found_issn_db is True:
+                if title_dict['local_issn'] != title_dict['issn_db_issn']:
+                    title_dict['local_issn_does_not_match_issn_db'] = '1'
         if title_dict['local_issn'] != title_dict['wc_issn_a']:
             title_dict['local_issn_does_not_match_wc_issn_a'] = '1'
-            if 'issn_db_issn' not in title_dict or title_dict['issn_db_issn'] != title_dict['local_issn']:
-                title_dict['issn_mismatch'] = '1'
+            if self.found_issn_db is True:
+                if 'issn_db_issn' not in title_dict or title_dict['issn_db_issn'] != title_dict['local_issn']:
+                    title_dict['issn_mismatch'] = '1'
 
     @staticmethod
     def run_holdings_checks(title_dict):
@@ -263,16 +269,6 @@ class InputDataProcessor:
             title_dict['invalid_media_type'] = ''
         else:
             title_dict['invalid_media_type'] = ''
-
-    @staticmethod
-    def set_title_dict_print_issn(title_dict):
-        title_dict['print_issn'] = ''
-        if not title_dict['local_issn'] and not title_dict['wc_issn_a']:
-            return
-        if not title_dict['local_issn_mismatches_issn_db_issn'] and not title_dict['issn_db_form_not_print']:
-            title_dict['print_issn'] = title_dict['local_issn']
-        elif not title_dict['wc_issn_mismatches_issn_db_issn'] and not title_dict['issn_db_form_not_print']:
-            title_dict['print_issn'] = title_dict['wc_issn_a']
 
     @staticmethod
     def match_titles(title_dict):

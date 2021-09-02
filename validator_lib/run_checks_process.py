@@ -33,6 +33,8 @@ class ChecksRunner:
         stc_runner = SpreadsheetTsvCsvRunner()
         validator_issn_db = ValidatorIssnDb()
 
+        found_issn_db = validator_issn_db.issn_db.found_issn_db
+
         completed_files = set()
         for input_file in all_input_files:
             if input_file in completed_files:
@@ -48,7 +50,7 @@ class ChecksRunner:
 
             self.add_worldcat_data_to_input_file_data_dicts(input_file_data, input_file)
             validator_issn_db.process_title_dicts(input_file_data, input_file)
-            InputDataProcessor(input_file_data, input_file)
+            InputDataProcessor(input_file_data, input_file, found_issn_db)
 
             ReviewWorkbookPrinter(input_file_data, line_583_validation_output)
 
