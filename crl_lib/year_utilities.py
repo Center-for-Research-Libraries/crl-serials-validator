@@ -2,7 +2,9 @@
 year_utilities
 
 Script for finding years in text strings, mainly holdings statements.
-Right now it basically works in most cases.
+Right now it basically works in most cases, but will sometimes still
+either fail to find valid years or mark as valid things that are not
+years.
 
 A lot of work needs to be done to rationalize and organize it.
 Because it's translated from Perl, it's not always so good about returning a 
@@ -25,13 +27,12 @@ import argparse
 import re
 import datetime
 import sys
-# from pprint import pprint
+import logging
 
 try:
     from crl_lib.months_finder import normalize_seasons_in_string, normalize_months_in_string
 except ModuleNotFoundError:
     from months_finder import normalize_seasons_in_string, normalize_months_in_string
-
 
 
 def return_all_years_in_range(first, last):
@@ -414,14 +415,11 @@ def _find_years_all_with_duplicates(input_string):
 
     # to account for holdings rejected by the year cleaner
     if not holdings or not re.search(r"\d\d\d\d", holdings):
-        # TODO: commented out warning log for now. Make it optional?.
         #  rejection tracking, for bug fixing
-        # m = re.findall(r"(\d\d)\d\d", input_string)
-        # for number_string in m:
-        #     if 16 <= int(number_string) <= 20:
-        #         log_out = open('dates_warning.log', 'a', encoding='utf8')
-        #         log_out.write(input_string + "\n")
-        #         log_out.close()
+        m = re.findall(r"(\d\d)\d\d", input_string)
+        for number_string in m:
+            if 16 <= int(number_string) <= 20:
+                logging.debug('year finder rejected numbers: {}'.format(number_string))
         return years
 
     # edge case: (no. 1620, 1622-1626, 1628, 1630-1631, 1633, 1635-1636)
@@ -751,10 +749,7 @@ def _year_cleaner(holdings):
     holdings = re.sub(r":", ", ", holdings)
     # fix silly spacing issue
     holdings = re.sub(r"(\d\d\d\d)no\.", r"\1 no.", holdings)
-    # # Sanity check for bad date range like '1881-1838'
-    # # Lots of these will by typos, but we can't fix that
-    # years_checking = re.findall(r"(\d\d\d\d)[^,;\d\d\d\d]*-[^,;]*(\d\d\d\d)", holdings)
-    # print("Exiting year_cleaner: " + holdings)
+
     return holdings
 
 
