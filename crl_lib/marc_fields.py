@@ -102,7 +102,7 @@ class MarcFields:
     non_repeatable_fields = {'LDR', '001'}
     main_entry_fields = ["100", "110", "111", "130"]
 
-    def __init__(self, record, record_origin=None):
+    def __init__(self, record, record_origin=None, log_warnings=False):
         """
         rather than set all vars at start, we dynamically search them when called for;
         i.e., calling for 'form' causes library to process everything in the 008 line
@@ -110,6 +110,7 @@ class MarcFields:
         if not record:
             raise Exception("No record sent to MarcFields object.")
 
+        self.log_warnings = log_warnings
         self.logger = logging.getLogger()
 
         # minimally validate and clean record
@@ -159,7 +160,8 @@ class MarcFields:
                 continue
             field = line[1:4]
             if len(field) < 3:
-                self.logger.warning('Invalid field {} in MARC passed to MarcFields object.'.format(field))
+                if self.log_warnings:
+                    self.logger.warning('Invalid field {} in MARC passed to MarcFields object.'.format(field))
                 continue
 
             try:
@@ -168,7 +170,8 @@ class MarcFields:
                     marc_dict[field].append(field_data)                  
                     continue
             except (TypeError, ValueError):
-                self.logger.warning('Invalid field {} in MARC passed to MarcFields object.'.format(field))
+                if self.log_warnings:
+                    self.logger.warning('Invalid field {} in MARC passed to MarcFields object.'.format(field))
                 continue
 
             ind1 = line[6]
@@ -178,7 +181,8 @@ class MarcFields:
                 field_list = line[9:].split('$')
             else:
                 field_list = line[8:].split('$')
-                self.logger.warning('No subfield indicator at start of MARC line {}'.format(line))
+                if self.log_warnings:
+                    self.logger.warning('No subfield indicator at start of MARC line {}'.format(line))
             for subfield_data in field_list:
                 subfield = subfield_data[0]
                 subfield_content = subfield_data[1:]
@@ -190,7 +194,8 @@ class MarcFields:
         # Check for illegally duplicated subfields. Right now only looking at a few minimal fields.
         for field in self.non_repeatable_fields:
             if len(marc_dict[field]) > 1:
-                self.logger.warning('Illegally repeated field {} in MARC record.'.format(field))
+                if self.log_warnings:
+                    self.logger.warning('Illegally repeated field {} in MARC record.'.format(field))
 
         return marc_dict
 
