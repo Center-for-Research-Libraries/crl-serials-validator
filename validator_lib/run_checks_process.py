@@ -39,7 +39,7 @@ class ChecksRunner:
         for input_file in all_input_files:
             if input_file in completed_files:
                 continue
-            self.logger.info('Processing {}'.format(input_file))
+            print('Processing {}'.format(input_file))
             completed_files.add(input_file)
             if input_file.endswith('mrk'):
                 mrk_runner = MrkProcessRunner(input_file)
@@ -55,18 +55,19 @@ class ChecksRunner:
             ReviewWorkbookPrinter(input_file_data, line_583_validation_output)
 
     def add_worldcat_data_to_input_file_data_dicts(self, input_file_data, input_file):
-        self.logger.info("Getting WorldCat data for records in {}.".format(input_file))
+        print("Getting WorldCat data for records in {}.".format(input_file))
         for i in range(0, len(input_file_data)):
             sys.stdout.write('\r{0:.1%}'.format(i/len(input_file_data)))
             sys.stdout.flush()
             worldcat_data = self.worldcat_data_getter.get_worldcat_marc_data(input_file_data[i]['local_oclc'])
             if worldcat_data['wc_title'] == 'Failed title':
-                self.logger.info('No WorldCat data found for OCLC {}'.format(input_file_data[i]['local_oclc']))
+                print('No WorldCat data found for OCLC {}'.format(input_file_data[i]['local_oclc']))
 
             for data_cat in worldcat_data:
                 input_file_data[i][data_cat] = worldcat_data[data_cat]
-        sys.stdout.write('\n')
+        sys.stdout.write('\r')
         sys.stdout.flush()
+        self.worldcat_data_getter.log_worldcat_data_not_found()
 
     def clear_output_folder(self):
         if self.running_headless is not True:

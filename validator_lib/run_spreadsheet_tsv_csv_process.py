@@ -42,7 +42,6 @@ class SpreadsheetTsvCsvRunner:
         input_fields = self.validator_config.get_input_fields(input_file)
         input_file_location = os.path.join(self.input_folder, input_file)
         if input_file.endswith('xlsx'):
-            self.logger.info('Opening XLSX file {}'.format(input_file))
             wb = openpyxl.load_workbook(input_file_location)
             iterator = wb.active
         else:
@@ -118,7 +117,7 @@ class SpreadsheetTsvCsvRunner:
             row_dict['public_notes'] = ''
             self.null_remover(row_dict)
             input_data.append(row_dict)
-        self.logger.info('Finished loading {}'.format(input_file))
+        print('Finished loading {}'.format(input_file))
         return input_data
 
     @staticmethod

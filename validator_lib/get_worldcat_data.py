@@ -17,6 +17,20 @@ class WorldCatMarcDataExtractor:
         self.logger = logging.getLogger('validator.WorldCatMarcDataExtractor')
         self.logger.info('Getting WorldCat data.')
         self.wc_api = WcApi()
+        self.no_worldcat_data_found = []
+        self.no_oclc_in_input = 0
+
+    def log_worldcat_data_not_found(self):
+        for oclc in self.no_worldcat_data_found:
+            self.logger.info('No WorldCat data found for OCLC {}'.format(oclc))
+        if self.no_oclc_in_input > 0:
+            if self.no_oclc_in_input == 1:
+                title_word = 'title'
+            else:
+                title_word = 'titles'
+            self.logger.info('{} {} without an OCLC number'.format(self.no_oclc_in_input, title_word))
+        self.no_worldcat_data_found = []
+        self.no_oclc_in_input = 0
 
     def get_worldcat_marc_data(self, oclc):
         if oclc or str(oclc) != 'None':
@@ -26,7 +40,10 @@ class WorldCatMarcDataExtractor:
         return_dummy_data = False
         if not marc:
             # if no MARC get a dummy MARC record to run the process. We'll later erase all of the extracted data.
-            self.logger.info('No WorldCat MARC returned from OCLC {}'.format(oclc))
+            if not oclc or str(oclc) == 'None' or str(oclc).lower() == 'null':
+                self.no_oclc_in_input += 1
+            else:
+                self.no_worldcat_data_found.append(oclc)
             marc = self.get_dummy_marc()
             return_dummy_data = True
         mf = WorldCatMarcFields(marc)

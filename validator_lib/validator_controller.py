@@ -15,7 +15,7 @@ from validator_lib.choose_disqualifying_issues import IssuesChooser
 DEBUG_MODE = False
 
 
-def set_validator_logger(log_to_screen):
+def set_validator_logger(log_to_screen=False):
     logger = logging.getLogger('validator')
     logger.setLevel(logging.DEBUG)
     log_directory = get_directory_location('logs')
@@ -68,8 +68,6 @@ class ValidatorController:
 
         self.input_files_seen = False
         self.marc_input_seen = False
-
-        self.logger.info('Beginning validation process.')
 
         self.check_input_folder()
         self.check_issn_db()
