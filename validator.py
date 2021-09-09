@@ -27,47 +27,48 @@ class SimpleValidatorInterface:
     def __init__(self):
 
         self.args = parse_command_line_args()
-        self.controller = ValidatorController(log_to_screen=True, headless_mode=False)
+        self.controller = ValidatorController(log_to_screen=False, headless_mode=False)
 
         question_map = self.get_question_map()
 
         while True:
             response = self.get_wanted_action(question_map)
-            if response == 'set_key':
+            if response == "set_key":
                 self.controller.set_api_keys()
-            elif response == 'scan_inputs':
+            elif response == "scan_inputs":
                 self.controller.scan_input_files()
-            elif response == 'set_input':
+                self.command_line_pause()
+            elif response == "set_input":
                 self.controller.choose_input_fields()
-            elif response == 'set_issues':
+            elif response == "set_issues":
                 self.controller.set_disqualifying_issues()
-            elif response == 'process_data':
+            elif response == "process_data":
                 self.controller.run_checks_process()
-            elif response == 'quit':
-                print('Quitting.')
+            elif response == "quit":
+                print("Quitting.")
                 sys.exit()
 
     @staticmethod
     def clear_screen():
         """Clear the screen so that there isn't an endless scroll of the question list."""
-        if os.name == 'nt':
-            os.system('cls')
+        if os.name == "nt":
+            os.system("cls")
         else:
-            os.system('clear')
+            os.system("clear")
 
     def get_wanted_action(self, question_map):
         """
         Print out the question list and get a response.
         """
         while True:
-            print('\nWhat would you like to do?')
+            print("\nWhat would you like to do?")
             for i in range(1, len(question_map)):
-                print('{}. {}'.format(i, question_map[i][0]))
-            print('q. Quit.')
+                print("{}. {}".format(i, question_map[i][0]))
+            print("q. Quit.")
             input_result = input()
             input_result = input_result.strip()
-            if input_result.lower() == 'q':
-                return 'quit'
+            if input_result.lower() == "q":
+                return "quit"
             if input_result.isdigit():
                 try:
                     response = question_map[int(input_result)][1]
@@ -79,23 +80,25 @@ class SimpleValidatorInterface:
 
     def get_question_map(self):
         """
-        Get the list of appropriate questions. It only allows for questions relating to the set if relevant data is 
+        Get the list of appropriate questions. It only allows for questions relating to the set if relevant data is
         seen in the input folder.
         """
-        question_map = ['']
-        question_map.append(('Set up your WorldCat Search API keys.', 'set_key'))
+        question_map = [""]
+        question_map.append(("Set up your WorldCat Search API keys.", "set_key"))
         if self.controller.input_files_seen:
             if self.controller.marc_input_seen:
-                question_map.append(('Do a quick scan of any MARC input files to find important fields.', 'scan_inputs'))
-            question_map.append(('Specify fields in input files.', 'set_input'))
-            question_map.append(('Specify disqualifying issues.', 'set_issues'))
-            question_map.append(('Process input and WorldCat MARC to create outputs.', 'process_data'))
+                question_map.append(
+                    ("Do a quick scan of any MARC input files to find important fields.", "scan_inputs")
+                )
+            question_map.append(("Specify fields in input files.", "set_input"))
+            question_map.append(("Specify disqualifying issues.", "set_issues"))
+            question_map.append(("Process input and WorldCat MARC to create outputs.", "process_data"))
         return question_map
 
     @staticmethod
     def command_line_pause():
         """Pause."""
-        input('\nPress Enter to continue.')
+        input("\nPress Enter to continue.")
 
     @staticmethod
     def get_stripped_input(question_list):
@@ -108,7 +111,7 @@ class SimpleValidatorInterface:
 
 def parse_command_line_args():
     parser = argparse.ArgumentParser(description="Validate shared print holdings data.")
-    parser.add_argument('--headless', '-a', action='store_true', help='Run in headless (automated) mode')
+    parser.add_argument("--headless", "-a", action="store_true", help="Run in headless (automated) mode")
     args = parser.parse_args()
     return args
 
@@ -116,6 +119,7 @@ def parse_command_line_args():
 def headless_app():
     vc = ValidatorController(headless_mode=True, log_to_screen=False)
     vc.run_checks_process()
+
 
 def command_line_app():
     SimpleValidatorInterface()
