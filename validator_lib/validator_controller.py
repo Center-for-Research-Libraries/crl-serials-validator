@@ -111,8 +111,7 @@ class ValidatorController:
         disqualifying issues. If a GUI or web frontend is added to the project then this function can probably be 
         removed.
         """
-        if self.log_to_screen is True:
-            print('========================================================')
-            print("Opening a new program window.")
-            print("If you don't see it, please look for it in your taskbar.")
-            print('========================================================')
+        print('========================================================')
+        print("Opening a new program window.")
+        print("If you don't see it, please look for it in your taskbar.")
+        print('========================================================')
