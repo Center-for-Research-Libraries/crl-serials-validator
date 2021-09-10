@@ -66,7 +66,7 @@ class SpreadsheetTsvCsvRunner:
                 row_locations['header_to_skip'] = False
                 continue
             n += 1
-            sys.stdout.write('\rReading row {}.'.format(n))
+            sys.stdout.write('\rReading row {}'.format(n))
             sys.stdout.flush()
             row_dict = {'filename': input_file}
             holdings_list = []
