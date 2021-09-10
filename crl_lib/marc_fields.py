@@ -102,28 +102,53 @@ class MarcFields:
     non_repeatable_fields = {'LDR', '001'}
     main_entry_fields = ["100", "110", "111", "130"]
 
-    def __init__(self, record, record_origin=None, log_warnings=False):
+    def __init__(self, record, record_origin=None, log_warnings=False, debug_info=''):
         """
         rather than set all vars at start, we dynamically search them when called for;
         i.e., calling for 'form' causes library to process everything in the 008 line
-        """
-        if not record:
-            raise Exception("No record sent to MarcFields object.")
 
+        debug_info is a string that will be added to any logging outputs, that might be useful for identifying the 
+        source of the MARC record in question, or some other piece of useful information. Something like "from local
+        catalog" might be an appropriate string.
+        """
         self.log_warnings = log_warnings
-        self.logger = logging.getLogger()
+        if debug_info:
+            debug_info = ' {}'.format(debug_info)
+        self.debug_info = debug_info
+
+        if not record:
+            if self.log_warnings:
+                error_message = 'No or blank record sent to MarcFields object{}'.format(self.debug_info)
+                logging.error(error_message)
+            raise Exception("No record sent to MarcFields object.")
 
         # minimally validate and clean record
         self.marc = self.check_and_clean_record(record)
-        self.marc_dict = self.convert_mrk_to_dicts()
+        self.marc_dict = defaultdict(list)
+        self.warnings_list = []
+        self.convert_mrk_to_dicts()
         self.record_origin = record_origin
+        self.print_warnings()
 
     def __getattr__(self, attr):
         """Main entry for all requests. This will be skipped if attribute already exists."""
-        func_name = 'get_{}'.format(attr)
-        func = getattr(self, func_name)
-        func()
-        return getattr(self, attr)
+        try:
+            func_name = 'get_{}'.format(attr)
+            func = getattr(self, func_name)
+            func()
+            return getattr(self, attr)
+        except RecursionError:
+            error_message = 'Call made for invalid attribute: {}'.format(attr)
+            raise Exception(error_message)
+
+    def print_warnings(self):
+        if self.warnings_list and self.log_warnings is True:
+            self.get_oclc()
+            for warning_message in self.warnings_list:
+                if self.oclc:
+                    warning_message ='{}; OCLC {}'.format(warning_message, self.oclc)
+                warning_message = '{}{}'.format(warning_message, self.debug_info)
+            logging.warning(warning_message)
 
     @staticmethod
     def check_and_clean_record(record):
@@ -150,8 +175,7 @@ class MarcFields:
     def convert_mrk_to_dicts(self):
         """
         Convert the record to a dict, to extract data from. 
-                """
-        marc_dict = defaultdict(list)
+        """
         pymarc_dict = {'leader': '', 'fields': []}
         marc_list = self.marc.split('\n')
         for line in marc_list:
@@ -160,44 +184,49 @@ class MarcFields:
                 continue
             field = line[1:4]
             if len(field) < 3:
-                if self.log_warnings:
-                    self.logger.warning('Invalid field {} in MARC passed to MarcFields object.'.format(field))
+                self.warnings_list.append('Invalid field {} in MARC passed to MarcFields object.'.format(field))
                 continue
 
             try:
                 if field == 'LDR' or int(field) < 10:
                     field_data = line[6:]
-                    marc_dict[field].append(field_data)                  
+                    self.marc_dict[field].append(field_data)                  
                     continue
             except (TypeError, ValueError):
-                if self.log_warnings:
-                    self.logger.warning('Invalid field {} in MARC passed to MarcFields object.'.format(field))
+                self.warnings_list.append('Invalid field {} in MARC passed to MarcFields object.'.format(field))
                 continue
 
             ind1 = line[6]
             ind2 = line[7]
-            marc_dict[field].append({'ind1': ind1, 'ind2': ind2, 'subfields': {}})
+            self.marc_dict[field].append({'ind1': ind1, 'ind2': ind2, 'subfields': {}})
+            if field == '040':
+                # 040 (cataloging source) line may have double dollar signs due to OCLC codes like "CQ$."
+                line = line.replace('$$', r'{dollar}$')
+                # Similar issue if last OCLC code ends with a dollar sign.
+                if line.endswith('$'):
+                    line = line[:-1] + r'{dollar}'
             if line[8] == '$':
                 field_list = line[9:].split('$')
             else:
                 field_list = line[8:].split('$')
-                if self.log_warnings:
-                    self.logger.warning('No subfield indicator at start of MARC line {}'.format(line))
+                self.warnings_list.append('No subfield indicator at start of MARC line {}'.format(line))
             for subfield_data in field_list:
-                subfield = subfield_data[0]
+                try:
+                    subfield = subfield_data[0]
+                except IndexError:
+                    self.warnings_list.append(
+                        'Subfield with no data in line {}, probably an extra $ or $ at end of line'.format(field))
+                    continue
                 subfield_content = subfield_data[1:]
-                marc_dict[field][-1]['subfields'].setdefault(subfield, [])
-                marc_dict[field][-1]['subfields'][subfield].append(subfield_content)
+                self.marc_dict[field][-1]['subfields'].setdefault(subfield, [])
+                self.marc_dict[field][-1]['subfields'][subfield].append(subfield_content)
                 if field == '245':
-                    marc_dict['title_line'].append((subfield, subfield_content))                   
+                    self.marc_dict['title_line'].append((subfield, subfield_content))                   
 
         # Check for illegally duplicated subfields. Right now only looking at a few minimal fields.
         for field in self.non_repeatable_fields:
-            if len(marc_dict[field]) > 1:
-                if self.log_warnings:
-                    self.logger.warning('Illegally repeated field {} in MARC record.'.format(field))
-
-        return marc_dict
+            if len(self.marc_dict[field]) > 1:
+                self.warnings_list.append('Illegally repeated field {} in MARC record'.format(field))
 
     def _get_list_from_marc_dict(self, field, subfield=None, position=None, end_position=None):
         if field not in self.marc_dict:
@@ -596,6 +625,7 @@ class MarcFields:
 
     def get_cat_agent(self):
         self.cat_agent = self._get_string_from_marc_dict(field='040', subfield='a')
+        self.cat_agent = self.cat_agent.replace(r'{dollar}', '$')
 
     def get_cat_lang(self):
         self.cat_lang = self._get_string_from_marc_dict(field='040', subfield='b')
@@ -970,8 +1000,8 @@ class WorldCatMarcFields(MarcFields):
     forces the process to take whatever is in the 001 field as the OCLC number.
 
     """
-    def __init__(self, record, record_origin='worldcat'):
-        super().__init__(record, record_origin)
+    def __init__(self, record, record_origin='worldcat', log_warnings=False, debug_info=''):
+        super().__init__(record, record_origin=record_origin, log_warnings=log_warnings, debug_info=debug_info)
         """marc as None means record failed checks in parent class"""
         if self.marc is None:
             return
@@ -981,9 +1011,9 @@ class CRLMarcFields(MarcFields):
     """
     Handle a Center for Research Libraries record, with its specific fields and data.
     """
-    def __init__(self, record, record_origin="crl"):
+    def __init__(self, record, record_origin="crl", log_warnings=False, debug_info=''):
         self.marc = None
-        super().__init__(record, record_origin)
+        super().__init__(record, record_origin=record_origin, log_warnings=log_warnings, debug_info=debug_info)
         """marc as None means record failed checks in parent class"""
         if self.marc is None:
             return
