@@ -148,7 +148,7 @@ class ValidatorIssnDb:
 
         issn_data_tuple = namedtuple("IssnDbTuple",
                                      "marc issn year_1 year_2 publisher form serial_type bib_lvl title_a title_b")
-        mf = MarcFields(marc)
+        mf = MarcFields(marc, log_warnings=True, debug_info='from ISSN database')
         title_a, title_b = self.issn_db.get_titles_from_issn_marc(marc)
         return_data = issn_data_tuple(marc, issn, mf.year_1, mf.year_2, mf.imprint, mf.form, mf.serial_type, mf.bib_lvl, title_a, title_b)
         return return_data

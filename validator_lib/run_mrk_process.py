@@ -66,7 +66,7 @@ class MrkProcessRunner:
 
     def get_data_from_record(self, record, seqnum):
         self.errors_this_record = []
-        mf = MarcFields(record)
+        mf = MarcFields(record, log_warnings=True, debug_info='from {}'.format(self.input_file))
 
         record_dict = {
             'bad_863_field': '',

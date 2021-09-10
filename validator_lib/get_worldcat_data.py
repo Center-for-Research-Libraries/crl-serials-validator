@@ -45,7 +45,7 @@ class WorldCatMarcDataExtractor:
                 self.no_worldcat_data_found.append(oclc)
             marc = self.get_dummy_marc()
             return_dummy_data = True
-        mf = WorldCatMarcFields(marc)
+        mf = WorldCatMarcFields(marc, log_warnings=True, debug_info='from WorldCat')
         worldcat_data = {
             'wc_oclc': mf.oclc,
             'oclcs_019': '; '.join(mf.oclcs_019),
