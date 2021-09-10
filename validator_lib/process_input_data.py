@@ -12,7 +12,6 @@ import validator_lib.utilities
 
 class InputDataProcessor:
     def __init__(self, title_dicts, input_fields, found_issn_db):
-        self.logger = logging.getLogger('validator.InputDataProcessor')
         self.found_issn_db = found_issn_db
         self.title_dicts = title_dicts
         self.input_fields = input_fields

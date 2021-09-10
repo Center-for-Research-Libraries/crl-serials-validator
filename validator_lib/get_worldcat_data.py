@@ -14,21 +14,20 @@ class WorldCatMarcDataExtractor:
     Note that there's no analysis in this object, just pure data gathering.
     """
     def __init__(self):
-        self.logger = logging.getLogger('validator.WorldCatMarcDataExtractor')
-        self.logger.info('Getting WorldCat data.')
+        logging.info('Getting WorldCat data.')
         self.wc_api = WcApi()
         self.no_worldcat_data_found = []
         self.no_oclc_in_input = 0
 
     def log_worldcat_data_not_found(self):
         for oclc in self.no_worldcat_data_found:
-            self.logger.info('No WorldCat data found for OCLC {}'.format(oclc))
+            logging.info('No WorldCat data found for OCLC {}'.format(oclc))
         if self.no_oclc_in_input > 0:
             if self.no_oclc_in_input == 1:
                 title_word = 'title'
             else:
                 title_word = 'titles'
-            self.logger.info('{} {} without an OCLC number'.format(self.no_oclc_in_input, title_word))
+            logging.info('{} {} without an OCLC number'.format(self.no_oclc_in_input, title_word))
         self.no_worldcat_data_found = []
         self.no_oclc_in_input = 0
 

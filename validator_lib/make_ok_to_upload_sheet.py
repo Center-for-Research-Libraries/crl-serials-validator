@@ -7,8 +7,6 @@ from crl_lib.marc_utilities import get_field_subfield, get_fields_subfields
 class UploadOKSheetMaker:
     def __init__(self, abbrev, program):
 
-        self.logger = logging.getLogger('validator.UploadOKSheetMaker')
-
         header = ['issnprint', 'oclc_symbol', 'oclc_number', 'year_archived', 'method', 'institution_name',
                      'program', 'oclc_holdings_location_code', 'custodial_history', 'summary_holdings',
                      'detailed_holdings', 'local_catalog_id', 'holdings_record_id', 'archive_action', 'date_of_action',

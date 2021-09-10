@@ -15,8 +15,6 @@ from validator_lib.process_input_data import InputDataProcessor
 class ChecksRunner:
     def __init__(self, running_headless=False):
 
-        self.logger = logging.getLogger('validator.ChecksRunner')
-
         self.running_headless = running_headless
 
         dirs = get_file_location_dict()
@@ -83,11 +81,11 @@ class ChecksRunner:
                     print("I didn't understand that.\n")
         output_files = os.listdir(self.output_dir)
         for output_file in output_files:
-            self.logger.info('Clearing output folder; deleting {}'.format(output_file))
+            logging.info('Clearing output folder; deleting {}'.format(output_file))
             output_file_loc = os.path.join(self.output_dir, output_file)
             if not os.path.isfile(output_file_loc):
                 continue
             try:
                 os.remove(output_file_loc)
             except PermissionError:
-                self.logger.warning("Could not delete file {} due to permissions error".format(output_file))
+                logging.warning("Could not delete file {} due to permissions error".format(output_file))

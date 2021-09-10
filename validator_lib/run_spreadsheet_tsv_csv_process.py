@@ -20,8 +20,6 @@ class SpreadsheetTsvCsvRunner:
 
     def __init__(self):
 
-        self.logger = logging.getLogger('validator.SpreadsheetTsvCsvRunner')
-
         self.validator_config = ValidatorConfig()
         self.input_cats = ['holdings_id', 'bib_id', 'oclc', 'issn', 'title', 'institution', 'oclc_symbol', 'location', 
                            'holdings_0', 'holdings_1', 'holdings_2', 'holdings_3']

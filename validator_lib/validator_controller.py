@@ -11,39 +11,8 @@ from validator_lib.run_checks_process import ChecksRunner
 from validator_lib.choose_disqualifying_issues import IssuesChooser
 
 
-# Setting this to True will turn on debugging messages in the logging and automatically log to the screen
+# Set the variable below to True to enable debug logging
 DEBUG_MODE = False
-
-
-def set_validator_logger(log_to_screen=False):
-    logger = logging.getLogger('validator')
-    logger.setLevel(logging.DEBUG)
-    log_directory = get_directory_location('logs')
-    log_file_name = 'validator_log_{:%Y-%m-%d}.log'.format(datetime.datetime.now())
-    log_file = os.path.join(log_directory, log_file_name)
-    fh = logging.FileHandler(log_file)
-    ch = logging.StreamHandler()
-    
-    if DEBUG_MODE is True:
-        fh.setLevel(logging.DEBUG)
-        ch.setLevel(logging.DEBUG)
-    else:
-        fh.setLevel(logging.INFO)
-        ch.setLevel(logging.INFO)
-
-    fh_formatter = logging.Formatter(
-        '%(asctime)s\t%(name)s\t%(levelname)s\t%(message)s', datefmt="%Y-%m-%d %H:%M:%S")
-    ch_formatter = logging.Formatter('%(message)s')
-
-    if log_to_screen is True:
-        ch.setFormatter(ch_formatter)
-        logger.addHandler(ch)
-
-    fh.setFormatter(fh_formatter)
-    logger.addHandler(fh)
-
-    if DEBUG_MODE is True:
-        logger.debug('Debug mode is on.')
 
 
 class ValidatorController:
@@ -53,15 +22,18 @@ class ValidatorController:
 
     viable_input_formats = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
 
-    def __init__(self, log_to_screen=False, headless_mode=False):
+    def __init__(self, headless_mode=False, log_level='info'):
         self.headless_mode = headless_mode
-        self.log_to_screen = log_to_screen
+        self.log_level = log_level
+        self.debug_mode = DEBUG_MODE    
 
-        set_validator_logger(log_to_screen)
-        self.logger = logging.getLogger('validator')
+        if self.headless_mode is True:
+            self.log_level = 'warning'
 
         if DEBUG_MODE is True:
-            self.log_to_screen = True
+            self.log_level = 'debug'
+
+        self.set_logging()
 
         # Make sure the relevant folders exist.
         initialize_folders()
@@ -74,19 +46,41 @@ class ValidatorController:
         
         if self.headless_mode is True and DEBUG_MODE is False:
             self.log_to_screen = False
-            self.logger.info('Running in headless mode.')
+            logging.info('Running in headless mode.')
+
+    def set_logging(self):
+        """
+        Initialize logging for the process.
+        """
+        log_levels = {
+            'debug': logging.DEBUG,
+            'info': logging.INFO,
+            'warning': logging.WARNING,
+            'error': logging.ERROR
+        }
+
+        log_directory = get_directory_location('logs')
+        log_file_name = 'validator_log_{:%Y-%m-%d}.log'.format(datetime.datetime.now())
+        log_file = os.path.join(log_directory, log_file_name)
+        logging.basicConfig(
+            filename=log_file, 
+            level=log_levels[self.log_level], 
+            filemode='a', format='%(asctime)s\t%(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+
 
     def check_issn_db(self):
         issn_db = IssnDb(ignore_missing_db=True)
         if issn_db.found_issn_db is True:
-            self.logger.info('ISSN database is installed.')
+            logging.info('ISSN database is installed.')
+        else:
+            logging.info('ISSN database is not installed.')
 
     def check_input_folder(self):
         input_files = get_input_files()
         if not input_files:
-            self.logger.warning('No input files found.')
+            logging.warning('No input files found.')
         for input_file in input_files:
-            self.logger.info('Found input file {}'.format(input_file))
+            logging.info('Found input file {}'.format(input_file))
             for input_format in self.viable_input_formats:
                 if input_file.lower().endswith(input_format):
                     self.input_files_seen = True

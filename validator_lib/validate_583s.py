@@ -12,8 +12,6 @@ class Line583Validator:
 
     def __init__(self):
 
-        self.logger = logging.getLogger('validator.Line583Validator')
-
         header = ['filename', 'seqnum', 'holdings_id', 'field_852a', 'line_583_errors', 'subfield_3', 'subfield_a',
                   'subfield_c',
                   'subfield_d', 'subfield_f', 'subfield_f_2', 'subfield_f_other', 'subfield_u', 'subfield_i',

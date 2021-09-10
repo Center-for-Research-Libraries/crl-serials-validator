@@ -26,7 +26,7 @@ class CRLXlsxWriter:
 
         Setting header to True will cause the first row to be printed entirely as strings.
         """
-        print('Creating {}'.format(workbook_name))
+        print('Creating workbook {}'.format(workbook_name))
         self.workbook = xlsxwriter.Workbook(workbook_name)
         for worksheet_name in worksheet_names_and_data:
             number_columns = set()

@@ -13,12 +13,6 @@ from validator_lib.validator_config import ValidatorConfig
 from validator_lib.utilities import left_pad_field_number, get_input_files, get_file_location_dict, get_failed_oclcs
 
 
-
-class OclcExtractor:
-
-    def __init__(self):
-        self.logger = logging.getLogger('validator.OclcExtractor')
-
 def choose_oclc_from_multiple_locations(locs):
     if not locs:
         return None
@@ -72,7 +66,7 @@ def read_text_data(oclcs, input_file_location, oclc_location, has_header):
 
 def read_spreadsheet_data(oclcs, input_file_location, oclc_location, has_header_row):
     # TODO
-    self.logger.info('Reading OCLCs from {}'.format(input_file_location))
+    logging.info('Reading OCLCs from {}'.format(input_file_location))
     oclc_column = int(oclc_location) - 1
     wb = openpyxl.load_workbook(input_file_location)
     ws = wb.active
@@ -96,7 +90,7 @@ def get_needed_oclcs():
     failed_oclcs = get_failed_oclcs()
     all_input_files = get_input_files()
     oclcs = set()
-    self.logger.info("Getting OCLC numbers from input files.")
+    logging.info("Getting OCLC numbers from input files.")
     dirs = get_file_location_dict()
     for input_file in all_input_files:
         input_file_location = os.path.join(dirs['input'], input_file)
@@ -122,7 +116,7 @@ def get_needed_oclcs():
                 read_text_data(oclcs, input_file_location, oclc_location, has_header_row)
         else:
             raise Exception("Input file of unsupported type: {}".format(input_file))
-    self.logger.info("Checking for OCLCs to download from API.")
+    logging.info("Checking for OCLCs to download from API.")
     local_marc_db = LocalMarcDb()
     oclcs_to_do = set()
     wc_oclcs = set()
@@ -135,6 +129,6 @@ def get_needed_oclcs():
             oclcs_to_do.add(oclc)
         else:
             wc_oclcs.add(oclc)
-    self.logger.info('{} WorldCat OCLCs seen in set.'.format(len(wc_oclcs)))
-    self.logger.info('{} OCLCs to download from API.'.format(len(oclcs_to_do)))
+    logging.info('{} WorldCat OCLCs seen in set.'.format(len(wc_oclcs)))
+    logging.info('{} OCLCs to download from API.'.format(len(oclcs_to_do)))
     return oclcs_to_do

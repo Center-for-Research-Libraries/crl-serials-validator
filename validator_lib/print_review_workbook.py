@@ -10,8 +10,6 @@ import validator_lib.utilities
 class ReviewWorkbookPrinter:
     def __init__(self, title_dicts, line_583_validation_output, print_errors_only=False):
 
-        self.logger = logging.getLogger('validator.ReviewWorkbookPrinter')
-
         # if we have KeyErrors with dict keys containing "issn_db" we'll know the database isn't installed
         self.issn_db_not_seen = False
 
@@ -286,9 +284,9 @@ class ReviewWorkbookPrinter:
                     if 'issn_db' in cat:
                         if self.issn_db_not_seen is False:
                             self.issn_db_not_seen = True
-                            self.logger.info('Skipping output of ISSN db related categories.')
+                            logging.info('Skipping output of ISSN db related categories.')
                     else:
-                        self.logger.error('Category {} not seen in checklist data.'.format(cat))
+                        logging.error('Category {} not seen in checklist data.'.format(cat))
             if self.print_errors_only is True and not output_list[0]:
                 continue
             self.checklist_outputs[inst].append(output_list)
