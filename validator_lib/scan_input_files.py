@@ -25,14 +25,12 @@ from validator_lib.utilities import get_input_files, get_file_location_dict
 class InputFileScanner:
     def __init__(self):
 
-        self.data = {}
         dirs = get_file_location_dict()
         self.input_dir = dirs['input']
+
+        self.data = {}
         logging.debug("Scanning input files.")
         all_input_files = get_input_files()
-        output_location = os.path.join(dirs['data'], "Quick Scan.txt")
-        self.fout = open(output_location, "w", encoding="utf8")
-        self.cout = csv.writer(self.fout, delimiter="\t")
         for input_file in all_input_files:
             if input_file.endswith(".mrk"):
                 logging.debug("Scanning {}".format(input_file))
@@ -44,12 +42,6 @@ class InputFileScanner:
                 logging.info("Skipping {}".format(input_file))
             else:
                 logging.warning("Unkown file type in input directory: {}".format(input_file))
-
-        self.fout.close()
-        logging.info('Finished scanning input files. Output is in "Quick Scan.txt" in the data folder.')
-
-    def __del__(self):
-        self.fout.close()
 
     def marc_scanner(self, input_file):
         input_file_loc = os.path.join(self.input_dir, input_file)
@@ -75,20 +67,18 @@ class InputFileScanner:
         cats = ["Total records", "Have 001 field", "Have 004 field", "Have 035", "OCLC in 035",
                 "Have 863/864/865", "Have 866/867/868"]
 
-        self.cout.writerow(["FILE: {}".format(input_file)])
-
         # skip blank file
         if file_data["Total records"] == 0:
             logging.warning('No records found in {}. Blank file?'.format(input_file))
             return
         
         logging.info('Quick scan of file {}'.format(input_file))
+        print('\nQuick scan of file {}'.format(input_file))
         for cat in cats:
             output = [cat, file_data[cat], "{:.1%}".format(file_data[cat]/file_data["Total records"])]
-            self.cout.writerow(output)
             output_string = '{}{}\t{}'.format(str(output[0]).ljust(16), str(output[1]).rjust(5), str(output[2]).rjust(7))
-            logging.info(output_string)        
-        self.cout.writerow(["", "", ""])
+            logging.info(output_string)
+            print(output_string)
         return file_data
 
     def text_scanner(self, input_file):
