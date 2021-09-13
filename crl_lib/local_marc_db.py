@@ -32,23 +32,10 @@ class LocalMarcDb:
         db = LocalMarcDb("/path/to/file")
 
     """
-
-    # set this variable to override all other MARC file location data
-    project_marc_collection_db_file_location = None
-
-    def __init__(self, local_db_file_location=None):
-        super().__init__()
-        if self.project_marc_collection_db_file_location:
-            self.marc_collection_db_file_location = self.project_marc_collection_db_file_location
-        elif local_db_file_location:
-            self.marc_collection_db_file_location = local_db_file_location
-        else:
-            try:
-                from crl_lib.crl_prefs import CrlFileLocations
-                self.files = CrlFileLocations()
-                self.marc_collection_db_file_location = self.files.marc_collection_db_file_location
-            except ModuleNotFoundError:
-                raise Exception('Need to set default local_db_file_location or add crl_prefs module to project.')
+    def __init__(self, data_folder):
+        if not data_folder:
+            raise Exception('No data folder location sent to local_marc_db')
+        self.marc_collection_db_file_location = os.path.join(data_folder, 'marc_collection.db')
         
         self.timestamp = self.make_year_month_day_timestamp()
         # default SQL commands
@@ -63,10 +50,10 @@ class LocalMarcDb:
         self.oclc_delete_data = []
 
         # open database, and create it if it doesn't already exist
-        if os.path.isfile(self.files.marc_collection_db_file_location):
-            self.conn = sqlite3.connect(self.files.marc_collection_db_file_location)
+        if os.path.isfile(self.marc_collection_db_file_location):
+            self.conn = sqlite3.connect(self.marc_collection_db_file_location)
         else:
-            self.conn = sqlite3.connect(self.files.marc_collection_db_file_location)
+            self.conn = sqlite3.connect(self.marc_collection_db_file_location)
             self.create_local_marc_db()
 
         self.main_table_has_issn_column = self._check_for_issn_column()
@@ -117,7 +104,10 @@ class LocalMarcDb:
         return False
 
     def close_marc_db(self):
-        self.conn.close()
+        try:
+            self.conn.close()
+        except AttributeError:
+            pass
 
     def create_local_marc_db(self):
         """

@@ -51,11 +51,10 @@ import time
 import sys
 import logging
 
-import crl_lib.crl_prefs
+from crl_lib.api_keys import OclcApiKeys
 import crl_lib.marcxml
 from crl_lib.crl_utilities import fix_issn, fix_lccn
 import crl_lib.local_marc_db
-
 
 
 class WorldCatApiFailureError(Exception):
@@ -68,17 +67,16 @@ class WorldCatApiFailureError(Exception):
     pass
 
 
-
 class WcApi:
     """
     Class for fetching MARC records from the WorldCat Search API.
 
     """
 
-    def __init__(self, user_name=None, local_marc_db_location=None):
+    def __init__(self, user_name=None, data_folder=None):
         self._name = user_name
         self.crl_marcxml = crl_lib.marcxml.CrlMarcXML()
-        self.crl_api_keys = crl_lib.crl_prefs.CrlApiKeys(user_name)
+        self.api_keys = OclcApiKeys(data_folder=data_folder, name_for_key=user_name)
         self._create_base_search_urls()
         self.search_type_map = {
             "oclc": "oclc",
@@ -86,7 +84,7 @@ class WcApi:
             "lccn": "dn",
             "sn": "sn"
         }
-        self.local_marc_db = crl_lib.local_marc_db.LocalMarcDb(local_marc_db_location)
+        self.local_marc_db = crl_lib.local_marc_db.LocalMarcDb(data_folder=data_folder)
         self.http = urllib3.PoolManager()
         self.counter = Counter()
 
@@ -99,7 +97,7 @@ class WcApi:
     @name.setter
     def name(self, new_name):
         self._name = new_name
-        self.crl_api_keys.set_api_key_name(self._name)
+        self.api_keys.set_api_key_name(self._name)
 
     @property
     def return_marcxml(self):
@@ -126,7 +124,7 @@ class WcApi:
         if search_type == "oclc":
             search_url = self.base_search_strings["oclc"].format(
                 search_term,
-                self.crl_api_keys.api_key
+                self.api_keys.api_key
             )
         elif institution:
             search_url = self.base_search_strings["institution"].format(
@@ -134,14 +132,14 @@ class WcApi:
                 search_term,
                 institution,
                 frbrize_string,
-                self.crl_api_keys.api_key
+                self.api_keys.api_key
             )
         else:
             search_url = self.base_search_strings["other"].format(
                 self.search_type_map[search_type],
                 search_term,
                 frbrize_string,
-                self.crl_api_keys.api_key
+                self.api_keys.api_key
             )
         return search_url
 

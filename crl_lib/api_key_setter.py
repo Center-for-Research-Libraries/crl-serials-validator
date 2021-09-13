@@ -1,6 +1,6 @@
 from tkinter import Tk, IntVar, Label, Entry, Button, Radiobutton, Frame
 
-from crl_lib.crl_prefs import CrlApiKeys
+from crl_lib.api_keys import OclcApiKeys
 from pprint import pprint
 
 
@@ -17,9 +17,10 @@ class ApiKeySetter:
     The script will print a copy of your names/keys to the console, if it is
     run from a command line.
     """
-    def __init__(self):
-        self.crl_api_keys = CrlApiKeys()
-        self.names = list(self.crl_api_keys.api_keys.keys())
+    def __init__(self, data_folder):
+        print(data_folder)
+        self.api_keys = OclcApiKeys(data_folder)
+        self.names = list(self.api_keys.api_keys.keys())
 
         # in case the window pops under the terminal
         print("Opening separate API key setter window.")
@@ -41,8 +42,8 @@ class ApiKeySetter:
             is_default = False
             try:
                 name = self.names[i]
-                api_key = self.crl_api_keys.api_keys[name]
-                if self.crl_api_keys.api_key_name == name:
+                api_key = self.api_keys.api_keys[name]
+                if self.api_keys.api_key_name == name:
                     is_default = True
             except IndexError:
                 name = ""
@@ -91,13 +92,13 @@ class ApiKeySetter:
                 if i == default_key:
                     default_key_name = name
         if new_api_keys:
-            self.crl_api_keys.config['API KEYS'] = {}
+            self.api_keys.config['API KEYS'] = {}
             for name in new_api_keys:
-                self.crl_api_keys.config['API KEYS'][name] = new_api_keys[name]
+                self.api_keys.config['API KEYS'][name] = new_api_keys[name]
         if default_key_name:
-            self.crl_api_keys.config['Preferred API Key'] = {default_key_name: 1}
+            self.api_keys.config['Preferred API Key'] = {default_key_name: 1}
 
-        self.crl_api_keys.write_preferences_to_file()
+        self.api_keys.write_preferences_to_file()
         self.window.destroy()
 
     def cancelled(self):

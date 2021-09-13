@@ -1,14 +1,10 @@
 """
 Work with the locally installed ISSN database. 
 
-Either the crl_prefs module must be present and the ISSN database in one of the locations specified in the 
-CrlFileLocations class, or the path to the local copy of the database must be set in the LOCAL_ISSN_DB_FILE_LOCATION 
-variable.
-
 Basic usage:
     from crl_lib.issn_db import IssnDb
 
-    issn_db = IssnDb()
+    issn_db = IssnDb(path_to_issn_database)
     marc_string_for_issn_a = issn_db.get_marc_from_issn_a(issn_a) 
     marc_string_for_issn_a = issn_db.get_marc_from_issn_db(issn)
     marc_list_for_issn_y = issn_db.get_marc_from_issn_y(issn_y)
@@ -36,32 +32,14 @@ import argparse
 from pprint import pprint
 import logging
 
-# Set the following variable to identify a specific path for a local install of the ISSN db.
-# Leave it as None if the crl_prefs module is installed locally and the db is at an expected location.
-LOCAL_ISSN_DB_FILE_LOCATION = None
-
 
 class IssnDb:
-    def __init__(self, ignore_missing_db=False):
+    def __init__(self, issn_db_location=None, ignore_missing_db=False):
 
         self.found_issn_db = False
         self.__issn_db_location = None
 
         self.logger = logging.getLogger()
-
-        if LOCAL_ISSN_DB_FILE_LOCATION:
-            self.__issn_db_location = LOCAL_ISSN_DB_FILE_LOCATION
-        else:
-            try:
-                from crl_lib.crl_prefs import CrlFileLocations
-            except ModuleNotFoundError or ImportError:
-                msg = 'local_issn_db_file_location variable not set and crl_prefs module not found.\n'
-                msg += 'ISSN database cannot be found. Quitting.'
-                self.logger.error(msg)
-                sys.exit()
-
-            crl_files = CrlFileLocations()
-            self.__issn_db_location = crl_files.issn_db_file_location
 
         error_message = ''
         if not self.__issn_db_location:

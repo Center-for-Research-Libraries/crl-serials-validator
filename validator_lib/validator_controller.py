@@ -21,6 +21,8 @@ class ValidatorController:
     """
 
     viable_input_formats = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
+    data_directory = get_directory_location('data')
+    logging_directory = get_directory_location('logs')
 
     def __init__(self, headless_mode=False, log_level='info'):
         self.headless_mode = headless_mode
@@ -59,9 +61,8 @@ class ValidatorController:
             'error': logging.ERROR
         }
 
-        log_directory = get_directory_location('logs')
         log_file_name = 'validator_log_{:%Y-%m-%d}.log'.format(datetime.datetime.now())
-        log_file = os.path.join(log_directory, log_file_name)
+        log_file = os.path.join(self.logging_directory, log_file_name)
         logging.basicConfig(
             filename=log_file, 
             level=log_levels[self.log_level], 
@@ -69,7 +70,8 @@ class ValidatorController:
 
 
     def check_issn_db(self):
-        issn_db = IssnDb(ignore_missing_db=True)
+        issn_db_location = os.path.join(self.data_directory, 'ISSN_db.db')
+        issn_db = IssnDb(issn_db_location=issn_db_location, ignore_missing_db=True)
         if issn_db.found_issn_db is True:
             logging.info('ISSN database is installed.')
         else:
@@ -89,7 +91,7 @@ class ValidatorController:
 
     def set_api_keys(self):
         self.print_popunder_window_warning()
-        ApiKeySetter()
+        ApiKeySetter(self.data_directory)
     
     def scan_input_files(self):
         InputFileScanner()
