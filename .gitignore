@@ -171,6 +171,7 @@ data/papr.sqlite3
 .idea/
 data/failed_oclcs.txt
 data/*ini
+data/*db
 
 # CRL libraries not relevant to this project
 api_hits_database.py
