@@ -10,7 +10,7 @@ from crl_lib.marc_file_reader import MarcFileReader
 from crl_lib.crl_utilities import clean_oclc
 from validator_lib.validator_config import ValidatorConfig
 from validator_lib.validate_583s import Line583Validator
-from validator_lib.utilities import get_file_location_dict, get_first_last_year_from_regular_holdings
+from validator_lib.utilities import get_first_last_year_from_regular_holdings
 from validator_lib.supplements_and_indexs_functions import remove_supplements_from_holdings, remove_indexes_from_holdings
 
 
@@ -18,10 +18,7 @@ class MrkProcessRunner:
     def __init__(self, input_file):
         
         self.input_file = input_file
-        dirs = get_file_location_dict()
-        self.input_file_location = os.path.join(dirs['input'], input_file)
-
-        self.error_output_file = os.path.join(dirs['output'], '{} MARC validation.txt'.format(input_file))
+        self.input_file_location = os.path.join(os.getcwd(), 'input', self.input_file)
 
         validator_config = ValidatorConfig()
         self.input_fields = validator_config.get_input_fields(self.input_file)
@@ -216,8 +213,3 @@ class MrkProcessRunner:
             ''
         ]
         error_output_list.extend(self.errors_this_record)
-
-        error_output_str = '\n'.join(error_output_list)
-        with open(self.error_output_file, 'a', encoding='utf8') as fout:
-            fout.write(error_output_str)
-            fout.write("\n\n--------------------------\n\n")

@@ -132,70 +132,25 @@ def get_later_of_slash_year(year, data_segment):
     return year
 
 
-def get_directory_location(dir):
-    validator_dirs = get_file_location_dict()
-    return validator_dirs[dir]
-
-
-def get_file_location_dict():
-    cwd = os.getcwd()
-    validator_dirs = {
-        'input': os.path.join(cwd, 'input'),
-        'data': os.path.join(cwd, 'data'),
-        'output': os.path.join(cwd, 'output'),
-        'logs': os.path.join(cwd, 'logs'),
-    }
-    return validator_dirs
-
-
 def initialize_folders():
-    validator_dirs = get_file_location_dict()
-    for directory in validator_dirs:
-        if not os.path.isdir(directory):
-            logging.info('Creating directory {}'.format(directory))
-            os.mkdir(directory)
+    dir_names = ['input', 'output', 'data', 'logs']
+    validator_dir = os.getcwd()
+    for dir_name in dir_names:
+        dir = os.path.join(validator_dir, dir_name)
+        if not os.path.isdir(dir):
+            logging.info('Creating directory {}'.format(dir))
+            os.mkdir(dir)
 
 
-def get_input_files():
-    folders = get_file_location_dict()
-    all_input_files = os.listdir(folders['input'])
-    input_files = []
-    for input_file in all_input_files:
-        if input_file.startswith('~'):
-            continue
-        if not input_file.endswith('mrk') and not input_file.endswith('mrc'):
-            if not input_file.endswith('txt') and not input_file.endswith('csv') and not input_file.endswith('tsv'):
-                if not input_file.endswith('xlsx'):
-                    continue
-        input_files.append(input_file)
-    return input_files
-
-
-def get_failed_oclcs():
-    """OCLCs not found in API searches."""
-    failed_oclcs = set()
-    dirs = get_file_location_dict()
-    fail_file = os.path.join(dirs['data'], 'failed_oclcs.txt')
-    if os.path.isfile(fail_file):
-        with open(fail_file, 'r') as fin:
-            oclcs = [line.rstrip() for line in fin]
-        for oclc in oclcs:
-            if not oclc or not oclc.isdigit():
-                continue
-            failed_oclcs.add(oclc)
-    return failed_oclcs
-
-
-def get_jstor_issns():
+def get_jstor_issns(validator_data_folder):
     jstor = set()
-    dirs = get_file_location_dict()
-    data_files = os.listdir(dirs['data'])
+    data_files = os.listdir(validator_data_folder)
     for data_file in data_files:
         if not data_file.lower().startswith('jstor'):
             continue
         if data_file.lower().endswith('xlsx'):
             continue
-        jstor_file = os.path.join(dirs['data'], data_file)
+        jstor_file = os.path.join(validator_data_folder, data_file)
         try:
             with open(jstor_file, 'r', encoding='utf8') as fin:
                 raw_issns = [line.rstrip() for line in fin]

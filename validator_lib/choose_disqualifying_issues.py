@@ -6,7 +6,6 @@ fail checks.
 import tkinter as tk
 import tkinter.ttk as ttk
 
-from validator_lib.utilities import get_input_files
 from validator_lib.validator_config import ValidatorConfig
 
 class IssuesChooser:

@@ -1,6 +1,10 @@
 # Validator
 Validate shared print bib data and holdings inputs.
 
+# About
+
+The Validator is a tool to validate serials bibliographic and holdings data according to a set of user-defined rules.s
+
 # Instructions
 
 ## The tl;dr version

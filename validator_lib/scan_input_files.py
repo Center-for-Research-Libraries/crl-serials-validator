@@ -19,19 +19,13 @@ import logging
 from crl_lib.marc_file_reader import MarcFileReader
 from crl_lib.marc_fields import MarcFields
 
-from validator_lib.utilities import get_input_files, get_file_location_dict
-
 
 class InputFileScanner:
-    def __init__(self):
-
-        dirs = get_file_location_dict()
-        self.input_dir = dirs['input']
+    def __init__(self, input_files):
 
         self.data = {}
         logging.debug("Scanning input files.")
-        all_input_files = get_input_files()
-        for input_file in all_input_files:
+        for input_file in input_files:
             if input_file.endswith(".mrk"):
                 logging.debug("Scanning {}".format(input_file))
                 self.marc_scanner(input_file)

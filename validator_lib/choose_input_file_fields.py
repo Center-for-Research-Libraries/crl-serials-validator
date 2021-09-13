@@ -8,16 +8,15 @@ import tkinter.ttk as ttk
 import tkinter.messagebox
 import re
 
-from validator_lib.utilities import get_input_files
 from validator_lib.validator_config import ValidatorConfig
 
 
 class InputFieldsChooser:
-    def __init__(self):
+    def __init__(self, input_files):
         self.validator_config = ValidatorConfig()
         self.window = None
         self.fields = None
-        self.all_input_files = get_input_files()
+        self.all_input_files = input_files
         self.warnings = None
         self.marc_cats = ["oclc", "583", "bib_id", "holdings_id", "863", "866", "holdings_1", "holdings_2"]
         self.spreadsheet_cats = ["header", "oclc", "bib_id", "holdings_id", "institution", "oclc_symbol", "location", 

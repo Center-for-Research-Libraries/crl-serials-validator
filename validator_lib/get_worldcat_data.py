@@ -3,8 +3,6 @@ import logging
 from crl_lib.wc_api import WcApi
 from crl_lib.marc_fields import WorldCatMarcFields
 
-from validator_lib.utilities import get_directory_location
-
 
 class WorldCatMarcDataExtractor:
     """
@@ -15,10 +13,9 @@ class WorldCatMarcDataExtractor:
 
     Note that there's no analysis in this object, just pure data gathering.
     """
-    def __init__(self):
+    def __init__(self, validator_data_storage_folder):
         logging.info('Getting WorldCat data.')
-        data_directory = get_directory_location('data')
-        self.wc_api = WcApi(data_folder=data_directory)
+        self.wc_api = WcApi(data_folder=validator_data_storage_folder)
         self.no_worldcat_data_found = []
         self.no_oclc_in_input = 0
 

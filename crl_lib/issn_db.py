@@ -34,10 +34,10 @@ import logging
 
 
 class IssnDb:
-    def __init__(self, issn_db_location=None, ignore_missing_db=False):
+    def __init__(self, issn_db_location, ignore_missing_db=False):
 
         self.found_issn_db = False
-        self.__issn_db_location = None
+        self.__issn_db_location = issn_db_location
 
         self.logger = logging.getLogger()
 

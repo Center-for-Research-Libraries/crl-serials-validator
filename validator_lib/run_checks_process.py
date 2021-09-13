@@ -3,7 +3,7 @@ from pprint import pprint
 import sys
 import logging
 
-from validator_lib.utilities import get_input_files, get_file_location_dict, get_jstor_issns
+from validator_lib.utilities import get_jstor_issns
 from validator_lib.print_review_workbook import ReviewWorkbookPrinter
 from validator_lib.run_mrk_process import MrkProcessRunner
 from validator_lib.run_spreadsheet_tsv_csv_process import SpreadsheetTsvCsvRunner
@@ -13,28 +13,24 @@ from validator_lib.process_input_data import InputDataProcessor
 
 
 class ChecksRunner:
-    def __init__(self, running_headless=False):
+    def __init__(self, data_storage_folder, data_folder, input_files, output_dir, issn_db_location, running_headless=False):
 
         self.running_headless = running_headless
 
-        dirs = get_file_location_dict()
-        self.input_dir = dirs['input']
-        self.output_dir = dirs['output']
+        self.output_dir = output_dir
         self.clear_output_folder()
 
-        self.jstor = get_jstor_issns()
+        self.jstor = get_jstor_issns(data_folder)
 
-        all_input_files = get_input_files()
-
-        self.worldcat_data_getter = WorldCatMarcDataExtractor()
+        self.worldcat_data_getter = WorldCatMarcDataExtractor(data_storage_folder)
 
         stc_runner = SpreadsheetTsvCsvRunner()
-        validator_issn_db = ValidatorIssnDb()
+        validator_issn_db = ValidatorIssnDb(issn_db_location)
 
         found_issn_db = validator_issn_db.issn_db.found_issn_db
 
         completed_files = set()
-        for input_file in all_input_files:
+        for input_file in input_files:
             if input_file in completed_files:
                 continue
             print('Processing {}'.format(input_file))
@@ -45,7 +41,6 @@ class ChecksRunner:
             else:
                 input_file_data = stc_runner.get_input_data_from_file(input_file)
                 line_583_validation_output = None
-
             self.add_worldcat_data_to_input_file_data_dicts(input_file_data, input_file)
             validator_issn_db.process_title_dicts(input_file_data, input_file)
             InputDataProcessor(input_file_data, input_file, found_issn_db)

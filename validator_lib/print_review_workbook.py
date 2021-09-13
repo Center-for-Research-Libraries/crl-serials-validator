@@ -60,7 +60,6 @@ class ReviewWorkbookPrinter:
         self.originally_from_header = ['Load Status', 'Reasons for Review', 'HoldingID', 'OCLC Number', 'Print ISSN',
                                        'Title', 'OCLC Symbol', 'OCLC HLC', 'Summary Holdings/Materials Specified']
 
-        dirs = validator_lib.utilities.get_file_location_dict()
         self.get_disqualifying_issue_categories = validator_lib.utilities.get_disqualifying_issue_categories()
         self.error_counter = defaultdict(Counter)
         self.disqualifying_error_counter = defaultdict(Counter)
@@ -72,7 +71,7 @@ class ReviewWorkbookPrinter:
         if self.issn_db_not_seen is True:
             self.remove_issn_db_from_checklist_cats()
 
-        self.output_folder = dirs['output']
+        self.output_folder = os.path.join(os.getcwd(), 'output')
         self.error_category_map = self.make_error_category_map()
 
         self.outputs = {}

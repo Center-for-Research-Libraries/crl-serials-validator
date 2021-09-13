@@ -13,9 +13,9 @@ from validator_lib.utilities import get_valid_forms, get_valid_serial_types
 
 
 class ValidatorIssnDb:
-    def __init__(self):
+    def __init__(self, issn_db_location):
 
-        self.issn_db = IssnDb(ignore_missing_db=True)
+        self.issn_db = IssnDb(issn_db_location=issn_db_location)
         self.issn_type_order = ['issn_l', 'issn_z', 'issn_y', 'issn_m']
 
         self.valid_forms = get_valid_forms()
