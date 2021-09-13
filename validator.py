@@ -117,7 +117,7 @@ def parse_command_line_args():
 
 
 def headless_app():
-    vc = ValidatorController(headless_mode=True, log_to_screen=False)
+    vc = ValidatorController(headless_mode=True)
     vc.run_checks_process()
 
 
