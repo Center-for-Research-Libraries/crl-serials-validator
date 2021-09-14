@@ -92,8 +92,11 @@ class ValidatorController(ValidatorFileLocations):
 
     def set_disqualifying_issues(self):
         self.print_popunder_window_warning()
-        IssuesChooser()
-    
+        if self.issn_db_location is None:
+            IssuesChooser(issn_db_missing=True)
+        else:
+            IssuesChooser(issn_db_missing=False)
+
     def run_checks_process(self):
         ChecksRunner(
             self.data_storage_folder,

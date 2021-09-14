@@ -10,8 +10,10 @@ from validator_lib.validator_config import ValidatorConfig
 
 class IssuesChooser:
 
-    def __init__(self):
+    def __init__(self, issn_db_missing=False):
         self.validator_config = ValidatorConfig()
+
+        self.issn_db_missing = issn_db_missing
 
         # Issue categories that should be at the top of sections.
         self.break_categories = {
@@ -36,7 +38,10 @@ class IssuesChooser:
         canvas = tk.Canvas(self.window)
         scroll_y = ttk.Scrollbar(self.window, orient="vertical", command=canvas.yview)
 
-        issn_mismatch_text = 'issn_mismatch means ISSN does not match WorldCat or ISSN database.\n'
+        if self.issn_db_missing:
+            issn_mismatch_text = 'issn_mismatch means ISSN does not match WorldCat database.\n'
+        else:
+            issn_mismatch_text = 'issn_mismatch means ISSN does not match WorldCat or ISSN database.\n'
 
         instructions_frame = tk.LabelFrame(self.window)
         instructions_label = tk.Label(self.window, text=issn_mismatch_text, justify=tk.LEFT, wraplength=600)
@@ -63,7 +68,11 @@ class IssuesChooser:
                 row_no += 1
             self.int_vars[issue] = tk.IntVar()
             self.int_vars[issue].set(self.validator_config.config['disqualifying_issues'][issue])
-            tk.Checkbutton(issues_frame, text=issue, variable=self.int_vars[issue]).grid(row=row_no, column=col_no, sticky=tk.W)
+            if 'issn_db' in issue and self.issn_db_missing is True:
+                tk.Checkbutton(issues_frame, text=issue, state=tk.DISABLED, variable=self.int_vars[issue]).grid(row=row_no, column=col_no, sticky=tk.W)
+            else:
+                tk.Checkbutton(issues_frame, text=issue, variable=self.int_vars[issue]).grid(row=row_no, column=col_no, sticky=tk.W)
+
             col_no += 1
             if col_no == 2:
                 row_no += 1
