@@ -1,7 +1,7 @@
 /*
  * To generate a styled html instructions or readme page, type something like:
  * 
- * pandoc -c pandoc.css -s --metadata pagetitle="PAPR Validator Instructions" INSTRUCTIONS.md -o Instructions.html
+ * pandoc -c pandoc.css -s --metadata pagetitle="Validator Instructions" INSTRUCTIONS.md -o Instructions.html
  * 
  * This file from https://gist.github.com/killercup/5917178
  */

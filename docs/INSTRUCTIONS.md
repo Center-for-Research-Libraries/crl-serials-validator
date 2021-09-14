@@ -6,7 +6,7 @@ Download the most recent version of Python 3 from [python.org](https://www.pytho
 
 ### Install additional requirements and create data folders
 
-Open a command line window in the PAPR validation folder. The easiest way to do this is to open the folder in Windows Explorer then type `cmd` in the address bar. 
+Open a command line window in the Validator folder. The easiest way to do this is to open the folder in Windows Explorer then type `cmd` in the address bar. 
 
 Install needed additional Python libraries with this command: `pip install -r requirements.txt`.
 
