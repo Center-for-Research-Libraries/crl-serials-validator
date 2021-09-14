@@ -13,7 +13,7 @@ If the user has a subscription to data downloads from the ISSN Centre, the user 
 
 To install and use the Validator you will need:
 
-* One or more WorldCat Search API keys.
+* One or more [WorldCat Search API keys](https://help.oclc.org/Discovery_and_Reference/WorldCat_Discovery/Troubleshooting/How_do_I_request_a_WSKey_for_the_WorldCat_Search_API?sl=en).
 * Python (version 3.4 or later), with the ability to install extra Python libraries.
 * Input files in one of the following formats: xlsx, csv, tab-separated text, or MARC text (mrk).
 
