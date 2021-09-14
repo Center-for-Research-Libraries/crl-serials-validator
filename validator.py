@@ -12,6 +12,7 @@ Usage:
 import sys
 import os
 import argparse
+import webbrowser
 
 from validator_lib.validator_controller import ValidatorController
 
@@ -32,7 +33,9 @@ class SimpleValidatorInterface:
 
         while True:
             response = self.get_wanted_action(question_map)
-            if response == "set_key":
+            if response == "visit_wiki":
+                self.controller.open_project_wiki()
+            elif response == "set_key":
                 self.controller.set_api_keys()
             elif response == "scan_inputs":
                 self.controller.scan_input_files()
@@ -83,6 +86,7 @@ class SimpleValidatorInterface:
         seen in the input folder.
         """
         question_map = [""]
+        question_map.append(("Visit the Validator wiki in a web browser.", "visit_wiki"))
         question_map.append(("Set up your WorldCat Search API keys.", "set_key"))
         if self.controller.input_files_seen:
             if self.controller.marc_input_seen:

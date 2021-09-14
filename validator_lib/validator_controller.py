@@ -1,6 +1,7 @@
 import logging
 import os
 import datetime
+import webbrowser
 
 from validator_lib.validator_file_locations import ValidatorFileLocations
 from crl_lib.api_key_setter import ApiKeySetter
@@ -20,6 +21,7 @@ class ValidatorController(ValidatorFileLocations):
     """
 
     viable_input_formats = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
+    wiki_url = 'https://github.com/Center-for-Research-Libraries/validator/wiki'
 
     def __init__(self, headless_mode=False, log_level='info', portable_install=False):
         super().__init__(portable_install=False)
@@ -78,6 +80,9 @@ class ValidatorController(ValidatorFileLocations):
                     self.input_files_seen = True
                     if input_format == 'mrk':
                         self.marc_input_seen = True
+
+    def open_project_wiki(self):
+        webbrowser.open(self.wiki_url)
 
     def set_api_keys(self):
         self.print_popunder_window_warning()
