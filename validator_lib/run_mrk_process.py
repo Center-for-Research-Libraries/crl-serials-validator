@@ -11,7 +11,7 @@ from crl_lib.crl_utilities import clean_oclc
 from validator_lib.validator_config import ValidatorConfig
 from validator_lib.validate_583s import Line583Validator
 from validator_lib.utilities import get_first_last_year_from_regular_holdings
-from validator_lib.supplements_and_indexs_functions import remove_supplements_from_holdings, remove_indexes_from_holdings
+from validator_lib.supplements_and_indexes_functions import remove_supplements_from_holdings, remove_indexes_from_holdings
 
 
 class MrkProcessRunner:
