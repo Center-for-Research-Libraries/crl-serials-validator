@@ -114,3 +114,12 @@ class ValidatorFileLocations:
                     if not input_file.endswith('xlsx'):
                         continue
             self.input_files.append(input_file)
+
+    def initialize_folders(self):
+        dir_names = ['input', 'output', 'data', 'logs']
+        validator_dir = os.getcwd()
+        for dir_name in dir_names:
+            dir = os.path.join(validator_dir, dir_name)
+            if not os.path.isdir(dir):
+                logging.info('Creating directory {}'.format(dir))
+                os.mkdir(dir)

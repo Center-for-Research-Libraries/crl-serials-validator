@@ -132,16 +132,6 @@ def get_later_of_slash_year(year, data_segment):
     return year
 
 
-def initialize_folders():
-    dir_names = ['input', 'output', 'data', 'logs']
-    validator_dir = os.getcwd()
-    for dir_name in dir_names:
-        dir = os.path.join(validator_dir, dir_name)
-        if not os.path.isdir(dir):
-            logging.info('Creating directory {}'.format(dir))
-            os.mkdir(dir)
-
-
 def get_jstor_issns(validator_data_folder):
     jstor = set()
     data_files = os.listdir(validator_data_folder)

@@ -3,7 +3,6 @@ import os
 import datetime
 
 from validator_lib.validator_file_locations import ValidatorFileLocations
-from validator_lib.utilities import initialize_folders
 from crl_lib.api_key_setter import ApiKeySetter
 from validator_lib.choose_input_file_fields import InputFieldsChooser
 from validator_lib.scan_input_files import InputFileScanner
@@ -11,7 +10,7 @@ from validator_lib.run_checks_process import ChecksRunner
 from validator_lib.choose_disqualifying_issues import IssuesChooser
 
 
-# Set the variable below to True to enable debug logging
+# Set the variable below to True to force debug logging
 DEBUG_MODE = False
 
 
@@ -40,7 +39,7 @@ class ValidatorController(ValidatorFileLocations):
         self.log_file_location_results()
 
         # Make sure the relevant folders exist.
-        initialize_folders()
+        self.initialize_folders()
 
         self.input_files_seen = False
         self.marc_input_seen = False
