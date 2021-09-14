@@ -3,7 +3,7 @@ Validate serials bibliographic and holdings data according to a set of user-defi
 
 ## About
 
-The Validator was built to aid in data analysis for shared print projects, but it can be useful whenever you need to check and verify the quality of any set of serials bibliographic and holdings data.
+The Validator was built to aid in data analysis for shared print projects, specifically for the PAPR project at the Center for Research Libraries. It howver can be useful whenever you need to check and verify the quality of any set of serials bibliographic and holdings data.
 
 The Validator works by reading user-supplied input data and comparing it against bibliographic data downloaded from the WorldCat Search API. It then checks every title in the input data according to rules that can mostly be turned on or off by the user. Typically the Validator looks for titles that exist in WorldCat, that are hard copy serials, that have titles roughly matching that on the WorldCat record, that have holdings with dates matching the publication dates as listed in the WorldCat MARC, and that (when appropriate) have valid and legitimate ISSNs.
 
