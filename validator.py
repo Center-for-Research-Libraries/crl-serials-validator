@@ -12,7 +12,6 @@ Usage:
 import sys
 import os
 import argparse
-import webbrowser
 
 from validator_lib.validator_controller import ValidatorController
 
