@@ -1,4 +1,4 @@
-# Validator
+# The Validator
 Validate serials bibliographic and holdings data according to a set of user-defined rules. 
 
 ## About
