@@ -30,4 +30,4 @@ The Validator has been tested and used on Windows 10 and Linux (Ubuntu 20.04). I
 7. Tell the scripts what input fields your input files have.
 8. Validate the input data.
 
-For further information, see the [Validator Wiki](https://github.com/Center-for-Research-Libraries/validator/wiki).
+For further information, see the [Validator documentation](https://github.com/Center-for-Research-Libraries/validator/tree/main/docs).
