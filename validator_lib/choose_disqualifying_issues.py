@@ -11,7 +11,7 @@ from validator_lib.validator_config import ValidatorConfig
 
 class IssuesChooser:
 
-    error_glossary_url = 'https://github.com/Center-for-Research-Libraries/validator/wiki/disqualifying_issues'
+    error_glossary_url = 'https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/disqualifying_issues.md'
 
     def __init__(self, issn_db_missing=False):
 
@@ -94,9 +94,9 @@ class IssuesChooser:
         btn_reset.grid(column=2, row=0)
         btn_frame.pack()
 
-        wiki_link_label = tk.Label(self.window, text="Click here to open a web browser to visit a glossary of issue codes on the project wiki", fg="blue", cursor="hand2")
-        wiki_link_label.pack()
-        wiki_link_label.bind("<Button-1>", lambda e: webbrowser.open(self.error_glossary_url))
+        docs_link_label = tk.Label(self.window, text="Click here to open a web browser to visit a glossary of issue codes in the documentation", fg="blue", cursor="hand2")
+        docs_link_label.pack()
+        docs_link_label.bind("<Button-1>", lambda e: webbrowser.open(self.error_glossary_url))
 
         canvas.create_window(0, 0, anchor="nw", window=f)
         canvas.update_idletasks()

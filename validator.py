@@ -32,8 +32,8 @@ class SimpleValidatorInterface:
 
         while True:
             response = self.get_wanted_action(question_map)
-            if response == "visit_wiki":
-                self.controller.open_project_wiki()
+            if response == "visit_docs":
+                self.controller.open_project_docs()
             elif response == "set_key":
                 self.controller.set_api_keys()
             elif response == "scan_inputs":
@@ -85,7 +85,7 @@ class SimpleValidatorInterface:
         seen in the input folder.
         """
         question_map = [""]
-        question_map.append(("Visit the Validator wiki in a web browser.", "visit_wiki"))
+        question_map.append(("Visit the Validator documentation in a web browser.", "visit_docs"))
         question_map.append(("Set up your WorldCat Search API keys.", "set_key"))
         if self.controller.input_files_seen:
             if self.controller.marc_input_seen:

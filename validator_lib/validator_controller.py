@@ -21,7 +21,7 @@ class ValidatorController(ValidatorFileLocations):
     """
 
     viable_input_formats = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
-    wiki_url = 'https://github.com/Center-for-Research-Libraries/validator/wiki'
+    docs_url = 'https://github.com/Center-for-Research-Libraries/validator/tree/main/docs'
 
     def __init__(self, headless_mode=False, log_level='info', portable_install=False):
         super().__init__(portable_install=False)
@@ -81,8 +81,8 @@ class ValidatorController(ValidatorFileLocations):
                     if input_format == 'mrk':
                         self.marc_input_seen = True
 
-    def open_project_wiki(self):
-        webbrowser.open(self.wiki_url)
+    def open_project_docs(self):
+        webbrowser.open(self.docs_url)
 
     def set_api_keys(self):
         self.print_popunder_window_warning()
