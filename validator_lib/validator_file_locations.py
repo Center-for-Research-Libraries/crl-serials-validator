@@ -39,6 +39,8 @@ class ValidatorFileLocations:
     issn_db_location = None
 
     def __init__(self, portable_install=False):
+        self.initialize_folders()
+
         self.look_for_validator_data_folder()
         if not portable_install:
             self.look_for_crl_marc_machine_folder()
