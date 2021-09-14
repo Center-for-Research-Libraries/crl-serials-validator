@@ -34,7 +34,7 @@ The Validator uses general data files in a folder called `CRL MARC Machine` loca
 
 ## Running the Validator
 
-The validator can be run by typing `python papr_validator.py` in the command window. You may see a warning that says "Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning." This can be ignored.
+The validator can be run by typing `python validator.py` in the command window. You may see a warning that says "Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning." This can be ignored.
 
 From here, running the Validator should be relatively straightforward.
 
@@ -46,7 +46,7 @@ Choosing this option will cause a separate window to open. It might open under t
 
 ### Do a quick scan of any MARC input files
 
-This runs through all of the MARC files in the input folder to check for common fields. It will print a report in a file called `Quick Scan.txt` that will go in the top level folder. This is intended to help you figure out what fields contain holdings, bib IDs, and so forth, and can be skipped if you are already familiar with your MARC input files.
+This runs through all of the MARC files in the input folder to check for common fields and print the results to the screen and the log file. This is intended to help you figure out what fields contain holdings, bib IDs, and so forth, and can be skipped if you are already familiar with your MARC input files.
 
 This option won't appear if there are no MARC files in the input folder.
 
@@ -61,6 +61,12 @@ MARC fields and subfields should be entered like "035a". Spreadsheet columns sho
 Skip any fields that aren't in the input file.
 
 This must be done before moving on to the next steps.
+
+### Specify disqualifying issues
+
+Choose this option to determine what issues will cause the Validator to fail a specific title. The Validator will always check for every issue and report when it finds them, but will only fail titles on the issues you specify.
+
+There is a [glossary of disqualifying issues](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/disqualifying_issues.md) in the documentation.
 
 ###  Process input and WorldCat MARC to create outputs
 
