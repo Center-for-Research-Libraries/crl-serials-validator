@@ -5,12 +5,16 @@ fail checks.
 
 import tkinter as tk
 import tkinter.ttk as ttk
+import webbrowser
 
 from validator_lib.validator_config import ValidatorConfig
 
 class IssuesChooser:
 
+    error_glossary_url = 'https://github.com/Center-for-Research-Libraries/validator/wiki/disqualifying_issues'
+
     def __init__(self, issn_db_missing=False):
+
         self.validator_config = ValidatorConfig()
 
         self.issn_db_missing = issn_db_missing
@@ -38,15 +42,14 @@ class IssuesChooser:
         canvas = tk.Canvas(self.window)
         scroll_y = ttk.Scrollbar(self.window, orient="vertical", command=canvas.yview)
 
-        if self.issn_db_missing:
-            issn_mismatch_text = 'issn_mismatch means ISSN does not match WorldCat database.\n'
-        else:
-            issn_mismatch_text = 'issn_mismatch means ISSN does not match WorldCat or ISSN database.\n'
+        title_text = 'Select Disqualifying Issues'
 
-        instructions_frame = tk.LabelFrame(self.window)
-        instructions_label = tk.Label(self.window, text=issn_mismatch_text, justify=tk.LEFT, wraplength=600)
-        instructions_label.pack()
-        instructions_frame.pack()
+        Font_tuple = ("sans", 12, "bold")
+
+        title_frame = tk.LabelFrame(self.window)
+        title_label = tk.Label(self.window, text=title_text, justify=tk.LEFT, wraplength=600, fg="black", bg="white")
+        title_label.configure(font=Font_tuple)
+        title_label.pack()
 
         # spacer bar
         tk.Frame(self.window, height=2, bd=1, relief=tk.SUNKEN).pack(fill=tk.X, padx=5, pady=5)
@@ -91,6 +94,10 @@ class IssuesChooser:
         btn_reset.grid(column=2, row=0)
         btn_frame.pack()
 
+        wiki_link_label = tk.Label(self.window, text="Click here to open a web browser to visit a glossary of issue codes on the project wiki", fg="blue", cursor="hand2")
+        wiki_link_label.pack()
+        wiki_link_label.bind("<Button-1>", lambda e: webbrowser.open(self.error_glossary_url))
+
         canvas.create_window(0, 0, anchor="nw", window=f)
         canvas.update_idletasks()
 
@@ -102,6 +109,9 @@ class IssuesChooser:
         self.window.lift()
 
         self.window.mainloop()
+
+    def open_glossary_on_wiki(self):
+        webbrowser.open(self.error_glossary_url)
 
     def ok_clicked(self):
         for issue in self.validator_config.config['disqualifying_issues']:
