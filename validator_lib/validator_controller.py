@@ -21,7 +21,7 @@ class ValidatorController(ValidatorFileLocations):
     """
 
     viable_input_formats = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
-    docs_url = 'https://github.com/Center-for-Research-Libraries/validator/tree/main/docs'
+    docs_url = 'https://github.com/Center-for-Research-Libraries/validator/blob/main/README.md'
 
     def __init__(self, headless_mode=False, log_level='info', portable_install=False):
         super().__init__(portable_install=False)
