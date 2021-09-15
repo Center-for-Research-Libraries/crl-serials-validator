@@ -110,11 +110,5 @@ The Validator will run and produce two spreadsheets for every institution, that 
 
 While the Validator is running, the process will download MARC records from the WorldCat API for any OCLC number that it has not updated in the last year. This means that initial runs of a set of data can be *much* longer than later runs. The speed of the API work will depend heavily on network conditions, both locally and at OCLC.
 
-## More information
-
-The [Validator documentation](https://github.com/Center-for-Research-Libraries/validator/tree/main/docs) includes glossaries of...
-* ...possible [disqualifying issues](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/disqualifying_issues.md).
-* ...terms from ["Originally from" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/originally_from.md).
-* ...terms from ["For review" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/for_review.md).
-* ...terms from the ["Checklist" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/checklist.md).
+For more on the outputs, see the glossary of terms for the ["Originally from" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/originally_from.md), the ["For review" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/for_review.md), and the the ["Checklist" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/checklist.md).
 
