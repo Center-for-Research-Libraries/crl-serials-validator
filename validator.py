@@ -44,7 +44,20 @@ class SimpleValidatorInterface:
             elif response == "set_issues":
                 self.controller.set_disqualifying_issues()
             elif response == "process_data":
-                self.controller.run_checks_process()
+                error_message, warning_messages = self.controller.check_if_run_is_possible()
+                if error_message:
+                    print('')
+                    print('ERROR: {}'.format(error_message))
+                    self.command_line_pause()
+                else:
+                    if warning_messages:
+                        for warning_message in warning_messages:
+                            print('WARNING: {}'.format(warning_message))
+                        continue_check = input("Run the process anyway? (Y/N)")
+                        if not continue_check.lower().startswith('y'):
+                            self.command_line_pause()
+                            continue
+                    self.controller.run_checks_process()
             elif response == "quit":
                 print("Quitting.")
                 sys.exit()
