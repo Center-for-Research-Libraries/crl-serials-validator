@@ -13,7 +13,9 @@ from validator_lib.process_input_data import InputDataProcessor
 
 
 class ChecksRunner:
-    def __init__(self, data_storage_folder, data_folder, input_files, output_dir, issn_db_location, running_headless=False):
+    def __init__(
+        self, data_storage_folder, data_folder, input_files, output_dir, issn_db_location, 
+        files_without_input_fields, running_headless=False):
 
         self.running_headless = running_headless
 
@@ -32,6 +34,9 @@ class ChecksRunner:
         completed_files = set()
         for input_file in input_files:
             if input_file in completed_files:
+                continue
+            elif input_file in files_without_input_fields:
+                print('Skipping {}; no input fields set.')
                 continue
             print('Processing {}'.format(input_file))
             completed_files.add(input_file)

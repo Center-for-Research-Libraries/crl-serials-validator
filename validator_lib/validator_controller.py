@@ -105,12 +105,14 @@ class ValidatorController(ValidatorFileLocations):
             IssuesChooser(issn_db_missing=False)
 
     def run_checks_process(self):
+        input_file_checks = self.get_files_with_and_without_input_fields()
         ChecksRunner(
             self.data_storage_folder,
             self.validator_data_folder,
             self.input_files,
             self.validator_output_folder, 
             self.issn_db_location,
+            input_file_checks['without_fields'],
             running_headless=self.headless_mode)
 
     def print_popunder_window_warning(self):
@@ -123,6 +125,21 @@ class ValidatorController(ValidatorFileLocations):
         print("Opening a new program window.")
         print("If you don't see it, please look for it in your taskbar.")
         print('========================================================')
+
+    def get_files_with_and_without_input_fields(self):
+        """
+        Check which files have and don't have input fields set.
+        """
+        input_file_checks = {'with_fields': set(), 'without_fields': set()}
+        v = ValidatorConfig()
+        for input_file in self.input_files:
+            input_fields = v.get_input_fields(input_file)
+            if input_fields:
+                input_file_checks['with_fields'].add(input_file)
+            else:
+                input_file_checks['without_fields'].add(input_file)
+        del(v)
+        return input_file_checks
 
     def check_if_run_is_possible(self):
         """
@@ -139,13 +156,13 @@ class ValidatorController(ValidatorFileLocations):
             error_message = "Please set a WorldCat Search API key."
             return error_message, warning_messages
         del(api_keys)
-        v = ValidatorConfig()
+
+        input_file_checks = self.get_files_with_and_without_input_fields()
         fields_seen = False
         file_seen = False
         for input_file in self.input_files:
             file_seen = True
-            input_fields = v.get_input_fields(input_file)
-            if input_fields:
+            if input_file in input_file_checks['with_fields']:
                 fields_seen = True
             else:
                 message = 'No input fields set for file {}. File will be skipped.'.format(input_file)
