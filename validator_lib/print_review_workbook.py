@@ -243,7 +243,7 @@ class ReviewWorkbookPrinter:
 
             load_status = 'review'
             if not title_dict['invalid_record'] == '1' and not title_dict['disqualifying_errors']:
-                load_status = 'loaded'
+                load_status = 'validated'
             if title_dict['local_title']:
                 title = title_dict['local_title']
             else:
