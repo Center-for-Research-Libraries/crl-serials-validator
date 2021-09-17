@@ -4,12 +4,14 @@ import datetime
 import webbrowser
 
 from validator_lib.validator_file_locations import ValidatorFileLocations
-from crl_lib.api_key_setter import ApiKeySetter
 from validator_lib.choose_input_file_fields import InputFieldsChooser
 from validator_lib.scan_input_files import InputFileScanner
 from validator_lib.run_checks_process import ChecksRunner
 from validator_lib.choose_disqualifying_issues import IssuesChooser
+from validator_lib.validator_config import ValidatorConfig
 
+from crl_lib.api_key_setter import ApiKeySetter
+from crl_lib.api_keys import OclcApiKeys
 
 # Set the variable below to True to force debug logging
 DEBUG_MODE = False
@@ -121,3 +123,41 @@ class ValidatorController(ValidatorFileLocations):
         print("Opening a new program window.")
         print("If you don't see it, please look for it in your taskbar.")
         print('========================================================')
+
+    def check_if_run_is_possible(self):
+        """
+        Make sure that everything is in place to actually complete a run. This is a simple check, checking only if:
+            1. An API key is set
+            2. At least one file in the input folder has input fields set
+        """
+
+        warning_messages = []
+
+        api_keys = OclcApiKeys(self.data_storage_folder)
+        if not api_keys.api_key:
+            logging.error('No WorldCat SEearch API key set.')
+            error_message = "Please set a WorldCat Search API key."
+            return error_message, warning_messages
+        del(api_keys)
+        v = ValidatorConfig()
+        fields_seen = False
+        file_seen = False
+        for input_file in self.input_files:
+            file_seen = True
+            input_fields = v.get_input_fields(input_file)
+            if input_fields:
+                fields_seen = True
+            else:
+                message = 'No input fields set for file {}. File will be skipped.'.format(input_file)
+                logging.warning(message)
+                warning_messages.append(message)
+        if fields_seen is True:
+            return None, warning_messages
+        elif file_seen is True:
+            error_message = 'No input fields set for any file.'
+            logging.error(error_message)
+            return error_message, warning_messages
+        else:
+            error_message = 'No valid input files seen in input folder.'
+            logging.error(error_message)
+            return error_message, warning_messages
