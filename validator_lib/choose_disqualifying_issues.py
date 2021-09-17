@@ -21,7 +21,7 @@ class IssuesChooser:
 
         # Issue categories that should be at the top of sections.
         self.break_categories = {
-            'binding_words_in_holdings', 'duplicate_holdings_id', 'holdings_out_of_range', 'invalid_local_issn', 
+            'binding_words_in_holdings', 'duplicate_holdings_id', 'holdings_out_of_range', 'title_in_jstor', 'invalid_local_issn', 
             'oclc_mismatch', 'line_583_error' }
 
         self.window = None

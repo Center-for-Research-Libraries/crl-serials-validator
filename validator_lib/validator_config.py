@@ -11,6 +11,7 @@ class ValidatorConfig:
         self.project_config_file = os.path.join(data_folder, 'validator_config.ini')
         self.config_data = {}
         self.read_validator_config_file()
+        self.check_that_all_issues_are_in_config()
 
     def read_validator_config_file(self):
         # create a blank file if none exists
@@ -39,6 +40,21 @@ class ValidatorConfig:
                 cat_data = self.zero_fill_marc_fields(cat_data)
             input_fields[cat] = cat_data
         return input_fields
+
+    def check_that_all_issues_are_in_config(self):
+        default_issues = self.get_default_disqualifying_issues()
+        changed_issues = False
+        for issue in default_issues:
+            if issue not in self.config['disqualifying_issues']:
+                print('NO {}'.format(issue))
+                self.config['disqualifying_issues'][issue] = '0'
+                changed_issues = True
+        for issue in self.config['disqualifying_issues']:
+            if issue not in default_issues:
+                self.config['disqualifying_issues'].pop(issue)
+                changed_issues = True
+        if changed_issues:
+            self.write_validator_config_file()
 
     @staticmethod
     def zero_fill_marc_fields(field):

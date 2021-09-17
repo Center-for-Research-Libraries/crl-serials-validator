@@ -11,8 +11,9 @@ import validator_lib.utilities
 
 
 class InputDataProcessor:
-    def __init__(self, title_dicts, input_fields, found_issn_db):
+    def __init__(self, title_dicts, input_fields, found_issn_db, jstor_titles):
         self.found_issn_db = found_issn_db
+        self.jstor_titles = jstor_titles
         self.title_dicts = title_dicts
         self.input_fields = input_fields
         self.disqualifying_issue_categories = validator_lib.utilities.get_disqualifying_issue_categories()
@@ -43,15 +44,16 @@ class InputDataProcessor:
             self.check_form(title_dict)
             self.check_carrier_type(title_dict)
             self.check_media_type(title_dict)
+            self.check_if_title_in_jstor(title_dict)
             self.assemble_errors_in_dict(title_dict)
 
     def get_issues_to_check(self):
         issues_to_check = [
             'bib_lvl_not_serial', 'binding_words_in_holdings', 'completeness_words_in_holdings', 'form_not_print', 
-            'holdings_have_no_years', 'holdings_out_of_range', 
+            'holdings_have_no_years', 'holdings_out_of_range', 'title_in_jstor',
             'invalid_carrier_type', 'invalid_local_issn', 'invalid_media_type', 'issn_mismatch', 
             'nonprint_words_in_holdings', 'oclc_mismatch', 'record_type_not_language_material', 
-            'serial_type_not_periodical', 'title_mismatch' ]
+            'serial_type_not_periodical', 'title_mismatch', 'title_in_jstor' ]
         if self.found_issn_db:
             issn_db_issues = [
                 'holdings_out_of_issn_db_date_range',
@@ -177,6 +179,12 @@ class InputDataProcessor:
             if self.found_issn_db is True:
                 if 'issn_db_issn' not in title_dict or title_dict['issn_db_issn'] != title_dict['local_issn']:
                     title_dict['issn_mismatch'] = '1'
+
+    def check_if_title_in_jstor(self, title_dict):
+        issn_cats = ['local_issn', 'wc_issn', 'issn_db_issn']
+        for issn_cat in issn_cats:
+            if title_dict[issn_cat] and title_dict[issn_cat] in self.jstor_titles:
+                title_id['title_in_jstor'] = '1'
 
     @staticmethod
     def run_holdings_checks(title_dict):
