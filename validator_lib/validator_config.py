@@ -72,6 +72,8 @@ class ValidatorConfig:
             'completeness_words_in_holdings': 1,
             'nonprint_words_in_holdings': 1,
 
+            'title_in_jstor': 0,
+
             'duplicate_holdings_id': 1,
             'duplicate_local_oclc': 1,
             'duplicate_wc_oclc': 1,
