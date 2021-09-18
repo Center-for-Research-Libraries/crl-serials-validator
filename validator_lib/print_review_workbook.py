@@ -2,13 +2,16 @@ from collections import defaultdict, Counter
 import os
 from pprint import pprint
 import logging
+import csv
 
 from crl_lib.crl_xlsxwriter import CRLXlsxWriter
 import validator_lib.utilities
 
 
 class ReviewWorkbookPrinter:
-    def __init__(self, title_dicts, line_583_validation_output, print_errors_only=False):
+    def __init__(self, title_dicts, line_583_validation_output, running_headless, print_errors_only=False):
+
+        self.running_headless = running_headless
 
         # if we have KeyErrors with dict keys containing "issn_db" we'll know the database isn't installed
         self.issn_db_not_seen = False
@@ -325,4 +328,18 @@ class ReviewWorkbookPrinter:
                 if self.line_583_validation_output and self.print_errors_only is False:
                     output_pages['Line 583 validation'] = {'data': self.line_583_validation_output}
 
+            if self.running_headless:
+                headless_output_filename = output_file_location.replace('.xlsx', '.txt')
+                headless_output_filename = headless_output_filename.replace('review', 'loading')
+                self.print_headless_output(output_pages['Checklist'], headless_output_filename)
+
             CRLXlsxWriter(output_file_location, output_pages)
+
+    def print_headless_output(self, checklist_data, headless_output_filename):
+        header_row = checklist_data['data'][0]
+        fout = open(headless_output_filename, 'w', encoding='utf8')
+        cout = csv.writer(fout, delimiter='\t')
+        for row in checklist_data['data']:
+            if row[1] == '1':
+                continue
+            cout.writerow(row)
