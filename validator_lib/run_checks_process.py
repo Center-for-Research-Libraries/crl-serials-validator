@@ -36,7 +36,7 @@ class ChecksRunner:
             if input_file in completed_files:
                 continue
             elif input_file in files_without_input_fields:
-                print('Skipping {}; no input fields set.')
+                print('Skipping {}; no input fields set.'.format(input_file))
                 continue
             print('Processing {}'.format(input_file))
             completed_files.add(input_file)
@@ -50,7 +50,7 @@ class ChecksRunner:
             validator_issn_db.process_title_dicts(input_file_data, input_file)
             InputDataProcessor(input_file_data, input_file, found_issn_db, self.jstor)
 
-            ReviewWorkbookPrinter(input_file_data, line_583_validation_output)
+            ReviewWorkbookPrinter(input_file_data, line_583_validation_output, self.running_headless)
 
     def add_worldcat_data_to_input_file_data_dicts(self, input_file_data, input_file):
         print("Getting WorldCat data for records in {}.".format(input_file))
