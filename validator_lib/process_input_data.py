@@ -181,10 +181,12 @@ class InputDataProcessor:
                     title_dict['issn_mismatch'] = '1'
 
     def check_if_title_in_jstor(self, title_dict):
-        issn_cats = ['local_issn', 'wc_issn', 'issn_db_issn']
+        title_dict['title_in_jstor'] = ''
+        issn_cats = ['local_issn', 'wc_issn_a', 'issn_db_issn']
         for issn_cat in issn_cats:
-            if title_dict[issn_cat] and title_dict[issn_cat] in self.jstor_titles:
-                title_id['title_in_jstor'] = '1'
+            if issn_cat in title_dict and title_dict[issn_cat]:
+                if title_dict[issn_cat] in self.jstor_titles:
+                    title_dict['title_in_jstor'] = '1'
 
     @staticmethod
     def run_holdings_checks(title_dict):
