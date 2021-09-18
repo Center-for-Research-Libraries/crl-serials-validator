@@ -56,8 +56,6 @@ Input files can be MARC text (.mrk), Excel, csv, or tsv (with a ".tsv" or ".txt"
 
 ### Add a JSTOR file, if needed
 
-NOTE: The JSTOR section isn't implemented, so ignore the below.
-
 If you want the system to check whether or not a title is in JSTOR, add a file of JSTOR ISSNs to the data folder. The file should be a text list of only jstor ISSNs, and should have a name starting with "jstor" and ending with ".txt". It doesn't have to be called `jstor.txt`, but that would be an obvious option.
 
 ### Data files
