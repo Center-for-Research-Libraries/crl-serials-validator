@@ -34,7 +34,9 @@ class ReviewWorkbookPrinter:
             'completeness_words_in_holdings', 'binding_words_in_holdings', 'nonprint_words_in_holdings', 
             'wc_line_362', 'current_freq', 'former_freq', 
             'preceding_oclcs',
-            'succeeding_oclcs', 'other_oclcs', 'numbering_peculiarities', 'issn_db_issn',
+            'succeeding_oclcs', 'other_oclcs', 'numbering_peculiarities', 
+            'title_in_jstor',
+            'issn_db_issn',
             'local_issn_mismatches_issn_db_issn', 'wc_issn_mismatches_issn_db_issn', 'issn_db_title', 'issn_db_format',
             'issn_db_serial_type', 'issn_db_year_1', 'issn_db_year_2', 'holdings_out_of_issn_db_date_range'
             ]
