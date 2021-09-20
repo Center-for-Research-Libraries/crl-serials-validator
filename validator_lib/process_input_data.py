@@ -7,13 +7,13 @@ import warnings
 
 with warnings.catch_warnings():
     """
-    fuzzywuzzy on import will throw the following warning:
+    thefuzz on import will throw the following warning:
     "Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning"
-    On Windows installing this requires installing a C++ package from Visual Studio, and so isn't realistic for this
+    On Windows installing this requires installing the Visual C++ 2019 redistributable, and so isn't realistic for this
     project. Instead we'll just suppress the warning.
     """
     warnings.simplefilter("ignore")
-    from fuzzywuzzy import fuzz
+    from thefuzz import fuzz
 
 
 from crl_lib.crl_utilities import check_for_valid_issn
@@ -294,7 +294,7 @@ class InputDataProcessor:
     @staticmethod
     def match_titles(title_dict):
         """
-        ATM we're doing simple Levenshtein distances with fuzzywuzzy. The numbers probably need to be massaged a lot.
+        ATM we're doing simple Levenshtein distances with thefuzz. The numbers probably need to be massaged a lot.
         """
         if not title_dict['local_title'] or not title_dict['wc_title']:
             title_dict['title_mismatch'] = ''

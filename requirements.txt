@@ -1,6 +1,6 @@
 unidecode
 pymarc
-fuzzywuzzy
+thefuzz
 xlsxwriter
 openpyxl
 requests
