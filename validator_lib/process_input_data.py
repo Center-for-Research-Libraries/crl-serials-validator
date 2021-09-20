@@ -1,8 +1,20 @@
 from collections import defaultdict
-from fuzzywuzzy import fuzz
 from unidecode import unidecode
 from pprint import pprint
 import logging
+import warnings
+
+
+with warnings.catch_warnings():
+    """
+    fuzzywuzzy on import will throw the following warning:
+    "Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning"
+    On Windows installing this requires installing a C++ package from Visual Studio, and so isn't realistic for this
+    project. Instead we'll just suppress the warning.
+    """
+    warnings.simplefilter("ignore")
+    from fuzzywuzzy import fuzz
+
 
 from crl_lib.crl_utilities import check_for_valid_issn
 from crl_lib.date_utilities import check_year_between
