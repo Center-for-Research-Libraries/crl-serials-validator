@@ -1,5 +1,4 @@
 unidecode
-pymarc
 thefuzz
 xlsxwriter
 openpyxl
