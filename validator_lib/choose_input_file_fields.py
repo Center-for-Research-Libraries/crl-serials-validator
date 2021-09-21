@@ -11,17 +11,12 @@ import re
 from validator_lib.validator_config import ValidatorConfig
 
 
-class InputFieldsChooser:
-    def __init__(self, input_files):
-        self.validator_config = ValidatorConfig()
-        self.window = None
-        self.fields = None
-        self.all_input_files = input_files
-        self.warnings = None
-        self.marc_cats = ["oclc", "583", "bib_id", "holdings_id", "863", "866", "holdings_1", "holdings_2"]
-        self.spreadsheet_cats = ["header", "oclc", "bib_id", "holdings_id", "institution", "oclc_symbol", "location", 
-                                 "issn", "title", "holdings_0", "holdings_1", "holdings_2", "holdings_3"]
-        self.cat_labels = {
+class InputFields:
+    marc_cats = ["oclc", "583", "bib_id", "holdings_id", "863", "866", "holdings_1", "holdings_2"]
+    spreadsheet_cats = [
+        "header", "oclc", "bib_id", "holdings_id", "institution", "oclc_symbol", "location", "issn", "title", 
+        "holdings_0", "holdings_1", "holdings_2", "holdings_3"]
+    cat_labels = {
             "header": "Has header row",
             "oclc": "OCLC",
             "bib_id": "Bib no",
@@ -39,8 +34,21 @@ class InputFieldsChooser:
             "location": "Location",
             "583": "File has 583s"
         }
+    spreadsheet_file_endings = [".txt", ".csv", ".tsv", ".xlsx", ".xls"]
+
+
+class InputFieldsChooser:
+    def __init__(self, input_files):
+        self.validator_config = ValidatorConfig()
+        self.window = None
+        self.fields = None
+        self.all_input_files = input_files
+        self.warnings = None
+        self.marc_cats = InputFields.marc_cats.copy()
+        self.spreadsheet_cats = InputFields.spreadsheet_cats.copy()
+        self.cat_labels = InputFields.cat_labels.copy()
         self.checkbox_cats = {"header", "863", "866", "583"}
-        self.spreadsheet_file_endings = [".txt", ".csv", ".tsv", ".xlsx", ".xls"]
+        self.spreadsheet_file_endings = InputFields.spreadsheet_file_endings.copy()
         self.create_main_window()
 
     def create_main_window(self):
