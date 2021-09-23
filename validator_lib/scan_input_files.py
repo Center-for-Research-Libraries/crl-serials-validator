@@ -54,12 +54,14 @@ class InputFileScanner:
                 file_data["OCLC in 035"] += 1
             elif "=035  " in marc:
                 file_data["Have 035"] += 1
+            if "=583  " in marc:
+                file_data["Have 583"] += 1
             if "=863  " in marc or "=864  " in marc or "=865  " in marc:
                 file_data["Have 863/864/865"] += 1
             if "=866  " in marc or "=867  " in marc or "=868  " in marc:
                 file_data["Have 866/867/868"] += 1
 
-        cats = ["Total records", "Have 001 field", "Have 004 field", "Have 035", "OCLC in 035",
+        cats = ["Total records", "Have 001 field", "Have 004 field", "Have 035", "OCLC in 035", "Have 583",
                 "Have 863/864/865", "Have 866/867/868"]
 
         # skip blank file
