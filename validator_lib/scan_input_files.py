@@ -22,8 +22,9 @@ from crl_lib.marc_fields import MarcFields
 
 class InputFileScanner:
     def __init__(self, input_files):
-
+        
         self.data = {}
+        self.input_dir = os.path.join(os.getcwd(), 'input')
         logging.debug("Scanning input files.")
         for input_file in input_files:
             if input_file.endswith(".mrk"):
