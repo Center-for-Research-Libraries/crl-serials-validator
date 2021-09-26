@@ -1,4 +1,5 @@
-from tkinter import Tk, IntVar, Label, Entry, Button, Radiobutton, Frame
+from tkinter import Tk, IntVar
+from tkinter.ttk import Label, Entry, Button, Radiobutton, Frame
 
 from crl_lib.api_keys import OclcApiKeys
 from pprint import pprint
