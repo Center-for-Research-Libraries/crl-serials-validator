@@ -8,7 +8,7 @@ import tkinter.ttk as ttk
 import webbrowser
 
 from validator_lib.validator_config import ValidatorConfig
-from validator_lib.ttk_theme import set_theme
+from validator_lib.ttk_theme import set_ttk_style
 
 class IssuesChooser(tk.Tk):
 
@@ -49,7 +49,7 @@ class IssuesChooser(tk.Tk):
         # style.configure('defaults.TButton')
         # style.map('defaults.TButton', background=[('active', 'lightblue')])
 
-        style = set_theme(self)
+        style = set_ttk_style(self)
 
         start_x, start_y = self.get_center_location()
         # self.geometry('{}x{}+{}+{}'.format(self.window_width, self.window_height, start_x, start_y))
@@ -63,8 +63,10 @@ class IssuesChooser(tk.Tk):
         # title_label = ttk.Label(self, text=self.title_text, justify=tk.LEFT, wraplength=600)
         # title_label.pack()
         
-        docs_link_label = ttk.Button(self, text="Click to visit a glossary of issue codes in a web browser")
-        docs_link_label['style'] = 'link.TButton'
+        spacer_top = tk.Label(text='')
+        spacer_top.pack()
+        docs_link_label = ttk.Button(self, text="Click here to visit a glossary of issue codes in a web browser")
+        docs_link_label['style'] = 'info.TButton'
         docs_link_label.pack(fill='x')
         docs_link_label.bind("<Button-1>", lambda e: webbrowser.open(self.error_glossary_url))
 
@@ -97,9 +99,9 @@ class IssuesChooser(tk.Tk):
         issues_frame.pack(anchor=tk.W, fill=tk.X, padx=5, pady=5)
 
         btn_frame = ttk.Frame(padding='10')
-        btn_save = ttk.Button(btn_frame, text="Save", style="save.TButton", command=self.ok_clicked)
-        btn_cancel = ttk.Button(btn_frame, text="Cancel", style="cancel.TButton",  command=self.cancelled)
-        btn_reset = ttk.Button(btn_frame, text="Defaults", style="defaults.TButton",  command=self.reset_fields)
+        btn_save = ttk.Button(btn_frame, text="Save", style="success.TButton", command=self.ok_clicked)
+        btn_cancel = ttk.Button(btn_frame, text="Cancel", style="warning.TButton",  command=self.cancelled)
+        btn_reset = ttk.Button(btn_frame, text="Defaults", style="danger.TButton",  command=self.reset_fields)
         btn_save.grid(column=0, row=0)
         spacer1 = tk.Label(btn_frame)
         spacer1.grid(column=1, row=0)

@@ -1,7 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 
-from validator_lib.ttk_theme import set_theme
+from validator_lib.ttk_theme import set_ttk_style
 from crl_lib.api_keys import OclcApiKeys
 
 
@@ -33,7 +33,7 @@ class ApiKeySetter(tk.Tk):
 
         self.title("Set WorldCat Search API keys")
 
-        style = set_theme(self)
+        style = set_ttk_style(self)
 
         # lbl = ttk.Label(self, text="Set WorldCat Search API keys", font=("Arial Bold", 14))
         # lbl.grid(column=1, row=0)
@@ -71,10 +71,12 @@ class ApiKeySetter(tk.Tk):
             self.inputs[i]["radio"].grid(column=2, row=i+2)
 
         btn_frame = ttk.Frame()
-        btn_save = ttk.Button(btn_frame, text="Save", command=self.clicked)
-        btn_cancel = ttk.Button(btn_frame, text="Cancel", command=self.cancelled)
+        btn_save = ttk.Button(btn_frame, text="Save", command=self.clicked, style='success.TButton')
+        spacer = ttk.Label(btn_frame)
+        btn_cancel = ttk.Button(btn_frame, text="Cancel", command=self.cancelled, style='warning.TButton')
         btn_save.grid(column=0, row=0)
-        btn_cancel.grid(column=1, row=0)
+        spacer.grid(column=1, row=0)
+        btn_cancel.grid(column=2, row=0)
         btn_frame.grid(row=9, column=2)
 
         # put the window more towards the center of the screen

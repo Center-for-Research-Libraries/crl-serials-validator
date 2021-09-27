@@ -9,7 +9,7 @@ import tkinter.messagebox
 import re
 
 from validator_lib.validator_config import ValidatorConfig
-from validator_lib.ttk_theme import set_theme
+from validator_lib.ttk_theme import set_ttk_style
 
 
 class InputFields:
@@ -57,7 +57,7 @@ class InputFieldsChooser(tk.Tk):
 
         self.warnings = []
 
-        style = set_theme(self)
+        style = set_ttk_style(self)
 
         self.title('Choose Input File Fields')
         window_width = 440
@@ -105,11 +105,11 @@ class InputFieldsChooser(tk.Tk):
 
         btn_frame = ttk.Frame(f)
         btn_save = ttk.Button(btn_frame, text="Save", command=self.ok_clicked)
-        btn_save['style'] = 'save.TButton'
+        btn_save['style'] = 'success.TButton'
         btn_cancel = ttk.Button(btn_frame, text="Cancel", command=self.cancelled)
-        btn_cancel['style'] = 'cancel.TButton'
+        btn_cancel['style'] = 'warning.TButton'
         btn_reset = ttk.Button(btn_frame, text="Reset Fields", command=self.reset_fields)
-        btn_reset['style'] = 'defaults.TButton'
+        btn_reset['style'] = 'danger.TButton'
 
         btn_save.grid(column=0, row=0)
         spacer1 = ttk.Label(btn_frame, text="")
