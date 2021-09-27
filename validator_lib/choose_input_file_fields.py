@@ -150,10 +150,10 @@ class InputFieldsChooser(tk.Tk):
                 file_data[cat] = ttk.Checkbutton(file_data["frame"], text=self.cat_labels[cat],
                                                 variable=file_data["{}_{}".format(input_file, cat)])
                 self.pre_fill_entry(cat, input_file, file_data)
-                file_data[cat].grid(row=row_number, column=0, columnspan=2, sticky=tk.W)
+                file_data[cat].grid(row=row_number, column=0, columnspan=2, sticky=tk.W, ipady=2)
             else:
                 ttk.Label(file_data["frame"], text=self.cat_labels[cat]).grid(row=row_number, column=0, sticky=tk.W)
-                file_data[cat] = ttk.Entry(file_data["frame"], width=10)
+                file_data[cat] = ttk.Entry(file_data["frame"])
                 self.pre_fill_entry(cat, input_file, file_data)
                 file_data[cat].grid(row=row_number, column=1)
                 

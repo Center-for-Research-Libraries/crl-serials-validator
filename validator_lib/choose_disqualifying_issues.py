@@ -85,10 +85,10 @@ class IssuesChooser(tk.Tk):
 
             if 'issn_db' in issue and self.issn_db_missing is True:
                 self.int_vars[issue].set(0)
-                ttk.Checkbutton(issues_frame, text=issue, state=tk.DISABLED, variable=self.int_vars[issue]).grid(row=row_no, column=col_no, sticky=tk.W)
+                ttk.Checkbutton(issues_frame, text=issue, state=tk.DISABLED, variable=self.int_vars[issue]).grid(row=row_no, column=col_no, sticky=tk.W, ipady=2)
             else:
                 self.int_vars[issue].set(self.validator_config.config['disqualifying_issues'][issue])
-                ttk.Checkbutton(issues_frame, text=issue, variable=self.int_vars[issue]).grid(row=row_no, column=col_no, sticky=tk.W)
+                ttk.Checkbutton(issues_frame, text=issue, variable=self.int_vars[issue]).grid(row=row_no, column=col_no, sticky=tk.W, ipady=2)
 
             col_no += 1
             if col_no == 2:
