@@ -1,5 +1,6 @@
 from tkinter import ttk
 import tkinter as tk
+import platform
 
 def set_theme(tk_object=None):
     """
@@ -16,7 +17,13 @@ def set_theme(tk_object=None):
     #     tk_object.configure(bg=bg_color)
 
     style = ttk.Style()
-    style.theme_use('clam')
+
+    if platform.system() == 'Windows':
+        style.theme_use('winnative')
+    elif platform.system() == 'Darwin':
+        style.theme_use('aqua')
+    else:
+        style.theme_use('clam')
 
     # style.configure('TFrame', background=bg_color, foreground=fg_color)
     # style.configure('TLabel', background=bg_color, foreground=fg_color)
