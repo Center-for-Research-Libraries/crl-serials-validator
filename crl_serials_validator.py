@@ -1,11 +1,11 @@
 """
-Basic interface for the Validator.
+Basic interface for the CRL Serials Validator.
 
 Usage:
 
-    python validator.py  # run the Validator with a command-line interface
-    python validator.py -a  # run the Validator in automated (headless) mode
-    python validator.py --headless  # run the Validator in automated (headless) mode
+    python crl_serials_validator.py  # run the Validator with a command-line interface
+    python crl_serials_validator.py -a  # run the Validator in automated (headless) mode
+    python crl_serials_validator.py --headless  # run the Validator in automated (headless) mode
     
 """
 

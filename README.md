@@ -1,23 +1,23 @@
-# The Validator
+# The CRL Serials Validator
 Validate serials bibliographic and holdings data according to a set of user-defined rules. 
 
 ## About
 
-The Validator was built to aid in data analysis for shared print projects, specifically for the PAPR project at the Center for Research Libraries. It howver can be useful whenever you need to check and verify the quality of any set of serials bibliographic and holdings data.
+The CRL Serials Validator was originally built at the Center for Research Libraries to aid in data analysis for shared print projects, specifically for the PAPR project at CRL It howver can be useful whenever you need to check and verify the quality of any set of serials bibliographic and holdings data.
 
-The Validator works by reading user-supplied input data and comparing it against bibliographic data downloaded from the WorldCat Search API. It then checks every title in the input data according to rules that can mostly be turned on or off by the user. Typically the Validator looks for titles that exist in WorldCat, that are hard copy serials, that have titles roughly matching that on the WorldCat record, that have holdings with dates matching the publication dates as listed in the WorldCat MARC, and that (when appropriate) have valid and legitimate ISSNs.
+The CRL Serials Validator works by reading user-supplied input data and comparing it against bibliographic data downloaded from the WorldCat Search API. It then checks every title in the input data according to rules that can mostly be turned on or off by the user. Typically the CRL Serials Validator looks for titles that exist in WorldCat, that are hard copy serials, that have titles roughly matching that on the WorldCat record, that have holdings with dates matching the publication dates as listed in the WorldCat MARC, and that (when appropriate) have valid and legitimate ISSNs.
 
 If the user has a subscription to data downloads from the ISSN Centre, the user can additionally validate their data against this ISSN data.
 
 ## Basic Requirements
 
-To install and use the Validator you will need:
+To install and use the CRL Serials Validator you will need:
 
 * One or more [WorldCat Search API keys](https://help.oclc.org/Discovery_and_Reference/WorldCat_Discovery/Troubleshooting/How_do_I_request_a_WSKey_for_the_WorldCat_Search_API?sl=en).
 * Python (version 3.4 or later), with the ability to install extra Python libraries.
 * Input files in one of the following formats: xlsx, csv, tab-separated text, or MARC text (mrk).
 
-The Validator has been tested and used on Windows 10 and Linux (Ubuntu 20.04). It should also work on Mac OS, but hasn't been tested.
+The CRL Serials Validator has been tested and used on Windows 10 and Linux (Ubuntu 20.04). It should also work on Mac OS, but hasn't been tested.
 
 ## Quick Start
 
@@ -25,7 +25,7 @@ The Validator has been tested and used on Windows 10 and Linux (Ubuntu 20.04). I
 2. Type `pip install -r requirements.txt` to install the needed Python libraries.
 3. Put your input files in the `input` folder.
 4. Add the ISSN database (optional, if you have a subscription to it).
-5. Run the Validator with `python validator.py`.
+5. Run the CRL Serials Validator with `python crl_serials_validator.py`.
 6. Setup your API keys.
 7. Tell the scripts what input fields your input files have.
 8. Validate the input data.
@@ -38,7 +38,7 @@ Download the most recent version of Python 3 from [python.org](https://www.pytho
 
 ### Install additional requirements and create data folders
 
-Open a command line window in the Validator folder. The easiest way to do this is to open the folder in Windows Explorer then type `cmd` in the address bar. 
+Open a command line window in the CRL Serials Validator folder. The easiest way to do this is to open the folder in Windows Explorer then type `cmd` in the address bar. 
 
 Install needed additional Python libraries with this command: `pip install -r requirements.txt`.
 
@@ -60,15 +60,15 @@ If you want the system to check whether or not a title is in JSTOR, add a file o
 
 ### Data files
 
-Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. Usually these files will all be found in the `data` directory in the Validator folder. If however you have an old copy of the Validator or have used the CRL MARC Machine program then some or all of them may be found in the  `CRL MARC Machine` folder in your home directory.
+Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. Usually these files will all be found in the `data` directory in the CRL Serials Validator folder. If however you have an old copy of the Validator or have used the CRL MARC Machine program then some or all of them may be found in the  `CRL MARC Machine` folder in your home directory.
 
 If you hae a copy of the ISSN database, it should be put in the same directory that contains `marc_database.db`.
 
-## Running the Validator
+## Running the CRL Serials Validator
 
-The validator can be run by typing `python validator.py` in the command window. You may see a warning that says "Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning." This can be ignored.
+The CRL Serials Validator can be run by typing `python crl_serials_validator.py` in the command window. You may see a warning that says "Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning." This can be ignored.
 
-From here, running the Validator should be relatively straightforward.
+From here, running the CRL Serials Validator should be relatively straightforward.
 
 ### Set up your WorldCat Search API keys
 
