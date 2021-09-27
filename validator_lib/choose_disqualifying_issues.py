@@ -8,6 +8,7 @@ import tkinter.ttk as ttk
 import webbrowser
 
 from validator_lib.validator_config import ValidatorConfig
+from validator_lib.ttk_theme import set_theme
 
 class IssuesChooser(tk.Tk):
 
@@ -32,21 +33,23 @@ class IssuesChooser(tk.Tk):
         self.warnings = []
         self.int_vars = {}
 
-        style = ttk.Style()
-        # print(s.theme_names())
-        # print(s.theme_use())
-        style.theme_use('clam')
+        # style = ttk.Style()
+        # style.theme_use('clam')
 
-        style.configure('link.TButton', foreground='blue')
+        # style.configure('TFrame', background='yellow')
 
-        style.configure('save.TButton')
-        style.map('save.TButton', background=[('active', 'lightgreen')])
+        # style.configure('link.TButton', foreground='blue')
 
-        style.configure('cancel.TButton')
-        style.map('cancel.TButton', background=[('active', '#FF7F7F')])
+        # style.configure('save.TButton')
+        # style.map('save.TButton', background=[('active', 'lightgreen')])
 
-        style.configure('defaults.TButton')
-        style.map('defaults.TButton', background=[('active', 'lightblue')])
+        # style.configure('cancel.TButton')
+        # style.map('cancel.TButton', background=[('active', '#FF7F7F')])
+
+        # style.configure('defaults.TButton')
+        # style.map('defaults.TButton', background=[('active', 'lightblue')])
+
+        style = set_theme(self)
 
         start_x, start_y = self.get_center_location()
         # self.geometry('{}x{}+{}+{}'.format(self.window_width, self.window_height, start_x, start_y))
@@ -98,10 +101,10 @@ class IssuesChooser(tk.Tk):
         btn_cancel = ttk.Button(btn_frame, text="Cancel", style="cancel.TButton",  command=self.cancelled)
         btn_reset = ttk.Button(btn_frame, text="Defaults", style="defaults.TButton",  command=self.reset_fields)
         btn_save.grid(column=0, row=0)
-        spacer1 = tk.Label(btn_frame, text="")
+        spacer1 = tk.Label(btn_frame)
         spacer1.grid(column=1, row=0)
         btn_cancel.grid(column=2, row=0)
-        spacer2 = tk.Label(btn_frame, text="")
+        spacer2 = tk.Label(btn_frame)
         spacer2.grid(column=3, row=0)
         btn_reset.grid(column=4, row=0)
         btn_frame.pack()
