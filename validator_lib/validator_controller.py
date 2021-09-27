@@ -9,8 +9,8 @@ from validator_lib.scan_input_files import InputFileScanner
 from validator_lib.run_checks_process import ChecksRunner
 from validator_lib.choose_disqualifying_issues import IssuesChooser
 from validator_lib.validator_config import ValidatorConfig
+from validator_lib.api_key_setter import ApiKeySetter
 
-from crl_lib.api_key_setter import ApiKeySetter
 from crl_lib.api_keys import OclcApiKeys
 
 # Set the variable below to True to force debug logging
