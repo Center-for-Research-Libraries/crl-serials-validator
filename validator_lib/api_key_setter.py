@@ -1,8 +1,8 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 
+from validator_lib.ttk_theme import set_theme
 from crl_lib.api_keys import OclcApiKeys
-from pprint import pprint
 
 
 class ApiKeySetter(tk.Tk):
@@ -112,23 +112,6 @@ class ApiKeySetter(tk.Tk):
     def cancelled(self):
         """Cancel pressed. Close the window."""
         self.destroy()
-
-
-def set_theme(tk_object=None):
-    """
-    This will be used to set a default ttk style, once we come up with one.
-    """
-
-    style = ttk.Style()
-    style.theme_use('clam')
-
-    style.configure('link.TButton', foreground='darkblue')
-
-    style.configure('save.TButton')
-    style.configure('cancel.TButton')
-    style.configure('defaults.TButton')
-
-    return style
 
 
 if __name__ == "__main__":
