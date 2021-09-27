@@ -1,11 +1,11 @@
-from tkinter import Tk, IntVar
-from tkinter.ttk import Label, Entry, Button, Radiobutton, Frame
+import tkinter as tk
+import tkinter.ttk as ttk
 
 from crl_lib.api_keys import OclcApiKeys
 from pprint import pprint
 
 
-class ApiKeySetter:
+class ApiKeySetter(tk.Tk):
     """
     Very simple Tkinter class to allow the user to more easily set API keys.
 
@@ -19,24 +19,31 @@ class ApiKeySetter:
     run from a command line.
     """
     def __init__(self, data_folder):
-        print(data_folder)
+        """
+        data_folder should be the location (or desired location) of the API keys config file.
+
+        style is an optional ttk style.
+        """
+        super().__init__()
         self.api_keys = OclcApiKeys(data_folder)
         self.names = list(self.api_keys.api_keys.keys())
 
         # in case the window pops under the terminal
         print("Opening separate API key setter window.")
 
-        self.window = Tk()
-        self.window.title("API Key Setter")
-        lbl = Label(self.window, text="Set WorldCat Search API keys", font=("Arial Bold", 14))
-        lbl.grid(column=1, row=0)
+        self.title("Set WorldCat Search API keys")
 
-        label_name = Label(self.window, text="Name")
-        label_key = Label(self.window, text="API Key")
+        style = set_theme(self)
+
+        # lbl = ttk.Label(self, text="Set WorldCat Search API keys", font=("Arial Bold", 14))
+        # lbl.grid(column=1, row=0)
+
+        label_name = ttk.Label(self, text="Name")
+        label_key = ttk.Label(self, text="API Key")
         label_name.grid(column=0, row=1)
         label_key.grid(column=1, row=1)
 
-        self.selected = IntVar()
+        self.selected = tk.IntVar()
 
         self.inputs = []
         for i in range(0, 6):
@@ -50,9 +57,9 @@ class ApiKeySetter:
                 name = ""
                 api_key = ""
             self.inputs.append({
-                "name": Entry(self.window, width=10),
-                "key": Entry(self.window, width=100),
-                "radio": Radiobutton(text='Default', value=i, variable=self.selected)
+                "name": ttk.Entry(self, width=10),
+                "key": ttk.Entry(self, width=100),
+                "radio": ttk.Radiobutton(text='Default', value=i, variable=self.selected)
             })
             self.inputs[i]["name"].insert(0, name)
             self.inputs[i]["key"].insert(0, api_key)
@@ -63,22 +70,22 @@ class ApiKeySetter:
             self.inputs[i]["key"].grid(column=1, row=i+2)
             self.inputs[i]["radio"].grid(column=2, row=i+2)
 
-        btn_frame = Frame()
-        btn_save = Button(btn_frame, text="Save", command=self.clicked)
-        btn_cancel = Button(btn_frame, text="Cancel", command=self.cancelled)
+        btn_frame = ttk.Frame()
+        btn_save = ttk.Button(btn_frame, text="Save", command=self.clicked)
+        btn_cancel = ttk.Button(btn_frame, text="Cancel", command=self.cancelled)
         btn_save.grid(column=0, row=0)
         btn_cancel.grid(column=1, row=0)
         btn_frame.grid(row=9, column=2)
 
         # put the window more towards the center of the screen
-        ws = self.window.winfo_screenwidth()
-        hs = self.window.winfo_screenheight()
+        ws = self.winfo_screenwidth()
+        hs = self.winfo_screenheight()
         x = (ws / 4)
         y = (hs / 4)
-        self.window.geometry('+%d+%d' % (x, y))
-        self.window.lift()
+        self.geometry('+%d+%d' % (x, y))
+        self.lift()
 
-        self.window.mainloop()
+        self.mainloop()
 
     def clicked(self):
         """Save clicked. Look for API keys and default key set and save to config file."""
@@ -100,12 +107,29 @@ class ApiKeySetter:
             self.api_keys.config['Preferred API Key'] = {default_key_name: 1}
 
         self.api_keys.write_preferences_to_file()
-        self.window.destroy()
+        self.destroy()
 
     def cancelled(self):
         """Cancel pressed. Close the window."""
-        self.window.destroy()
+        self.destroy()
+
+
+def set_theme(tk_object=None):
+    """
+    This will be used to set a default ttk style, once we come up with one.
+    """
+
+    style = ttk.Style()
+    style.theme_use('clam')
+
+    style.configure('link.TButton', foreground='darkblue')
+
+    style.configure('save.TButton')
+    style.configure('cancel.TButton')
+    style.configure('defaults.TButton')
+
+    return style
 
 
 if __name__ == "__main__":
-    a = ApiKeySetter()
+    a = ApiKeySetter('')
