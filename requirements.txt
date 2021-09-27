@@ -4,4 +4,4 @@ xlsxwriter
 openpyxl
 requests
 appdirs
-yaml
+pyyaml
