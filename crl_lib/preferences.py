@@ -49,12 +49,6 @@ class Preferences:
         self.config = configparser.ConfigParser()
         self.config.read(self.preferences_file_location)
 
-    def __del__(self):
-        """
-        Save the config file on crash or other unplanned close.
-        """
-        self.write_preferences_to_file()
-
     def update_preference_value(self, section, key, value, create_new_section=False):
         """
         Change a value, or add a key-value pair
