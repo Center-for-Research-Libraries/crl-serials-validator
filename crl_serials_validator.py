@@ -41,6 +41,8 @@ class ValidatorTkinterInterface(tk.Tk):
 
         style = set_ttk_style()
 
+        self.issn_database_note_printed = False
+
         self.resizable(1, 1)
         self.title('CRL Serials Validator')
     
