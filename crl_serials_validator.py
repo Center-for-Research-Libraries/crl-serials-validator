@@ -213,8 +213,8 @@ class SimpleValidatorInterface:
 
 def parse_command_line_args():
     parser = argparse.ArgumentParser(description="Validate shared print holdings data.")
-    parser.add_argument("--headless", "-a", action="store_true", help="Run in headless (automated) mode")
-    parser.add_argument("--graphical", "-g", action="store_true", help="Run in graphical (GUI) mode")
+    parser.add_argument("--headless", "-a", action="store_true", help="Run in headless (automated) mode.")
+    parser.add_argument("--graphical", "-g", action="store_true", help="Run in graphical (GUI) mode. (Experimental)")
     args = parser.parse_args()
     return args
 
