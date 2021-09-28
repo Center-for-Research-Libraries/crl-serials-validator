@@ -42,9 +42,6 @@ class BulkConfig:
         self.input_fields = {}
         self.disqualifying_issues = OrderedDict()
         self.read_config_file()
-        self.run_bulk_config()
-        self.add_new_data_to_config()
-        self.write_config_data()
 
     @staticmethod
     def print_break():
@@ -242,14 +239,8 @@ class BulkConfig:
         self.choose_disqualifying_issues()
 
 
-def check_for_api_key(self):
-    pass
-
-
-def app():
-    BulkConfig()
-
-
-
-if __name__ == "__main__":
-    app()
+def run_bulk_config():
+    bulk_config = BulkConfig()
+    bulk_config.run_bulk_config()
+    bulk_config.add_new_data_to_config()
+    bulk_config.write_config_data()
