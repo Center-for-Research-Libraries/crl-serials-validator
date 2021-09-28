@@ -6,6 +6,10 @@ Usage:
     python crl_serials_validator.py  # run the Validator with a command-line interface
     python crl_serials_validator.py -a  # run the Validator in automated (headless) mode
     python crl_serials_validator.py --headless  # run the Validator in automated (headless) mode
+    python crl_serials_validator.py -b  # set bulk/automated/headless mode preferences
+    python crl_serials_validator.py --bulk_prefs  # set bulk/automated/headless mode preferences
+    python crl_serials_validator.py -s  # set WorldCat Search API keys on the command line
+    python crl_serials_validator.py --set_keys  # set WorldCat Search API keys on the command line
     
 """
 
@@ -19,6 +23,8 @@ from contextlib import redirect_stdout
 import io
 
 from validator_lib.validator_controller import ValidatorController
+from validator_lib.bulk_validator_preferences import BulkConfig
+from validator_lib.command_line_api_keys import CommandLineApiKeys
 from validator_lib.ttk_theme import set_ttk_style
 
 
@@ -215,6 +221,8 @@ def parse_command_line_args():
     parser = argparse.ArgumentParser(description="Validate shared print holdings data.")
     parser.add_argument("--headless", "-a", action="store_true", help="Run in headless (automated) mode.")
     parser.add_argument("--graphical", "-g", action="store_true", help="Run in graphical (GUI) mode. (Experimental)")
+    parser.add_argument("--bulk_prefs", "-b", action="store_true", help="Set bulk (headless) preferences.")
+    parser.add_argument("--set_keys", "-s", action="store_true", help="Set API keys on the command line.")
     args = parser.parse_args()
     return args
 
@@ -222,6 +230,14 @@ def parse_command_line_args():
 def headless_app():
     vc = ValidatorController(headless_mode=True)
     vc.run_checks_process()
+
+
+def headless_api_keys():
+    CommandLineApiKeys()
+
+
+def bulk_preferences():
+    BulkConfig()
 
 
 def gui_app():
@@ -234,7 +250,11 @@ def command_line_app():
 
 if __name__ == "__main__":
     args = parse_command_line_args()
-    if args.headless is True:
+    if args.set_keys is True:
+        headless_api_keys()
+    elif args.bulk_prefs is True:
+        bulk_preferences()
+    elif args.headless is True:
         headless_app()
     elif args.graphical is True:
         gui_app()
