@@ -12,8 +12,93 @@ Usage:
 import sys
 import os
 import argparse
+from tkinter import Label, ttk
+import tkinter as tk
+import webbrowser
+from contextlib import redirect_stdout
+import io
 
 from validator_lib.validator_controller import ValidatorController
+from validator_lib.ttk_theme import set_ttk_style
+
+
+class ValidatorTkinterInterface(tk.Tk):
+    """
+    Basic GUI interface for the Validator.
+    """
+
+    docs_text = 'Visit the documentation in a web browser'
+    api_text = 'Set up your WorldCat Search API keys'
+    scan_text = 'Do a quick scan of any MARC input files to find important fields'
+    fields_text = 'Specify fields in input files'
+    issues_text = 'Specify disqualifying issues'
+    process_text = 'Process input and WorldCat MARC to create outputs'
+
+    def __init__(self):
+        super().__init__()
+
+        self.validator_controller = ValidatorController()
+
+        style = set_ttk_style()
+
+        self.resizable(1, 1)
+        self.title('CRL Serials Validator')
+    
+        ttk.Button(text=self.api_text, style='primary.TButton', command=self.run_api_keys).pack(padx=5, pady=5, fill='x')
+        ttk.Button(text=self.scan_text, style='primary.TButton', command=self.scan_files).pack(padx=5, pady=5, fill='x')
+        ttk.Button(text=self.fields_text, style='primary.TButton', command=self.select_fields).pack(padx=5, pady=5, fill='x')
+        ttk.Button(text=self.issues_text, style='primary.TButton', command=self.select_issues).pack(padx=5, pady=5, fill='x')
+        ttk.Button(text=self.process_text, style='primary.TButton', command=self.process_files).pack(padx=5, pady=5, fill='x')
+        ttk.Button(text=self.docs_text, style='info.TButton', command=self.load_docs).pack(padx=5, pady=5, fill='x')
+
+        ttk.Button(text='Quit', style="warning.TButton", command=self.cancel).pack(padx=5, pady=5)
+
+        self.mainloop()
+
+    def run_api_keys(self):
+        self.cancel()
+        self.validator_controller.set_api_keys()
+        self.create_main_window()
+
+    def scan_files(self):
+        """
+        Temporary working version with redirected output.
+        """
+        self.cancel()
+        f = io.StringIO()
+        with redirect_stdout(f):
+            self.validator_controller.scan_input_files()
+        s = f.getvalue()
+        print(s)
+        w = tk.Tk()
+        ttk.Label(w, text=s).pack()
+        w.mainloop()
+        self.create_main_window()
+
+    def select_fields(self):
+        self.cancel()
+        self.validator_controller.choose_input_fields()
+        self.create_main_window()
+
+    def select_issues(self):
+        self.cancel()
+        self.validator_controller.set_disqualifying_issues()
+        self.create_main_window()
+
+    def process_files(self):
+        self.cancel()
+        self.validator_controller.run_checks_process()
+        self.create_main_window()
+
+    def load_docs(self):
+        self.validator_controller.open_project_docs()
+
+    def cancel(self):
+        self.destroy()
+
+    def create_main_window(self):
+        self.__init__()
+
 
 
 class SimpleValidatorInterface:
@@ -127,6 +212,7 @@ class SimpleValidatorInterface:
 def parse_command_line_args():
     parser = argparse.ArgumentParser(description="Validate shared print holdings data.")
     parser.add_argument("--headless", "-a", action="store_true", help="Run in headless (automated) mode")
+    parser.add_argument("--graphical", "-g", action="store_true", help="Run in graphical (GUI) mode")
     args = parser.parse_args()
     return args
 
@@ -134,6 +220,10 @@ def parse_command_line_args():
 def headless_app():
     vc = ValidatorController(headless_mode=True)
     vc.run_checks_process()
+
+
+def gui_app():
+    ValidatorTkinterInterface()
 
 
 def command_line_app():
@@ -144,5 +234,7 @@ if __name__ == "__main__":
     args = parse_command_line_args()
     if args.headless is True:
         headless_app()
+    elif args.graphical is True:
+        gui_app()
     else:
         command_line_app()
