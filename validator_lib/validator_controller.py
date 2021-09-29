@@ -109,7 +109,7 @@ class ValidatorController(ValidatorFileLocations):
         else:
             IssuesChooser(issn_db_missing=False)
 
-    def run_checks_process(self, single_file):
+    def run_checks_process(self, single_file=None):
         input_file_checks = self.get_files_with_and_without_input_fields()
         if single_file:
             single_file = os.path.split(single_file)[-1]
