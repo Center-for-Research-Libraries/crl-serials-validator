@@ -24,6 +24,7 @@ import io
 
 from validator_lib.validator_controller import ValidatorController
 from validator_lib.bulk_validator_preferences import run_bulk_config
+from validator_lib.prepare_headless_run import HeadlessPrep
 from validator_lib.command_line_api_keys import CommandLineApiKeys
 from validator_lib.ttk_theme import set_ttk_style
 
@@ -229,6 +230,7 @@ def parse_command_line_args():
 
 
 def headless_app():
+    HeadlessPrep()
     vc = ValidatorController(headless_mode=True)
     vc.run_checks_process()
 
