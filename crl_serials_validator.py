@@ -258,7 +258,7 @@ def process_single_file(filename):
 if __name__ == "__main__":
     args = parse_command_line_args()
 
-    if args.p[0]:
+    if args.p:
         process_single_file(args.p[0])
     elif args.set_keys is True:
         headless_api_keys()
