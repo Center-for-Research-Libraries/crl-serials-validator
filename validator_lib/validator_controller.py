@@ -2,6 +2,7 @@ import logging
 import os
 import datetime
 import webbrowser
+import sys
 
 from validator_lib.validator_file_locations import ValidatorFileLocations
 from validator_lib.choose_input_file_fields import InputFieldsChooser
@@ -25,7 +26,7 @@ class ValidatorController(ValidatorFileLocations):
     viable_input_formats = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
     docs_url = 'https://github.com/Center-for-Research-Libraries/validator/blob/main/README.md'
 
-    def __init__(self, headless_mode=False, log_level='info', portable_install=False):
+    def __init__(self, headless_mode=False, log_level='info', portable_install=False, single_file_run=False):
         super().__init__(portable_install=False)
 
         self.headless_mode = headless_mode
@@ -53,6 +54,10 @@ class ValidatorController(ValidatorFileLocations):
         if self.headless_mode is True and DEBUG_MODE is False:
             self.log_to_screen = False
             logging.info('Running in headless mode.')
+
+        if single_file_run:
+            self.run_checks_process(single_file=single_file_run)
+            sys.exit()
 
     def set_logging(self):
         """
@@ -104,8 +109,15 @@ class ValidatorController(ValidatorFileLocations):
         else:
             IssuesChooser(issn_db_missing=False)
 
-    def run_checks_process(self):
+    def run_checks_process(self, single_file):
         input_file_checks = self.get_files_with_and_without_input_fields()
+        if single_file:
+            single_file = os.path.split(single_file)[-1]
+            print(single_file)
+            for myfile in input_file_checks['with_fields']:
+                if myfile != single_file:
+                    input_file_checks['without_fields'].add(myfile)
+            input_file_checks['with_fields'] = {single_file}
         ChecksRunner(
             self.data_storage_folder,
             self.validator_data_folder,

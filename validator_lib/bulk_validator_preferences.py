@@ -56,6 +56,7 @@ class BulkConfig:
         if not self.config_data:
             self.config_data = {}
         for program in self.config_data:
+            program = program.lower()
             if not program:
                 continue
             for associated_name in self.config_data[program]['associated_names']:
@@ -82,7 +83,7 @@ class BulkConfig:
         while True:
             program_name = get_varied_response('Enter program identification:', blank_ok=False)
             if get_yes_no_response("You entered {}. Is this correct?".format(program_name)):
-                self.program_name = program_name
+                self.program_name = program_name.lower()
                 self.check_if_program_done_already()
                 self.print_break()
                 break
@@ -114,11 +115,11 @@ class BulkConfig:
                     return
             associated_name = get_varied_response('Enter associated name.', blank_ok=True)
             if associated_name:
-                if associated_name in self.config_data:
+                if associated_name.lower() in self.config_data:
                     print('Name {} found in configuration file. Skipping.'.format(associated_name))
                 else:
                     print('Adding {} to {}.'.format(associated_name, self.program_name))
-                    self.associated_names.add(associated_name)
+                    self.associated_names.add(associated_name.lower())
             else:
                 print('No associated name added.')
             if not get_yes_no_response('Add another name?'):

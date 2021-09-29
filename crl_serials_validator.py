@@ -10,6 +10,7 @@ Usage:
     python crl_serials_validator.py --bulk_prefs  # set bulk/automated/headless mode preferences
     python crl_serials_validator.py -s  # set WorldCat Search API keys on the command line
     python crl_serials_validator.py --set_keys  # set WorldCat Search API keys on the command line
+    python crl_serials_validator.py -p my_filename.tsv  # process a single specifid file
     
 """
 
@@ -18,7 +19,6 @@ import os
 import argparse
 from tkinter import Label, ttk
 import tkinter as tk
-import webbrowser
 from contextlib import redirect_stdout
 import io
 
@@ -223,6 +223,7 @@ def parse_command_line_args():
     parser.add_argument("--graphical", "-g", action="store_true", help="Run in graphical (GUI) mode. (Experimental)")
     parser.add_argument("--bulk_prefs", "-b", action="store_true", help="Set bulk (headless) preferences.")
     parser.add_argument("--set_keys", "-s", action="store_true", help="Set API keys on the command line.")
+    parser.add_argument("-p", nargs=1, help="Process this single record.")
     args = parser.parse_args()
     return args
 
@@ -248,9 +249,16 @@ def command_line_app():
     SimpleValidatorInterface()
 
 
+def process_single_file(filename):
+    ValidatorController(headless_mode=True, single_file_run=filename)
+
+
 if __name__ == "__main__":
     args = parse_command_line_args()
-    if args.set_keys is True:
+
+    if args.p[0]:
+        process_single_file(args.p[0])
+    elif args.set_keys is True:
         headless_api_keys()
     elif args.bulk_prefs is True:
         bulk_preferences()
