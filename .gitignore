@@ -156,6 +156,7 @@ input_backup
 .vscode/
 input.zip
 *.ini
+*.yaml
 DATA*.txt
 backup/
 data/Quick Scan.txt
