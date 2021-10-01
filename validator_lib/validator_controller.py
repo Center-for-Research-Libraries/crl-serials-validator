@@ -127,6 +127,9 @@ class ValidatorController(ValidatorFileLocations):
             input_file_checks['without_fields'],
             running_headless=self.headless_mode)
 
+    def add_fields_for_single_file_run(self):
+        pass
+
     def print_popunder_window_warning(self):
         """
         When printing to screen, print a warning about potential popunders when setting API keys, wanted fields, or 
