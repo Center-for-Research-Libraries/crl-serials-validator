@@ -52,44 +52,32 @@ class BulkConfig:
             with open(self.bulk_config_file, 'w', encoding='utf8') as fout:
                 pass
         with open(self.bulk_config_file, 'r', encoding='utf8') as fin:
-            self.config_data = yaml.load(fin, Loader=yaml.FullLoader)
-        if not self.config_data:
-            self.config_data = {}
-        for program in self.config_data:
+            self.bulk_config_data = yaml.load(fin, Loader=yaml.FullLoader)
+        if not self.bulk_config_data:
+            self.bulk_config_data = {}
+        for program in self.bulk_config_data:
             program = program.lower()
             if not program:
                 continue
-            for associated_name in self.config_data[program]['associated_names']:
+            for associated_name in self.bulk_config_data[program]['associated_names']:
                 if not associated_name:
                     continue
                 self.associated_names_map[associated_name.lower()] = program
 
-    def write_config_data(self):
-        self.config_data[self.program_name]['associated_names'] = list(self.associated_names.copy())
+    def write_bulk_config_data(self):
+        self.bulk_config_data[self.program_name]['associated_names'] = list(self.associated_names.copy())
         with open(self.bulk_config_file, 'w', encoding='utf8') as fout:
-            yaml.dump(self.config_data, fout)
-
-    def get_fields_for_individual_file(self, filename):
-        """
-        Look for appropriate fields from the bulk config when presented with an individual file.
-        """
-        pass
-
-    def get_issues_for_individual_file(self, filename):
-        """
-        Look for appropriate issues from the bulk config when presented with an individual file.
-        """
-        pass
+            yaml.dump(self.bulk_config_data, fout)
 
     def add_new_data_to_config(self):
-        self.config_data[self.program_name] = {
+        self.bulk_config_data[self.program_name] = {
             'file_type': self.input_file_type,
             'input_fields': {},
             'disqualifying_issues': {}}
         for input_field in self.input_fields:
-            self.config_data[self.program_name]['input_fields'][input_field] = self.input_fields[input_field]
+            self.bulk_config_data[self.program_name]['input_fields'][input_field] = self.input_fields[input_field]
         for disqualifying_issue in self.disqualifying_issues:
-            self.config_data[self.program_name]['disqualifying_issues'][disqualifying_issue] = self.disqualifying_issues[disqualifying_issue]
+            self.bulk_config_data[self.program_name]['disqualifying_issues'][disqualifying_issue] = self.disqualifying_issues[disqualifying_issue]
 
     def get_program_name(self):
         while True:
@@ -101,7 +89,7 @@ class BulkConfig:
                 break
 
     def check_if_program_done_already(self):
-        for program in self.config_data:
+        for program in self.bulk_config_data:
             if program and program.lower() == self.program_name.lower():
                 question = 'Data for {} found in configurations file. Overwrite? (y/n)'.format(self.program_name)
                 if not get_yes_no_response(question):
@@ -112,11 +100,11 @@ class BulkConfig:
             question = 'Remove association? (y/n)'
             if get_yes_no_response(question) is True:
                 remove_me = set()
-                for i, associated_name in enumerate(self.config_data[associated_program]['associated_names']):
+                for i, associated_name in enumerate(self.bulk_config_data[associated_program]['associated_names']):
                     if associated_name.lower() == self.program_name.lower():
                         remove_me.add(associated_name)
                 for remove_name in remove_me:
-                    self.config_data[associated_program]['associated_names'].remove(remove_name)
+                    self.bulk_config_data[associated_program]['associated_names'].remove(remove_name)
             else:
                 sys.exit('Will not remove. Quitting.')
 
@@ -127,7 +115,7 @@ class BulkConfig:
                     return
             associated_name = get_varied_response('Enter associated name.', blank_ok=True)
             if associated_name:
-                if associated_name.lower() in self.config_data:
+                if associated_name.lower() in self.bulk_config_data:
                     print('Name {} found in configuration file. Skipping.'.format(associated_name))
                 else:
                     print('Adding {} to {}.'.format(associated_name, self.program_name))
@@ -252,8 +240,65 @@ class BulkConfig:
         self.choose_disqualifying_issues()
 
 
+class BulkDataFinder():
+    """
+    Class for retrieving the correct fields and issue data while running in bulk/headless mode.
+
+    For record fields will first look to the Validator configuration file for any specific data, then to the bulk data. 
+    
+    For disqualifying issues it first looks to the bulk data for any specific issues, then to the Validator configuration.
+
+    The idea behind this discrepancy is to always look for specifics first. 
+    """
+
+    def __init__(self):
+        self.validator_config = ValidatorConfig()
+        self.bulk_config = BulkConfig()
+
+    def get_fields_for_individual_file(self, filename):
+        """
+        Look for appropriate fields from the bulk config when presented with an individual file.
+        """
+        input_fields = self.validator_config.get_input_fields(filename)
+        if input_fields:
+            return input_fields
+        inst_name = self.get_institution_name_from_filename(filename)
+
+        if inst_name in self.bulk_config.bulk_config_data:
+            return self.bulk_config.bulk_config_data[inst_name]['input_fields']
+        
+        elif inst_name in self.bulk_config.associated_names_map:
+            program_name = self.bulk_config.associated_names_map[inst_name]
+            return self.bulk_config.bulk_config_data[program_name]['input_fields']
+
+
+    def get_issues_for_individual_file(self, filename):
+        """
+        Look for appropriate issues from the bulk config when presented with an individual file.
+        """
+        inst_name = self.get_institution_name_from_filename(filename)
+
+        if inst_name in self.bulk_config.bulk_config_data:
+            return self.bulk_config.bulk_config_data[inst_name]['disqualifying_issues']
+        
+        elif inst_name in self.bulk_config.associated_names_map:
+            program_name = self.bulk_config.associated_names_map[inst_name]
+            return self.bulk_config.bulk_config_data[program_name]['disqualifying_issues']
+
+        else:
+            try:
+                return self.validator_config.config_data['disqualifying_issues']
+            except KeyError:
+                return {}
+
+    def get_institution_name_from_filename(self, filename):
+        # in case we're sent a file path
+        file_proper =  os.path.split(filename)[-1]
+        return file_proper.split('.')[0].lower()
+
+
 def run_bulk_config():
     bulk_config = BulkConfig()
     bulk_config.run_bulk_config()
     bulk_config.add_new_data_to_config()
-    bulk_config.write_config_data()
+    bulk_config.write_bulk_config_data()
