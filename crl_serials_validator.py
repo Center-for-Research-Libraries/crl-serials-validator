@@ -24,7 +24,6 @@ import io
 
 from validator_lib.validator_controller import ValidatorController
 from validator_lib.bulk_validator_preferences import run_bulk_config
-from validator_lib.prepare_headless_run import HeadlessPrep
 from validator_lib.command_line_api_keys import CommandLineApiKeys
 from validator_lib.ttk_theme import set_ttk_style
 
@@ -230,9 +229,15 @@ def parse_command_line_args():
 
 
 def headless_app():
-    HeadlessPrep()
-    vc = ValidatorController(headless_mode=True)
-    vc.run_checks_process()
+    """
+    Headless/bulk mode works by getting every file in the input folder, then running each file individually.
+    """
+    input_files = os.listdir('input')
+    for input_file in input_files:
+        file_ext = os.path.split(input_file)[-1].split('.')[-1].lower()
+        if file_ext in {'mrk', 'txt', 'tsv', 'csv', 'xlsx'}:
+            vc = ValidatorController(headless_mode=True, single_file_run=input_file)
+            del(vc)
 
 
 def headless_api_keys():
