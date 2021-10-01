@@ -240,63 +240,6 @@ class BulkConfig:
         self.choose_disqualifying_issues()
 
 
-class BulkDataFinder():
-    """
-    Class for retrieving the correct fields and issue data while running in bulk/headless mode.
-
-    For record fields will first look to the Validator configuration file for any specific data, then to the bulk data. 
-    
-    For disqualifying issues it first looks to the bulk data for any specific issues, then to the Validator configuration.
-
-    The idea behind this discrepancy is to always look for specifics first. 
-    """
-
-    def __init__(self):
-        self.validator_config = ValidatorConfig()
-        self.bulk_config = BulkConfig()
-
-    def get_fields_for_individual_file(self, filename):
-        """
-        Look for appropriate fields from the bulk config when presented with an individual file.
-        """
-        input_fields = self.validator_config.get_input_fields(filename)
-        if input_fields:
-            return input_fields
-        inst_name = self.get_institution_name_from_filename(filename)
-
-        if inst_name in self.bulk_config.bulk_config_data:
-            return self.bulk_config.bulk_config_data[inst_name]['input_fields']
-        
-        elif inst_name in self.bulk_config.associated_names_map:
-            program_name = self.bulk_config.associated_names_map[inst_name]
-            return self.bulk_config.bulk_config_data[program_name]['input_fields']
-
-
-    def get_issues_for_individual_file(self, filename):
-        """
-        Look for appropriate issues from the bulk config when presented with an individual file.
-        """
-        inst_name = self.get_institution_name_from_filename(filename)
-
-        if inst_name in self.bulk_config.bulk_config_data:
-            return self.bulk_config.bulk_config_data[inst_name]['disqualifying_issues']
-        
-        elif inst_name in self.bulk_config.associated_names_map:
-            program_name = self.bulk_config.associated_names_map[inst_name]
-            return self.bulk_config.bulk_config_data[program_name]['disqualifying_issues']
-
-        else:
-            try:
-                return self.validator_config.config_data['disqualifying_issues']
-            except KeyError:
-                return {}
-
-    def get_institution_name_from_filename(self, filename):
-        # in case we're sent a file path
-        file_proper =  os.path.split(filename)[-1]
-        return file_proper.split('.')[0].lower()
-
-
 def run_bulk_config():
     bulk_config = BulkConfig()
     bulk_config.run_bulk_config()
