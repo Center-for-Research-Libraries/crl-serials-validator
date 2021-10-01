@@ -11,6 +11,7 @@ from validator_lib.run_checks_process import ChecksRunner
 from validator_lib.choose_disqualifying_issues import IssuesChooser
 from validator_lib.validator_config import ValidatorConfig
 from validator_lib.api_key_setter import ApiKeySetter
+from validator_lib.bulk_validator_preferences import BulkDataFinder
 
 from crl_lib.api_keys import OclcApiKeys
 
