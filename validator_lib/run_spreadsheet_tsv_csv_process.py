@@ -6,8 +6,7 @@ import sys
 from pprint import pprint
 import logging
 
-from validator_lib.validator_config import FieldsAndIssuesFinder
-from validator_lib.utilities import get_first_last_year_from_regular_holdings
+from validator_lib.utilities import get_first_last_year_from_regular_holdings, FieldsAndIssuesFinder
 from validator_lib.supplements_and_indexes_functions import remove_indexes_from_holdings, remove_supplements_from_holdings
 
 

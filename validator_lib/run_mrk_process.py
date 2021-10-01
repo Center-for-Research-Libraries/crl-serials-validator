@@ -8,9 +8,8 @@ from crl_lib.line_85x86x import Convert85x86x
 from crl_lib.marc_fields import MarcFields
 from crl_lib.marc_file_reader import MarcFileReader
 from crl_lib.crl_utilities import clean_oclc
-from validator_lib.validator_config import FieldsAndIssuesFinder
 from validator_lib.validate_583s import Line583Validator
-from validator_lib.utilities import get_first_last_year_from_regular_holdings
+from validator_lib.utilities import get_first_last_year_from_regular_holdings, FieldsAndIssuesFinder
 from validator_lib.supplements_and_indexes_functions import remove_supplements_from_holdings, remove_indexes_from_holdings
 
 

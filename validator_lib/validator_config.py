@@ -3,7 +3,6 @@ import configparser
 import re
 from collections import OrderedDict
 
-from validator_lib.bulk_validator_preferences import BulkConfig
 
 class ValidatorConfig:
     def __init__(self):
@@ -112,69 +111,3 @@ class ValidatorConfig:
             'missing_field_852a': 1,
         })
         return disqualifying_issues
-
-
-class FieldsAndIssuesFinder():
-    """
-    Class for retrieving the correct fields and issue data while running in bulk/headless mode.
-
-    For record fields will first look to the Validator configuration file for any specific data, then to the bulk data. 
-    
-    For disqualifying issues it first looks to the bulk data for any specific issues, then to the Validator configuration.
-
-    The idea behind this discrepancy is to always look for specifics first. 
-    """
-
-    def __init__(self):
-        self.validator_config = ValidatorConfig()
-        self.bulk_config = BulkConfig()
-        self.use_validator_config = False
-
-    def get_fields_for_individual_file(self, filename):
-        """
-        Look for appropriate fields from the bulk config when presented with an individual file.
-        """
-        input_fields = self.validator_config.get_input_fields(filename)
-        if input_fields:
-            self.use_validator_config = True
-            return input_fields
-        self.use_validator_config = False
-        inst_name = self.get_institution_name_from_filename(filename)
-
-        if inst_name in self.bulk_config.bulk_config_data:
-            return self.bulk_config.bulk_config_data[inst_name]['input_fields']
-        
-        elif inst_name in self.bulk_config.associated_names_map:
-            program_name = self.bulk_config.associated_names_map[inst_name]
-            return self.bulk_config.bulk_config_data[program_name]['input_fields']
-
-
-    def get_issues_for_individual_file(self, filename):
-        """
-        Look for appropriate issues from the bulk config when presented with an individual file.
-
-        If we found the file fields in the Validator config, use the issues from the same place.
-        """
-        inst_name = self.get_institution_name_from_filename(filename)
-
-        if inst_name in self.bulk_config.bulk_config_data and not self.use_validator_config:
-            logging.info('Using disqualifying issues set for {}'.format(inst_name))
-            return self.bulk_config.bulk_config_data[inst_name]['disqualifying_issues']
-        
-        elif inst_name in self.bulk_config.associated_names_map:
-            program_name = self.bulk_config.associated_names_map[inst_name]
-            logging.info('Using disqualifying issues set for {}'.format(program_name))
-            return self.bulk_config.bulk_config_data[program_name]['disqualifying_issues']
-
-        else:
-            try:
-                return self.validator_config.config_data['disqualifying_issues']
-            except KeyError:
-                # return defaults if nothing else is set
-                logging.warning('No disqualifying issues set. Using defaults.')
-                return {}
-
-    def get_institution_name_from_filename(self, filename):
-        # in case we're sent a file path
-        file_proper =  os.path.split(filename)[-1]
-        return file_proper.split('.')[0].lower()
