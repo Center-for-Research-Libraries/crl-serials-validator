@@ -69,6 +69,18 @@ class BulkConfig:
         with open(self.bulk_config_file, 'w', encoding='utf8') as fout:
             yaml.dump(self.config_data, fout)
 
+    def get_fields_for_individual_file(self, filename):
+        """
+        Look for appropriate fields from the bulk config when presented with an individual file.
+        """
+        pass
+
+    def get_issues_for_individual_file(self, filename):
+        """
+        Look for appropriate issues from the bulk config when presented with an individual file.
+        """
+        pass
+
     def add_new_data_to_config(self):
         self.config_data[self.program_name] = {
             'file_type': self.input_file_type,
