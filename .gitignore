@@ -201,3 +201,6 @@ number_transform.py
 simple_file_reader.py
 spreadsheet_reader.py
 volume_transform.py
+
+# scripts used in development
+z_test*
