@@ -30,6 +30,8 @@ from validator_lib.ttk_theme import set_ttk_style
 class ValidatorTkinterInterface(tk.Tk):
     """
     Basic GUI interface for the Validator.
+
+    Currently the "process input" part does not run in the GUI window, so this option should be considered incomplete.
     """
 
     docs_text = 'Visit the documentation in a web browser'
@@ -228,7 +230,9 @@ def parse_command_line_args():
 
 def headless_app():
     """
-    Headless/bulk mode works by getting every file in the input folder, then running each file individually.
+    Headless/bulk mode automatically starts processing input files, without providing the opportunity to enter API
+    keys, select issues, etc. Those should be done either with the normal process or by setting them in bulk using the
+    bulk_prefs (b) option and the set_keys (s) option.
     """
     vc = ValidatorController(headless_mode=True)
     vc.run_checks_process()
