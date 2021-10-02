@@ -2,6 +2,7 @@ import logging
 import os
 import datetime
 import webbrowser
+import sys
 
 from validator_lib.validator_file_locations import ValidatorFileLocations
 from validator_lib.choose_input_file_fields import InputFieldsChooser
@@ -10,6 +11,7 @@ from validator_lib.run_checks_process import ChecksRunner
 from validator_lib.choose_disqualifying_issues import IssuesChooser
 from validator_lib.validator_config import ValidatorConfig
 from validator_lib.api_key_setter import ApiKeySetter
+from validator_lib.utilities import FieldsAndIssuesFinder
 
 from crl_lib.api_keys import OclcApiKeys
 
@@ -25,7 +27,7 @@ class ValidatorController(ValidatorFileLocations):
     viable_input_formats = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
     docs_url = 'https://github.com/Center-for-Research-Libraries/validator/blob/main/README.md'
 
-    def __init__(self, headless_mode=False, log_level='info', portable_install=False):
+    def __init__(self, headless_mode=False, log_level='info', portable_install=False, single_file_run=False):
         super().__init__(portable_install=False)
 
         self.headless_mode = headless_mode
@@ -34,6 +36,9 @@ class ValidatorController(ValidatorFileLocations):
 
         if self.headless_mode is True:
             self.log_level = 'warning'
+            self.fields_and_issues_finder = FieldsAndIssuesFinder()
+        else:
+            self.fields_and_issues_finder = None
 
         if DEBUG_MODE is True:
             self.log_level = 'debug'
@@ -51,7 +56,7 @@ class ValidatorController(ValidatorFileLocations):
         self.check_input_folder()
         
         if self.headless_mode is True and DEBUG_MODE is False:
-            self.log_to_screen = False
+            # self.log_to_screen = False
             logging.info('Running in headless mode.')
 
     def set_logging(self):
@@ -105,15 +110,39 @@ class ValidatorController(ValidatorFileLocations):
             IssuesChooser(issn_db_missing=False)
 
     def run_checks_process(self):
-        input_file_checks = self.get_files_with_and_without_input_fields()
-        ChecksRunner(
-            self.data_storage_folder,
-            self.validator_data_folder,
-            self.input_files,
-            self.validator_output_folder, 
-            self.issn_db_location,
-            input_file_checks['without_fields'],
-            running_headless=self.headless_mode)
+
+        error_message, warning_messages = self.check_if_run_is_possible()
+        for warning_message in warning_messages:
+            logging.warning(warning_message)
+        if error_message:
+            logging.error(error_message)
+            sys.exit()
+
+        self.clear_output_folder()
+        x = 0
+        for input_file in self.input_files:
+            x += 1
+            print(f'RUN {x} -- {input_file}')
+            v = ValidatorConfig()
+
+            if self.headless_mode is True:
+                input_fields = self.fields_and_issues_finder.get_fields_for_individual_file(input_file)
+            else:
+                input_fields = v.get_input_fields(input_file)       
+            if not input_fields:
+                warning_message = 'No input fields set for file {}. Skipping.'.format(input_file)
+                logging.warning(warning_message)
+                continue
+            del(v)
+
+            ChecksRunner(
+                input_file,
+                input_fields,
+                self.data_storage_folder,
+                self.validator_data_folder,
+                self.validator_output_folder, 
+                self.issn_db_location,
+                running_headless=self.headless_mode)
 
     def print_popunder_window_warning(self):
         """
@@ -126,55 +155,44 @@ class ValidatorController(ValidatorFileLocations):
         print("If you don't see it, please look for it in your taskbar.")
         print('========================================================')
 
-    def get_files_with_and_without_input_fields(self):
-        """
-        Check which files have and don't have input fields set.
-        """
-        input_file_checks = {'with_fields': set(), 'without_fields': set()}
-        v = ValidatorConfig()
-        for input_file in self.input_files:
-            input_fields = v.get_input_fields(input_file)
-            if input_fields:
-                input_file_checks['with_fields'].add(input_file)
-            else:
-                input_file_checks['without_fields'].add(input_file)
-        del(v)
-        return input_file_checks
 
     def check_if_run_is_possible(self):
         """
-        Make sure that everything is in place to actually complete a run. This is a simple check, checking only if:
+        Make sure that everything is in place to actually complete a run. This is a simple check, at the moment checking only if:
             1. An API key is set
-            2. At least one file in the input folder has input fields set
         """
 
         warning_messages = []
 
         api_keys = OclcApiKeys(self.data_storage_folder)
         if not api_keys.api_key:
-            logging.error('No WorldCat SEearch API key set.')
+            logging.error('No WorldCat Search API key set.')
             error_message = "Please set a WorldCat Search API key."
             return error_message, warning_messages
         del(api_keys)
 
-        input_file_checks = self.get_files_with_and_without_input_fields()
-        fields_seen = False
-        file_seen = False
-        for input_file in self.input_files:
-            file_seen = True
-            if input_file in input_file_checks['with_fields']:
-                fields_seen = True
-            else:
-                message = 'No input fields set for file {}. File will be skipped.'.format(input_file)
-                logging.warning(message)
-                warning_messages.append(message)
-        if fields_seen is True:
-            return None, warning_messages
-        elif file_seen is True:
-            error_message = 'No input fields set for any file.'
-            logging.error(error_message)
-            return error_message, warning_messages
-        else:
-            error_message = 'No valid input files seen in input folder.'
-            logging.error(error_message)
-            return error_message, warning_messages
+        return '', warning_messages
+
+
+    def clear_output_folder(self):
+        if self.headless_mode is not True:
+            while True:
+                print('------------')
+                print('Should we erase all files in the output folder? (Y/N)')
+                clear_question = input()
+                if clear_question.lower().startswith('n'):
+                    return
+                elif clear_question.lower().startswith('y'):
+                    break
+                else:
+                    print("I didn't understand that.\n")
+        output_files = os.listdir(self.validator_output_folder)
+        for output_file in output_files:
+            logging.info('Clearing output folder; deleting {}'.format(output_file))
+            output_file_loc = os.path.join(self.validator_output_folder, output_file)
+            if not os.path.isfile(output_file_loc):
+                continue
+            try:
+                os.remove(output_file_loc)
+            except PermissionError:
+                logging.warning("Could not delete file {} due to permissions error".format(output_file))

@@ -23,12 +23,12 @@ import validator_lib.utilities
 
 
 class InputDataProcessor:
-    def __init__(self, title_dicts, input_fields, found_issn_db, jstor_titles):
+    def __init__(self, title_dicts, input_fields, found_issn_db, jstor_titles, input_file):
         self.found_issn_db = found_issn_db
         self.jstor_titles = jstor_titles
         self.title_dicts = title_dicts
         self.input_fields = input_fields
-        self.disqualifying_issue_categories = validator_lib.utilities.get_disqualifying_issue_categories()
+        self.disqualifying_issue_categories = validator_lib.utilities.get_disqualifying_issue_categories(input_file)
         self.errors = []
 
         self.issues_to_check = self.get_issues_to_check()

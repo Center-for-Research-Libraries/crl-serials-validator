@@ -6,7 +6,6 @@ import sys
 from pprint import pprint
 import logging
 
-from validator_lib.validator_config import ValidatorConfig
 from validator_lib.utilities import get_first_last_year_from_regular_holdings
 from validator_lib.supplements_and_indexes_functions import remove_indexes_from_holdings, remove_supplements_from_holdings
 
@@ -20,7 +19,6 @@ class SpreadsheetTsvCsvRunner:
 
     def __init__(self):
 
-        self.validator_config = ValidatorConfig()
         self.input_cats = ['holdings_id', 'bib_id', 'oclc', 'issn', 'title', 'institution', 'oclc_symbol', 'location', 
                            'holdings_0', 'holdings_1', 'holdings_2', 'holdings_3']
 
@@ -36,8 +34,7 @@ class SpreadsheetTsvCsvRunner:
             row_locations['header_to_skip'] = True
         return row_locations
 
-    def get_input_data_from_file(self, input_file):
-        input_fields = self.validator_config.get_input_fields(input_file)
+    def get_input_data_from_file(self, input_file, input_fields):
         input_file_location = os.path.join(self.input_folder, input_file)
         if input_file.endswith('xlsx'):
             wb = openpyxl.load_workbook(input_file_location)
