@@ -9,18 +9,17 @@ from crl_lib.marc_fields import MarcFields
 from crl_lib.marc_file_reader import MarcFileReader
 from crl_lib.crl_utilities import clean_oclc
 from validator_lib.validate_583s import Line583Validator
-from validator_lib.utilities import get_first_last_year_from_regular_holdings, FieldsAndIssuesFinder
+from validator_lib.utilities import get_first_last_year_from_regular_holdings
 from validator_lib.supplements_and_indexes_functions import remove_supplements_from_holdings, remove_indexes_from_holdings
 
 
 class MrkProcessRunner:
-    def __init__(self, input_file):
+    def __init__(self, input_file, input_fields):
         
         self.input_file = input_file
         self.input_file_location = os.path.join(os.getcwd(), 'input', self.input_file)
 
-        fields_and_issues_finder = FieldsAndIssuesFinder()
-        self.input_fields = fields_and_issues_finder.get_fields_for_individual_file(self.input_file)
+        self.input_fields = input_fields
 
         self.line_583_validator = Line583Validator()
 

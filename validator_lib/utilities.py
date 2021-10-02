@@ -231,7 +231,11 @@ class FieldsAndIssuesFinder():
         except KeyError:
             pass
         # return defaults if nothing else is set
-        logging.warning('No disqualifying issues set. Using defaults.')
+        if filename:
+            logging.warning('No disqualifying issues set for file {}. Using defaults.'.format(filename))
+        else:
+            logging.warning('No disqualifying issues set. Using defaults.')
+
         default_issues = self.validator_config.get_default_disqualifying_issues()
         return dict(default_issues)
 

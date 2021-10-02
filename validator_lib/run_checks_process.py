@@ -14,7 +14,8 @@ from validator_lib.process_input_data import InputDataProcessor
 
 class ChecksRunner:
     def __init__(
-        self, input_file, data_storage_folder, data_folder, output_dir, issn_db_location, running_headless=False):
+        self, input_file, input_fields, data_storage_folder, data_folder, output_dir, issn_db_location, 
+        running_headless=False):
 
         self.running_headless = running_headless
 
@@ -31,13 +32,14 @@ class ChecksRunner:
 
         print('Processing {}'.format(input_file))
         if input_file.endswith('mrk'):
-            mrk_runner = MrkProcessRunner(input_file)
+            mrk_runner = MrkProcessRunner(input_file, input_fields)
             input_file_data, line_583_validation_output = mrk_runner.get_data_from_marc()
         else:
-            input_file_data = stc_runner.get_input_data_from_file(input_file)
+            input_file_data = stc_runner.get_input_data_from_file(input_file, input_fields)
             line_583_validation_output = None
         self.add_worldcat_data_to_input_file_data_dicts(input_file_data, input_file)
         validator_issn_db.process_title_dicts(input_file_data, input_file)
+        
         InputDataProcessor(input_file_data, input_file, found_issn_db, self.jstor, input_file)
 
         ReviewWorkbookPrinter(input_file_data, line_583_validation_output, self.running_headless)

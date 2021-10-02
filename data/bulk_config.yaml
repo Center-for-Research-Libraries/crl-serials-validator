@@ -1,7 +1,7 @@
 west:
   associated_names:
-  - afu
   - azs
+  - afu
   disqualifying_issues:
     bib_lvl_not_serial: 1
     binding_words_in_holdings: 1

@@ -232,12 +232,8 @@ def headless_app():
     """
     Headless/bulk mode works by getting every file in the input folder, then running each file individually.
     """
-    input_files = os.listdir('input')
-    for input_file in input_files:
-        file_ext = os.path.split(input_file)[-1].split('.')[-1].lower()
-        if file_ext in {'mrk', 'txt', 'tsv', 'csv', 'xlsx'}:
-            vc = ValidatorController(headless_mode=True, single_file_run=input_file)
-            del(vc)
+    vc = ValidatorController(headless_mode=True)
+    vc.run_checks_process()
 
 
 def headless_api_keys():

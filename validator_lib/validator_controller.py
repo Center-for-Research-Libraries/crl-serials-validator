@@ -56,11 +56,8 @@ class ValidatorController(ValidatorFileLocations):
         self.check_input_folder()
         
         if self.headless_mode is True and DEBUG_MODE is False:
-            self.log_to_screen = False
+            # self.log_to_screen = False
             logging.info('Running in headless mode.')
-
-        if single_file_run:
-            self.run_checks_process(single_file=single_file_run)
 
     def set_logging(self):
         """
@@ -112,20 +109,24 @@ class ValidatorController(ValidatorFileLocations):
         else:
             IssuesChooser(issn_db_missing=False)
 
-    def run_checks_process(self, single_file=None):
+    def run_checks_process(self):
 
         error_message, warning_messages = self.check_if_run_is_possible()
         for warning_message in warning_messages:
             logging.warning(warning_message)
         if error_message:
+            logging.error(error_message)
             sys.exit()
 
         self.clear_output_folder()
+        x = 0
         for input_file in self.input_files:
+            x += 1
+            print(f'RUN {x} -- {input_file}')
             v = ValidatorConfig()
 
             if self.headless_mode is True:
-                input_fields = self.fields_and_issues_finder.get_issues_for_individual_file(input_file)
+                input_fields = self.fields_and_issues_finder.get_fields_for_individual_file(input_file)
             else:
                 input_fields = v.get_input_fields(input_file)       
             if not input_fields:
@@ -134,13 +135,14 @@ class ValidatorController(ValidatorFileLocations):
                 continue
             del(v)
 
-        ChecksRunner(
-            input_file,
-            self.data_storage_folder,
-            self.validator_data_folder,
-            self.validator_output_folder, 
-            self.issn_db_location,
-            running_headless=self.headless_mode)
+            ChecksRunner(
+                input_file,
+                input_fields,
+                self.data_storage_folder,
+                self.validator_data_folder,
+                self.validator_output_folder, 
+                self.issn_db_location,
+                running_headless=self.headless_mode)
 
     def print_popunder_window_warning(self):
         """
@@ -187,7 +189,7 @@ class ValidatorController(ValidatorFileLocations):
         output_files = os.listdir(self.validator_output_folder)
         for output_file in output_files:
             logging.info('Clearing output folder; deleting {}'.format(output_file))
-            output_file_loc = os.path.join(self.output_dir, output_file)
+            output_file_loc = os.path.join(self.validator_output_folder, output_file)
             if not os.path.isfile(output_file_loc):
                 continue
             try:
