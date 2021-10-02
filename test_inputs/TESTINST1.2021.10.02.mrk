@@ -11,7 +11,7 @@
 =583  \\$acommitted to retain$c20141106$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bmain$hHF5601$i.A6
-=853  00$81$av.$i(year) 
+=853  00$81$av.$i(year)
 =863  30$81.1$a1-$i1926-
 
 =LDR  00548    a2200193 n 4500
@@ -231,7 +231,7 @@
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bmain$hB1$i.J7
 =853  00$81$av.$i(year)
-=853  00$82$an.s. v.$i(year) 
+=853  00$82$an.s. v.$i(year)
 =863  30$81.1$a1-22$i1867-1893$wg
 =863  30$82.1$a5-$i1991-
 
@@ -1801,7 +1801,7 @@
 =583  \\$3 v.4-v.12 (2010-2018)$acommitted to retain$c20180907$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hSK361$i.H86$xTESTPROGRAM$zCurrent issues in Main-Multimedia.
-=853  00$81$av.$bno.$i(year)$j(season)    
+=853  00$81$av.$bno.$i(year)$j(season)
 =863  30$81.1$a4-12$b1-3$i2010-2018$j21-24
 
 =LDR  00588    a2200181 n 4500
@@ -1817,7 +1817,7 @@
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hSK361$i.H86$xTESTPROGRAM
 =853  00$81$av.$bno.$i(year)$j(season)
-=863  30$81.1$a1-3$b1-2$i2007-2009$j21-23 
+=863  30$81.1$a1-3$b1-2$i2007-2009$j21-23
 
 =LDR  00597    a2200181 n 4500
 =001  .c4541741
@@ -1846,7 +1846,7 @@
 =583  \\$3v.1-v.14(1997-2010)$acommitted to retain$c20180907$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hQA1$i.C461$xTESTPROGRAM
-=853  00$81$av.$bno.$i(year)$j(month) 
+=853  00$81$av.$bno.$i(year)$j(month)
 =863  30$81.1$a1-13$b1-5$i1997-2009$j3-10$wg
 =863  30$81.2$a14-14$b1-6$i2010-2010$j2-12
 
@@ -1959,7 +1959,7 @@
 =583  \\$3v.1-9 (2000-2008)$acommitted to retain$c20180907$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hBF1$i.P82  $xTESTPROGRAM
-=853  00$81$av.$bno.$i(year)$j(month) 
+=853  00$81$av.$bno.$i(year)$j(month)
 =863  30$81.1$a1-9$b1-3$i2000-2008$j5-12
 
 =LDR  00589    a2200181 n 4500
@@ -1989,7 +1989,7 @@
 =583  \\$3v.1-v.21 (1989-2009) $acommitted to retain$c20180907$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$xTESTPROGRAM
-=853  00$81$av.$bno.$i(year)$j(season) 
+=853  00$81$av.$bno.$i(year)$j(season)
 =863  30$81.1$a1-21$b1-4$i1989-2009$j24-23
 
 =LDR  00606ny  a22001933n 4500
@@ -2200,7 +2200,7 @@
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hQE701$i.K3$xTESTPROGRAM
 =853  00$81$ano.$i(year)
-=863  30$81.1$a1-49$i(1947-1968) 
+=863  30$81.1$a1-49$i(1947-1968)
 
 =LDR  00580ny  a22001933n 4500
 =001  .c4656817
@@ -2215,7 +2215,7 @@
 =583  \\$3v.1-10 (1963-1983)$acommitted to retain$c20180907$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hQD1$i.S85$xTESTPROGRAM
-=853  00$81$av.$i(year) 
+=853  00$81$av.$i(year)
 =863  30$81.1$a1-10$i1963-1983
 
 =LDR  00628ny  a22002053n 4500
@@ -2297,7 +2297,7 @@
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hZ671$i.C6 sup.$xTESTPROGRAM
 =853  00$81$av.$i(year)
-=863  30$81.1$a42-46$i1981-1985$wg 
+=863  30$81.1$a42-46$i1981-1985$wg
 =863  30$81.2$a48-81$i1987-2020
 
 =LDR  00529ny  a22001693n 4500
@@ -2483,7 +2483,7 @@
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hSB998.N4$iN5$xTESTPROGRAM
 =853  00$81$av.$bno.$i(year)$j(month)
-=863  30$81.1$a39-48$b1-2$i2009-2018$j6-12 
+=863  30$81.1$a39-48$b1-2$i2009-2018$j6-12
 
 =LDR  00584ny  a22001813n 4500
 =001  .c4657007
@@ -2525,7 +2525,7 @@
 =583  \\$31983-1994$acommitted to retain$c20180907$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hQC851$i.D372$xTESTPROGRAM
-=853  00$81$a(year)      
+=853  00$81$a(year)
 =863  30$81.1$a1983-1994
 
 =LDR  00539ny  a22001693n 4500
@@ -2539,7 +2539,7 @@
 =583  \\$3v.1-10 (1993-2002)$acommitted to retain$c20180907$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hQA76.76.A65$iA6$xTESTPROGRAM
-=853  00$81$av.$i(year) 
+=853  00$81$av.$i(year)
 =863  30$81.1$a1-10$i1993-2002
 
 =LDR  00559ny  a22001813n 4500
@@ -2554,7 +2554,7 @@
 =583  \\$3v.1-4 (2005-2008)$acommitted to retain$c20180907$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hSF481$i.B72$xTESTPROGRAM
-=853  00$81$av.$i(year) 
+=853  00$81$av.$i(year)
 =863  30$81.1$a1-4$i2005-2008
 
 =LDR  00577ny  a22001813n 4500
@@ -2569,7 +2569,7 @@
 =583  \\$3ser. 2 v.1-8 (1964-1971)$acommitted to retain$c20180907$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hS15$i.R676 ser. 2$xTESTPROGRAM
-=853  00$81$aser. 2 v.$i(year) 
+=853  00$81$aser. 2 v.$i(year)
 =863  30$81.1$a1-8$i1964-1971
 
 =LDR  00587ny  a22001813n 4500
@@ -2656,11 +2656,11 @@
 =008  1705195p\\\\8\\\0001aaeng0\\\\\\\\\\\\\\
 =014  1\$a2370453    $bOCoLC
 =022  \\$a0080-2328
-=035  \\$a(OCoLC)2370453    
+=035  \\$a(OCoLC)2370453
 =583  \\$3ser. 4 v.4-8 (1964-1971)$acommitted to retain$c20180907$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hS15$i.R676 ser. 4$xTESTPROGRAM
-=853  00$81$aser.4 v.$i(year) 
+=853  00$81$aser.4 v.$i(year)
 =863  30$81.1$a1-8$i1964-1971
 
 =LDR  00559ny  a22001813n 4500
@@ -3146,15 +3146,15 @@
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hDS119.7$i.J63$xTESTPROGRAM
 =853  00$81$av.$bno.$i(year)$j(season)
-=863  30$81.1$a1-1$b1-4$i1971-1972$j23-22$wg 
-=863  30$81.2$a2$b4$i1973$j22$wg 
-=863  30$81.3$a4$b1$i1974$j23$wg 
+=863  30$81.1$a1-1$b1-4$i1971-1972$j23-22$wg
+=863  30$81.2$a2$b4$i1973$j22$wg
+=863  30$81.3$a4$b1$i1974$j23$wg
 =863  30$81.4$a4-5$b4-3/4$i1975-1976$j22-21/22$wg
-=863  30$81.5$a6-6$b3-4$i1977-1977$j21-22$wg 
-=863  30$81.6$a8-9$b2-3$i1979-1980$j24-21$wg 
-=863  30$81.7$a10-11$b 4-3$i1981-1982$j22-21$wg 
-=863  30$81.8$a13-14$b3-3$i1984-1985$j21-21$wg 
-=863  30$81.9$a17-40$b1-1$i1987-2010$j23-23 
+=863  30$81.5$a6-6$b3-4$i1977-1977$j21-22$wg
+=863  30$81.6$a8-9$b2-3$i1979-1980$j24-21$wg
+=863  30$81.7$a10-11$b 4-3$i1981-1982$j22-21$wg
+=863  30$81.8$a13-14$b3-3$i1984-1985$j21-21$wg
+=863  30$81.9$a17-40$b1-1$i1987-2010$j23-23
 
 =LDR  00939ny  a22002773n 4500
 =001  .c4657445
@@ -3173,7 +3173,7 @@
 =863  30$81.1$a1$b2$i1921$j10$wg
 =863  30$81.2$a2-2$b2-3$i1924-1924$j6-9$wg
 =863  30$81.3$a3-3$b1-4$i1925-1925$j4-12$wg
-=863  30$81.4$a4-4$b2-4$i1926-1926$j6-12$wg 
+=863  30$81.4$a4-4$b2-4$i1926-1926$j6-12$wg
 =863  30$81.5$a5-5$b2-3$i1927-1927$j6-9$wg
 =863  30$81.6$a6$b3$i1928$j9$wg
 =863  30$81.7$a7-20$b1-4$i1929-1942$j3-12$wn
@@ -3221,7 +3221,7 @@
 =583  \\$3v.1-89 (1903-1947)$acommitted to retain$c20180907$dDecember 31, 2035$fTESTPROGRAM$fTESTPROGRAM Bronze
 =561  \\$aTESTINST1
 =852  \\$aTESTINST1$bstor$hN1$i.B95$xTESTPROGRAM
-=853  00$81$av.$i(year) 
+=853  00$81$av.$i(year)
 =863  30$81.1$a1-89$i1903-1947
 
 =LDR  00785ny  a22002293n 4500
@@ -3240,7 +3240,7 @@
 =853  00$83.1$a41-75$b161-300$i1974-2008$j2-11
 =853  00$81$ano.$i(year)$j(month)$gv.
 =853  00$82$an.s. v.$bno.$i(year)$j(month)
-=853  00$83$a[n.s.] v.$bno.$i(year)$j(month) 
+=853  00$83$a[n.s.] v.$bno.$i(year)$j(month)
 =863  30$81.1$a1-42$i1921-1933$j1-11$g1-13$wn
 
 =LDR  00557ny  a22001813n 4500
