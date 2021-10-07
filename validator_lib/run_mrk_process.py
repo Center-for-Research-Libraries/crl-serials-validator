@@ -45,7 +45,7 @@ class MrkProcessRunner:
             if '583' in self.input_fields and self.input_fields['583']:
                 record_dict['583_in_file'] = True
                 self.line_583_validator.validate_583_lines_in_record(record, record_dict)
-                if record_dict['line_583_errors']:
+                if record_dict['line_583_error']:
                     record_dict['errors'].append('line_583_error')
                     record_dict['line_583_error'] = True
                     record_dict['583_lines_validate'] = False
@@ -195,19 +195,15 @@ class MrkProcessRunner:
                         return
 
     def make_record_error_output(self, seqnum, record_dict):
-        if not record_dict['line_583_error'] and not self.errors_this_record:
-            record_dict['marc_validation_error'] = False
-            return
-        else:
+        if self.errors_this_record:
             record_dict['marc_validation_error'] = True
-        record_dict['errors'].append('marc_validation_error')
-        record_dict['marc_validation_error'] = True
-        error_output_list = [
-            "Record # {}".format(seqnum),
-            "Bib id:      {}".format(record_dict['bib_id']),
-            "Holdings id: {}".format(record_dict['holdings_id']),
-            "OCLC #:      {}".format(record_dict['local_oclc']),
-            "Line 245$a:  {}".format(record_dict['local_title']),
-            ''
-        ]
-        error_output_list.extend(self.errors_this_record)
+            record_dict['errors'].append('marc_validation_error')
+            error_output_list = [
+                "Record # {}".format(seqnum),
+                "Bib id:      {}".format(record_dict['bib_id']),
+                "Holdings id: {}".format(record_dict['holdings_id']),
+                "OCLC #:      {}".format(record_dict['local_oclc']),
+                "Line 245$a:  {}".format(record_dict['local_title']),
+                ''
+            ]
+            error_output_list.extend(self.errors_this_record)

@@ -216,6 +216,7 @@ class FieldsAndIssuesFinder():
         if filename:
             inst_name = self.get_institution_name_from_filename(filename)
 
+            # NOTE: The bulk/headless issue preferences don't work at the moment, so this section will not find anything.
             if inst_name in self.bulk_config.bulk_config_data and not self.use_validator_config:
                 logging.info('Using disqualifying issues set for {}'.format(inst_name))
                 return self.bulk_config.bulk_config_data[inst_name]['disqualifying_issues']
@@ -224,17 +225,13 @@ class FieldsAndIssuesFinder():
                 program_name = self.bulk_config.associated_names_map[inst_name]
                 logging.info('Using disqualifying issues set for {}'.format(program_name))
                 return self.bulk_config.bulk_config_data[program_name]['disqualifying_issues']
-
         try:
-            if self.validator_config.config_data['disqualifying_issues']:
-                return self.validator_config.config_data['disqualifying_issues']
+            if self.validator_config.config['disqualifying_issues']:
+                return self.validator_config.config['disqualifying_issues']
         except KeyError:
             pass
         # return defaults if nothing else is set
-        if filename:
-            logging.warning('No disqualifying issues set for file {}. Using defaults.'.format(filename))
-        else:
-            logging.warning('No disqualifying issues set. Using defaults.')
+        logging.warning('No disqualifying issues set. Using defaults.')
 
         default_issues = self.validator_config.get_default_disqualifying_issues()
         return dict(default_issues)
@@ -250,7 +247,7 @@ def get_disqualifying_issue_categories(input_file=None):
     disqualifying_issues = fields_and_issues_finder.get_issues_for_individual_file(input_file)
 
     for issue in disqualifying_issues:
-        if str(disqualifying_issues[issue]) == '1':
+        if disqualifying_issues[issue]:
             disqualifying_issue_categories.add(issue)
     return disqualifying_issue_categories
 

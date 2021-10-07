@@ -33,36 +33,12 @@ class IssuesChooser(tk.Tk):
         self.warnings = []
         self.int_vars = {}
 
-        # style = ttk.Style()
-        # style.theme_use('clam')
-
-        # style.configure('TFrame', background='yellow')
-
-        # style.configure('link.TButton', foreground='blue')
-
-        # style.configure('save.TButton')
-        # style.map('save.TButton', background=[('active', 'lightgreen')])
-
-        # style.configure('cancel.TButton')
-        # style.map('cancel.TButton', background=[('active', '#FF7F7F')])
-
-        # style.configure('defaults.TButton')
-        # style.map('defaults.TButton', background=[('active', 'lightblue')])
-
         style = set_ttk_style(self)
 
         start_x, start_y = self.get_center_location()
-        # self.geometry('{}x{}+{}+{}'.format(self.window_width, self.window_height, start_x, start_y))
         self.resizable(1, 1)
         self.title('Select disqualifying_issues')
-        
-        # canvas = tk.Canvas(self)
-        # scroll_y = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
-
-        # title_frame = ttk.LabelFrame(self)
-        # title_label = ttk.Label(self, text=self.title_text, justify=tk.LEFT, wraplength=600)
-        # title_label.pack()
-        
+                
         spacer_top = tk.Label(text='')
         spacer_top.pack()
         docs_link_label = ttk.Button(self, text="Click here to visit a glossary of issue codes in a web browser")
@@ -74,15 +50,17 @@ class IssuesChooser(tk.Tk):
 
         row_no = 1
         col_no = 0
-        for issue in self.validator_config.config['disqualifying_issues']:
+        for issue in self.validator_config.issue_categories:
             if issue in self.break_categories:
                 col_no = 0
                 row_no += 1
                 break_label = ttk.Label(issues_frame, text='')
                 break_label.grid(row=row_no, column=col_no, sticky=tk.W)
                 row_no += 1
-            self.int_vars[issue] = tk.IntVar()    
-
+            self.int_vars[issue] = tk.IntVar()
+            if 'range' in issue:
+                print(issue)
+                print(self.validator_config.config['disqualifying_issues'][issue])
             if 'issn_db' in issue and self.issn_db_missing is True:
                 self.int_vars[issue].set(0)
                 ttk.Checkbutton(issues_frame, text=issue, state=tk.DISABLED, variable=self.int_vars[issue]).grid(row=row_no, column=col_no, sticky=tk.W, ipady=2)
@@ -111,14 +89,6 @@ class IssuesChooser(tk.Tk):
         btn_reset.grid(column=4, row=0)
         btn_frame.pack()
 
-        # canvas.create_window(0, 0, anchor="nw")
-        # canvas.update_idletasks()
-
-        # canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
-
-        # canvas.pack(fill='both', expand=True, side='left')
-        # scroll_y.pack(fill='y', side='right')
-
         self.mainloop()
 
     def get_center_location(self):
@@ -134,7 +104,7 @@ class IssuesChooser(tk.Tk):
     def ok_clicked(self):
         for issue in self.validator_config.config['disqualifying_issues']:
             issue_state = self.int_vars[issue].get()
-            self.validator_config.config['disqualifying_issues'][issue] = str(issue_state)
+            self.validator_config.config['disqualifying_issues'][issue] = bool(issue_state)
         self.validator_config.write_validator_config_file()
         self.cancelled()
 
@@ -143,7 +113,9 @@ class IssuesChooser(tk.Tk):
         self.destroy()
 
     def reset_fields(self):
-        self.validator_config.config['disqualifying_issues'] = self.validator_config.get_default_disqualifying_issues()
+        disqualifying_issues = self.validator_config.get_default_disqualifying_issues()
+        # YAML can't write OrderedDict, so convert to regular dict
+        self.validator_config.config['disqualifying_issues'] = dict(disqualifying_issues)
         self.validator_config.write_validator_config_file()
         self.cancelled()
         self.__init__(self.issn_db_missing)

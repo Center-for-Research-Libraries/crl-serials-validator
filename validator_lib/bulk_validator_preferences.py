@@ -202,14 +202,17 @@ class BulkConfig:
             if get_yes_no_response('Use default disqualifying issues for {}?'.format(self.program_name)):
                 self.copy_default_issues()
             else:
-                print('Choosing disqualifying issues. Please enter 1 or 0, or return to accept the default.')
+                print('Choosing disqualifying issues. Please enter 1 for True or 0 for False, or return to accept the default.')
                 valid_responses = {'0', '1'}
                 for issue in self.default_disqualifying_issues:
                     default_response = self.default_disqualifying_issues[issue]
                     response = get_varied_response(
                         '{} [default {}]'.format(issue, default_response), valid_responses=valid_responses, blank_ok=True)
                     if response in valid_responses:
-                        self.disqualifying_issues[issue] = response
+                        if response == '1':
+                            self.disqualifying_issues[issue] = True
+                        else:
+                            self.disqualifying_issues[issue] = False
                     else:
                         self.disqualifying_issues[issue] = default_response
             print('Your choices:')

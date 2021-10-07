@@ -12,7 +12,7 @@ class Line583Validator:
 
     def __init__(self):
 
-        header = ['filename', 'seqnum', 'holdings_id', 'field_852a', 'line_583_errors', 'subfield_3', 'subfield_a',
+        header = ['filename', 'seqnum', 'holdings_id', 'field_852a', 'line_583_error', 'subfield_3', 'subfield_a',
                   'subfield_c',
                   'subfield_d', 'subfield_f', 'subfield_f_2', 'subfield_f_other', 'subfield_u', 'subfield_i',
                   'subfield_l', 'subfield_z', 'subfield_l_2', 'subfield_z_2', 'subfield_l_other', 'subfield_z_other',
@@ -30,7 +30,7 @@ class Line583Validator:
             record_dict['record_contains_852a'] = False
             record_dict['errors'].append('missing_field_852a')
         lines_583 = re.findall(r"(=583\s\s[^\r\n]+)", record)
-        record_dict['line_583_errors'] = []
+        record_dict['line_583_error'] = []
         record_dict['line_583_error_details'] = []
         saw_committed_to_retain = False
         for line in lines_583:
@@ -39,7 +39,7 @@ class Line583Validator:
             self.validate_583_line(line, record_dict)
 
         if not saw_committed_to_retain:
-            record_dict['line_583_errors'].append('no_committed_to_retain_in_583')
+            record_dict['line_583_error'].append('no_committed_to_retain_in_583')
 
     def validate_583_line(self, line, record_dict):
         errors = []
@@ -107,7 +107,7 @@ class Line583Validator:
         output_row.append('; '.join(errors))
 
         self.output_lines.append(output_row)
-        record_dict['line_583_errors'].extend(errors)
+        record_dict['line_583_error'].extend(errors)
 
     @staticmethod
     def add_subfield_from_list_to_output(subfield_list, output_row):

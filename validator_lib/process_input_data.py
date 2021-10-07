@@ -23,6 +23,9 @@ import validator_lib.utilities
 
 
 class InputDataProcessor:
+
+    marc_issues_to_check = ['line_583_error', 'marc_validation_error', 'missing_field_852a']
+
     def __init__(self, title_dicts, input_fields, found_issn_db, jstor_titles, input_file):
         self.found_issn_db = found_issn_db
         self.jstor_titles = jstor_titles
@@ -30,7 +33,7 @@ class InputDataProcessor:
         self.input_fields = input_fields
         self.disqualifying_issue_categories = validator_lib.utilities.get_disqualifying_issue_categories(input_file)
         self.errors = []
-
+        print(self.disqualifying_issue_categories)
         self.issues_to_check = self.get_issues_to_check()
 
         self.unique_cats = ['local_oclc', 'wc_oclc', 'holdings_id']
@@ -66,6 +69,7 @@ class InputDataProcessor:
             'invalid_carrier_type', 'invalid_local_issn', 'invalid_media_type', 'issn_mismatch', 
             'nonprint_words_in_holdings', 'oclc_mismatch', 'record_type_not_language_material', 
             'serial_type_not_periodical', 'title_mismatch', 'title_in_jstor' ]
+
         if self.found_issn_db:
             issn_db_issues = [
                 'holdings_out_of_issn_db_date_range',
@@ -99,10 +103,10 @@ class InputDataProcessor:
                         title_dict['disqualifying_errors'].append(issue_to_check)
 
         # MARC-only errors
-        if title_dict['filename'].endswith('mrk') or title_dict['filename'].endswith('mrc'):
-            # 852 issues will only come up if 583s are listed as present in the records
-            if 'record_contains_852a' in title_dict and title_dict['record_contains_852a'] is False:
-                title_dict['errors'].append('missing_field_852a')
+        for marc_issue in self.marc_issues_to_check:
+            if marc_issue in title_dict['errors'] and marc_issue in self.disqualifying_issue_categories:
+                title_dict['invalid_record'] = '1'
+                title_dict['disqualifying_errors'].append(marc_issue)         
         title_dict['error_category'] = '; '.join(title_dict['errors'])
         title_dict['disqualifying_error_category'] = '; '.join(title_dict['disqualifying_errors'])
         title_dict['has_disqualifying_error'] = ''
