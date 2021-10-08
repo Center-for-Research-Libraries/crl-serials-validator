@@ -1,8 +1,8 @@
 import os
-import configparser
 import yaml
 import re
 from collections import OrderedDict
+from pprint import pprint
 
 
 class ValidatorConfig:
@@ -11,6 +11,8 @@ class ValidatorConfig:
 
     def __init__(self):
         self.config = {}
+
+        self.names_associated_to_programs_map = {}
 
         self.issue_categories = self.get_issue_categories()
 
@@ -41,6 +43,21 @@ class ValidatorConfig:
             disqualifying_issues = self.get_default_disqualifying_issues()
             # YAML can't write an OrderdDict, so convert to dict
             self.config['disqualifying_issues'] = dict(disqualifying_issues)
+
+        if 'programs' not in self.config:
+            self.config['programs'] = {}
+        
+        for program in self.config['programs']:
+            program = program.lower()
+            if not program:
+                continue
+            try:
+                for associated_name in self.config['programs'][program]['associated_names']:
+                    if not associated_name:
+                        continue
+                    self.names_associated_to_programs_map[associated_name.lower()] = program
+            except KeyError:
+                pass
 
     def _read_config(self):
         with open(self.config_file, 'r', encoding='utf8') as fin:
