@@ -66,6 +66,15 @@ The project can use, but does not require access to, a copy of the ISSN database
 * The next version of the CRL Serials Validator will have a full (non command line) GUI, and by default will run in graphical mode.
 * We will have a binary (.exe file) release of the CRL Serials Validator for Windows, so it can be run by clicking an icon rather than opening a command line.
 
+### Other documentation
+
+* Glossaries of...
+    - ...possible [disqualifying issues](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/disqualifying_issues.md).
+    - ...terms from ["Originally from" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/originally_from.md).
+    - ...terms from ["For review" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/for_review.md).
+    - ...terms from the ["Checklist" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/checklist.md).
+* How to run the CRL Serials Validator in [bulk/"headless" mode](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/bulk.md).
+
 ## Running the CRL Serials Validator
 
 The CRL Serials Validator can be run by typing `python crl_serials_validator.py` in the command window. You may see a warning that says "Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning." This can be ignored.
