@@ -20,8 +20,6 @@ The program can provess input data in a variety of formats: MARC, tab-separated 
 
 If the user has a subscription to data downloads from the ISSN Centre, the user can additionally validate their data against this ISSN data.
 
----
-
 ## Basic Requirements
 
 To install and use the CRL Serials Validator you will need:
