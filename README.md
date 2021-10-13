@@ -41,7 +41,7 @@ The CRL Serials Validator has been tested and used on Windows 10 and Linux (Ubun
 7. Tell the scripts what input fields your input files have.
 8. Validate the input data.
 
-## Complete Instructions
+## More information
 
 ### ISSN Database
 
