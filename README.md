@@ -3,7 +3,7 @@ Validate serials bibliographic and holdings data according to a set of user-defi
 
 ## About
 
-The CRL Serials Validator takes serials bibliographic and holdings data, checks it against data downloaded from the WorldCat Search API, validates it based on rules set by the user, and declares each title valid or invalid based on what it finds.
+The CRL Serials Validator takes serials bibliographic and holdings data, checks it against data downloaded from the WorldCat Search API, validates it based on rules set by the user, and declares each title valid (accurate and in scope) or invalid based on what it finds.
 
 The CRL Serials Validator was originally built at the [Center for Research Libraries](https://www.crl.edu) for use with the [the Print Archives Preservation Registry (PAPR)](http://papr.crl.edu/), to aid in checking serials bibliographic data for accuracy and appropriate scope. It can be used for similar work with shared print data, or anywhere that you need to check a large amount of serials data for accuracy and relevance.
 
