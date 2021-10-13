@@ -61,6 +61,11 @@ If you want the system to check whether or not a title is in JSTOR, add a file o
 
 The project can use, but does not require access to, a copy of the ISSN database. If you are running the project from a machine on CRL's internal network and have the Tech Services drive mapped, the program should be able to scan your drives and find the database there. Otherwise, contact Nate to get a copy. Users outside of CRL will need a separate license from the ISSN International Centre to use ISSN data.
 
+### Planned updates
+
+* The next version of the CRL Serials Validator will have a full (non command line) GUI, and by default will run in graphical mode.
+* We will have a binary (.exe file) release of the CRL Serials Validator for Windows, so it can be run by clicking an icon rather than opening a command line.
+
 ## Running the CRL Serials Validator
 
 The CRL Serials Validator can be run by typing `python crl_serials_validator.py` in the command window. You may see a warning that says "Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning." This can be ignored.
