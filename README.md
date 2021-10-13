@@ -57,7 +57,7 @@ If you want the system to check whether or not a title is in JSTOR, add a file o
 
 ### Data files
 
-Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. Usually these files will all be found in the `data` directory in the CRL Serials Validator folder. If however you have an old copy of the Validator or have used the CRL MARC Machine program then some or all of them may be found in the  `CRL MARC Machine` folder in your home directory.
+Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. These files will all be found in a folder called `CRL` in your user data folder. On Windows this will usually be found at `'C:\Users\USERNAME\AppData\Local\CRL'. On most Linux systems it will usually be at `/home/USERNAME/.local/share/CRL`.
 
 If you hae a copy of the ISSN database, it should be put in the same directory that contains `marc_database.db`.
 
