@@ -43,23 +43,23 @@ The CRL Serials Validator has been tested and used on Windows 10 and Linux (Ubun
 
 ## More information
 
-### ISSN Database
-
-The project can use but does not require access to a copy of the ISSN database. If you are running the project from a machine on CRL's internal network and have the Tech Services drive mapped, the program should be able to scan your drives and find the database there. Otherwise, contact Nate to get a copy. Users outside of CRL will need a separate license from the ISSN International Centre to use ISSN data.
-
 ### Input files
 
 Put your input files in the input folder. They should all go in the top level folder, not in any subfolders. Input files can be MARC text (.mrk), Excel, csv, or tsv (with a ".tsv" or ".txt" extension).
-
-### Add a JSTOR file, if needed
-
-If you want the system to check whether or not a title is in JSTOR, add a file of JSTOR ISSNs to the data folder. The file should be a text list of only jstor ISSNs, and should have a name starting with "jstor" and ending with ".txt". It doesn't have to be called `jstor.txt`, but that would be an obvious option.
 
 ### Data files
 
 Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. These files will all be found in a folder called `CRL` in your user data folder. On Windows this will usually be found at `'C:\Users\USERNAME\AppData\Local\CRL'. On most Linux systems it will usually be at `/home/USERNAME/.local/share/CRL`.
 
 If you hae a copy of the ISSN database, it should be put in the same directory that contains `marc_database.db`.
+
+### JSTOR
+
+If you want the system to check whether or not a title is in JSTOR, add a file of JSTOR ISSNs to the data folder. The file should be a text list of only jstor ISSNs, and should have a name starting with "jstor" and ending with ".txt". It doesn't have to be called `jstor.txt`, but that would be an obvious option.
+
+### ISSN Database
+
+The project can use, but does not require access to, a copy of the ISSN database. If you are running the project from a machine on CRL's internal network and have the Tech Services drive mapped, the program should be able to scan your drives and find the database there. Otherwise, contact Nate to get a copy. Users outside of CRL will need a separate license from the ISSN International Centre to use ISSN data.
 
 ## Running the CRL Serials Validator
 
