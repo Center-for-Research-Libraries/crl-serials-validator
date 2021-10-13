@@ -3,11 +3,24 @@ Validate serials bibliographic and holdings data according to a set of user-defi
 
 ## About
 
-The CRL Serials Validator was originally built at the Center for Research Libraries to aid in data analysis for shared print projects, specifically for the PAPR project at CRL It however can be useful whenever you need to check and verify the quality of any set of serials bibliographic and holdings data.
+The CRL Serials Validator takes serials bibliographic and holdings data, checks it against data downloaded from the WorldCat Search API, validates it based on rules set by the user, and declares each title valid or invalid based on what it finds.
 
-The CRL Serials Validator works by reading user-supplied input data and comparing it against bibliographic data downloaded from the WorldCat Search API. It then checks every title in the input data according to rules that can mostly be turned on or off by the user. Typically the CRL Serials Validator looks for titles that exist in WorldCat, that are hard copy serials, that have titles roughly matching that on the WorldCat record, that have holdings with dates matching the publication dates as listed in the WorldCat MARC, and that (when appropriate) have valid and legitimate ISSNs.
+The CRL Serials Validator was originally built at the [Center for Research Libraries](https://www.crl.edu) for use with the [the Print Archives Preservation Registry (PAPR)](http://papr.crl.edu/), to aid in checking serials bibliographic data for accuracy and appropriate scope. It can be used for similar work with shared print data, or anywhere that you need to check a large amount of serials data for accuracy and relevance.
+
+Generally, the CRL Serials Validator attempts to answer these questions:
+
+* Can the title be found in WorldCat?
+* Is the title a serial?
+* Is it attached to a hard copy bibliographic record?
+* Do the holdings fit within the title's publication range?
+
+Specific criteria can be set by the user, to make checking more or less strict as required.
+
+The program can provess input data in a variety of formats: MARC, tab-separated and comma-separated text files, and Excel (xlsx) spreadsheets. It produces an output spreadsheet with information about every title in the input set, any relevant errors found, and a list of titles that passed all of the selected checks.
 
 If the user has a subscription to data downloads from the ISSN Centre, the user can additionally validate their data against this ISSN data.
+
+---
 
 ## Basic Requirements
 
