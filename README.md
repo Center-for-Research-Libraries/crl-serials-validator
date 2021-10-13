@@ -43,27 +43,13 @@ The CRL Serials Validator has been tested and used on Windows 10 and Linux (Ubun
 
 ## Complete Instructions
 
-### Install Python
-
-Download the most recent version of Python 3 from [python.org](https://www.python.org/downloads/) and install it. Be sure to click the checkbox for adding Python to your PATH.
-
-### Install additional requirements and create data folders
-
-Open a command line window in the CRL Serials Validator folder. The easiest way to do this is to open the folder in Windows Explorer then type `cmd` in the address bar. 
-
-Install needed additional Python libraries with this command: `pip install -r requirements.txt`.
-
-The system might give you a warning that says you need to upgrade pip. This can be ignored. Note that for Linux and MacOS you may need to replace `python` with `python3` for all commands.
-
 ### ISSN Database
 
 The project can use but does not require access to a copy of the ISSN database. If you are running the project from a machine on CRL's internal network and have the Tech Services drive mapped, the program should be able to scan your drives and find the database there. Otherwise, contact Nate to get a copy. Users outside of CRL will need a separate license from the ISSN International Centre to use ISSN data.
 
-### Add input files
+### Input files
 
-Put your input files in the input folder. They should all go in the top level folder, not in any subfolders.
-
-Input files can be MARC text (.mrk), Excel, csv, or tsv (with a ".tsv" or ".txt" extension).
+Put your input files in the input folder. They should all go in the top level folder, not in any subfolders. Input files can be MARC text (.mrk), Excel, csv, or tsv (with a ".tsv" or ".txt" extension).
 
 ### Add a JSTOR file, if needed
 
