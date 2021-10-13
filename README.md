@@ -33,7 +33,7 @@ The CRL Serials Validator has been tested and used on Windows 10 and Linux (Ubun
 ## Quick Start
 
 1. Install Python 3. Add Python to your PATH.
-2. Type `pip install -r requirements.txt` to install the needed Python libraries.
+2. Install the needed Python dependencies by typing `pip install -r requirements.txt`.
 3. Put your input files in the `input` folder.
 4. Add the ISSN database (optional, if you have a subscription to it).
 5. Run the CRL Serials Validator with `python crl_serials_validator.py`.
