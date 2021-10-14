@@ -12,7 +12,7 @@ class ReviewWorkbookPrinter:
     def __init__(self, title_dicts, line_583_validation_output, running_headless, print_errors_only=False):
 
         self.running_headless = running_headless
-
+        
         # if we have KeyErrors with dict keys containing "issn_db" we'll know the database isn't installed
         self.issn_db_not_seen = False
 
@@ -65,7 +65,6 @@ class ReviewWorkbookPrinter:
         self.originally_from_header = ['Load Status', 'Reasons for Review', 'HoldingID', 'OCLC Number', 'Print ISSN',
                                        'Title', 'OCLC Symbol', 'OCLC HLC', 'Summary Holdings/Materials Specified']
 
-        self.get_disqualifying_issue_categories = validator_lib.utilities.get_disqualifying_issue_categories()
         self.error_counter = defaultdict(Counter)
         self.disqualifying_error_counter = defaultdict(Counter)
         self.count_errors(title_dicts)

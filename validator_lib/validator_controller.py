@@ -11,7 +11,6 @@ from validator_lib.run_checks_process import ChecksRunner
 from validator_lib.choose_disqualifying_issues import IssuesChooser
 from validator_lib.validator_config import ValidatorConfig
 from validator_lib.api_key_setter import ApiKeySetter
-from validator_lib.utilities import FieldsAndIssuesFinder
 
 from crl_lib.api_keys import OclcApiKeys
 
@@ -36,9 +35,6 @@ class ValidatorController(ValidatorFileLocations):
 
         if self.headless_mode is True:
             self.log_level = 'warning'
-            self.fields_and_issues_finder = FieldsAndIssuesFinder()
-        else:
-            self.fields_and_issues_finder = None
 
         if DEBUG_MODE is True:
             self.log_level = 'debug'
@@ -122,13 +118,11 @@ class ValidatorController(ValidatorFileLocations):
         x = 0
         for input_file in self.input_files:
             x += 1
-            print(f'RUN {x} -- {input_file}')
             v = ValidatorConfig()
 
-            if self.headless_mode is True:
-                input_fields = self.fields_and_issues_finder.get_fields_for_individual_file(input_file)
-            else:
-                input_fields = v.get_input_fields(input_file)       
+            input_fields = v.get_input_fields(input_file)       
+            disqualifying_issue_categories = v.get_disqualifying_issue_categories(input_file)
+
             if not input_fields:
                 warning_message = 'No input fields set for file {}. Skipping.'.format(input_file)
                 logging.warning(warning_message)
@@ -138,6 +132,7 @@ class ValidatorController(ValidatorFileLocations):
             ChecksRunner(
                 input_file,
                 input_fields,
+                disqualifying_issue_categories,
                 self.data_storage_folder,
                 self.validator_data_folder,
                 self.validator_output_folder, 

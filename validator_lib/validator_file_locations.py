@@ -23,6 +23,7 @@ class ValidatorFileLocations:
 
     current_os = platform.system()
     home_folder = os.path.expanduser("~")
+    crl_folder = os.path.join(os.path.expanduser("~"), 'CRL')
     marc_db_name = 'marc_collection.db'
     issn_db_name = 'ISSN_db.db'
     api_key_config_name = 'api_keys.ini'
@@ -125,3 +126,12 @@ class ValidatorFileLocations:
             if not os.path.isdir(dir):
                 logging.info('Creating directory {}'.format(dir))
                 os.mkdir(dir)
+        if not os.path.isdir(self.crl_folder):
+            os.mkdir(self.crl_folder)
+        self.check_about_file()
+
+    def check_about_file(self):
+        about_file_location = os.path.join(self.crl_folder, 'about.txt')
+        if not os.path.isfile(about_file_location):
+            with open(about_file_location, 'w') as fout:
+                fout.write('This folder contains data files for utilities from the Center for Research Libraries.\n')

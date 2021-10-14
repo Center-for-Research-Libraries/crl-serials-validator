@@ -14,8 +14,8 @@ from validator_lib.process_input_data import InputDataProcessor
 
 class ChecksRunner:
     def __init__(
-        self, input_file, input_fields, data_storage_folder, data_folder, output_dir, issn_db_location, 
-        running_headless=False):
+        self, input_file, input_fields, disqualifying_issue_categories, data_storage_folder, data_folder, output_dir, 
+        issn_db_location, running_headless=False):
 
         self.running_headless = running_headless
 
@@ -40,8 +40,8 @@ class ChecksRunner:
         self.add_worldcat_data_to_input_file_data_dicts(input_file_data, input_file)
         validator_issn_db.process_title_dicts(input_file_data, input_file)
         
-        InputDataProcessor(input_file_data, input_file, found_issn_db, self.jstor, input_file)
-
+        InputDataProcessor(
+            input_file, input_file_data, input_fields, disqualifying_issue_categories, found_issn_db, self.jstor)
         ReviewWorkbookPrinter(input_file_data, line_583_validation_output, self.running_headless)
 
     def add_worldcat_data_to_input_file_data_dicts(self, input_file_data, input_file):

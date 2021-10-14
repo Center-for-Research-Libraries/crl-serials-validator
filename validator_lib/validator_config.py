@@ -3,6 +3,7 @@ import yaml
 import re
 from collections import OrderedDict
 from pprint import pprint
+import logging
 
 
 class ValidatorConfig:
@@ -64,6 +65,11 @@ class ValidatorConfig:
             config = yaml.safe_load(fin)
         return config
 
+    @staticmethod
+    def _get_short_input_filename(input_file):
+        input_file_parts = input_file.split('.')
+        return input_file_parts[0].lower()
+
     def write_validator_config_file(self):
         with open(self.config_file, 'w', encoding='utf8') as fout:
             yaml.safe_dump(self.config, fout)
@@ -80,7 +86,58 @@ class ValidatorConfig:
             if input_file.endswith('mrk'):
                 cat_data = self.zero_fill_marc_fields(cat_data)
             input_fields[cat] = cat_data
+        if not input_fields:
+            self.get_input_fields_from_program(input_file, input_fields)
         return input_fields
+
+    def get_input_fields_from_program(self, input_file, input_fields):
+        short_filename = self._get_short_input_filename(input_file)
+        if short_filename in self.names_associated_to_programs_map:
+            short_filename = self.names_associated_to_programs_map[short_filename]
+
+        if short_filename in self.config['programs'] and 'input_fields' in self.config['programs'][short_filename]:
+            for cat in self.config['programs'][short_filename]['input_fields']:
+                if not self.config['programs'][short_filename]['input_fields'][cat]:
+                    continue
+                cat_data = self.config['programs'][short_filename]['input_fields'][cat]
+                cat_data = cat_data.strip()
+                if input_file.endswith('mrk'):
+                    cat_data = self.zero_fill_marc_fields(cat_data)
+                input_fields[cat] = cat_data
+
+        return input_fields
+
+    def get_disqualifying_issues(self, input_file=None):
+        """
+        Look for appropriate issues from the bulk config when presented with an individual file. Otherwise, return the
+        regular disqualifying issues. If none have been set then these will be the defaults.
+        """
+        if input_file:
+            inst_name = self._get_short_input_filename(input_file)
+
+            if inst_name in self.names_associated_to_programs_map:
+                program_name = self.names_associated_to_programs_map[inst_name]
+            else:
+                program_name = inst_name
+            try:
+                disqualifying_issues = self.config['programs'][program_name]['disqualifying_issues']
+                if program_name == inst_name:
+                    logging.info('Using disqualifying issues set for {}'.format(program_name))
+                else:
+                    logging.info('Using disqualifying issues set for {} in program {}'.format(inst_name, program_name))
+                return disqualifying_issues
+            except KeyError:
+                pass
+
+        return self.config['disqualifying_issues']
+
+    def get_disqualifying_issue_categories(self, input_file=None):
+        disqualifying_issue_categories = set()
+        disqualifying_issues = self.get_disqualifying_issues(input_file)
+        for disquaifying_issue in disqualifying_issues:
+            if disqualifying_issues[disquaifying_issue] is True:
+                disqualifying_issue_categories.add(disquaifying_issue)
+        return disqualifying_issue_categories
 
     def check_that_all_issues_are_in_config(self):
         default_issues = self.get_default_disqualifying_issues()

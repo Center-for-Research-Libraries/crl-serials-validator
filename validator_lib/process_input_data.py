@@ -26,14 +26,14 @@ class InputDataProcessor:
 
     marc_issues_to_check = ['line_583_error', 'marc_validation_error', 'missing_field_852a']
 
-    def __init__(self, title_dicts, input_fields, found_issn_db, jstor_titles, input_file):
+    def __init__(self, input_file, title_dicts, input_fields, disqualifying_issue_categories, found_issn_db, jstor_titles):
+        self.input_file = input_file
         self.found_issn_db = found_issn_db
         self.jstor_titles = jstor_titles
         self.title_dicts = title_dicts
         self.input_fields = input_fields
-        self.disqualifying_issue_categories = validator_lib.utilities.get_disqualifying_issue_categories(input_file)
+        self.disqualifying_issue_categories = disqualifying_issue_categories
         self.errors = []
-        print(self.disqualifying_issue_categories)
         self.issues_to_check = self.get_issues_to_check()
 
         self.unique_cats = ['local_oclc', 'wc_oclc', 'holdings_id']
