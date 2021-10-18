@@ -9,7 +9,6 @@ class Line583Validator:
         'a', 'b', 'c', 'd', 'e', 'f', 'h', 'i', 'j', 'k', 'l', 'n', 'o', 'u', 'x', 'z', '2', '3', '5', '6', '8'}
     unsearched_legal_subfields = ['b', 'e', 'k', '6', '8']
 
-
     def __init__(self):
 
         header = ['filename', 'seqnum', 'holdings_id', 'field_852a', 'line_583_error', 'subfield_3', 'subfield_a',
@@ -24,6 +23,7 @@ class Line583Validator:
         return self.output_lines.copy()
 
     def validate_583_lines_in_record(self, record, record_dict):
+        record_dict['lines_583_data'] = []
         if record_dict['field_852a']:
             record_dict['record_contains_852a'] = True
         else:
@@ -40,6 +40,14 @@ class Line583Validator:
 
         if not saw_committed_to_retain:
             record_dict['line_583_error'].append('no_committed_to_retain_in_583')
+
+        line_561_3s = get_fields_subfields(record, '561', '3')
+        line_561_as = get_fields_subfields(record, '561', 'a')
+        line_561_5s = get_fields_subfields(record, '561', '5')
+        
+        record_dict['line_561_3s'] = '|$3'.join(line_561_3s)
+        record_dict['line_561_as'] = '|$a'.join(line_561_as)
+        record_dict['line_561_5s'] = '|$5'.join(line_561_5s)
 
     def validate_583_line(self, line, record_dict):
         errors = []
@@ -61,6 +69,20 @@ class Line583Validator:
         subfield_j = get_field_subfield(line, '583', 'j')
         subfield_2 = get_field_subfield(line, '583', '2')
         subfield_5 = get_field_subfield(line, '583', '5')
+
+        line_583_data = {
+            'a': subfield_a,
+            'c': subfield_c,
+            'd': subfield_d,
+            'i': subfield_i,
+            'l': '; '.join(subfields_l),
+            'z': '; '.join(subfields_z),
+            'f': '; '.join(subfields_f),
+            'j': subfield_j,
+            '3': subfield_3,
+            '5': subfield_5
+        }
+        record_dict['lines_583_data'].append(line_583_data)
 
         other_subfield_data = []
         for unsearched_subfield in self.unsearched_legal_subfields:

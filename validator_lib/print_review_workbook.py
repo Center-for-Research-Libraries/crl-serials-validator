@@ -3,6 +3,7 @@ import os
 from pprint import pprint
 import logging
 import csv
+import re
 
 from crl_lib.crl_xlsxwriter import CRLXlsxWriter
 import validator_lib.utilities
@@ -149,6 +150,7 @@ class ReviewWorkbookPrinter:
             self.make_originally_from_outputs()
         self.make_workbooks()
         self.print_good_marc_output()
+        self.make_583_output()
 
     def remove_issn_db_from_checklist_cats(self):
         new_checklist_cats = []
@@ -409,17 +411,90 @@ class ReviewWorkbookPrinter:
                 if self.line_583_validation_output and self.print_errors_only is False:
                     output_pages['Line 583 validation'] = {'data': self.line_583_validation_output}
 
-            if self.running_headless:
+            # TODO: temporary, until "headless" output can also be made a manual option
+            # if self.running_headless:
+            if True:
                 headless_output_filename = output_file_location.replace('.xlsx', '.txt')
                 headless_output_filename = headless_output_filename.replace('review', 'loading')
                 self.print_headless_output(output_pages['Checklist'], headless_output_filename)
 
             CRLXlsxWriter(output_file_location, output_pages)
 
+    def make_583_output(self):
+        if not self.line_583_validation_output:
+            return
+        output = defaultdict(list)
+
+        header = [
+            'Title',
+            'Notes',
+            'OCLC_Number',
+            'Print ISSN',
+            'LSN',
+            'BibRecNo',
+            'Institution Name',
+            'InstitutionSymbol_852$a',
+            'HoldingLibrary_852$b',
+            'CollectionID',
+            'ActionNote_583$a',
+            'ActionDate_583$c',
+            'ExpirationDate_583$d',
+            'MethodofAction_583$i',
+            'Status_583$l',
+            'PublicNote_583$z',
+            'ProgramName_583$f',
+            'SiteOfAction_583$j',
+            'MaterialsSpecified_583$3',
+            'CustodialHistory_561$3a5',
+            'ArchivingInstitution_583$5'
+        ]
+        for record_dict in self.title_dicts:
+            inst = self.get_inst_from_dict(record_dict)
+            if record_dict['has_disqualifying_error']:
+                continue
+            for line_583_data in record_dict['lines_583_data']:
+                output_row = [
+                    record_dict['seqnum'],
+                    record_dict['wc_title'],
+                    '',  # notes
+                    record_dict['wc_oclc'],
+                    record_dict['local_issn'],
+                    record_dict['holdings_id'],
+                    record_dict['bib_id'],
+                    inst,
+                    record_dict['field_852a'],
+                    record_dict['field_852b'],
+                    '',  # collection ID
+                    line_583_data['a'],
+                    line_583_data['c'],
+                    line_583_data['d'],
+                    line_583_data['i'],
+                    line_583_data['l'],
+                    line_583_data['z'],
+                    line_583_data['f'],
+                    line_583_data['j'],
+                    line_583_data['3'],
+                    record_dict['line_561_as'],
+                    record_dict['line_561_3s'],
+                    record_dict['line_561_5s']
+                ]
+                output[inst].append(output_row)
+
+        for inst in output:
+            output_filename = '{} for LHRs.txt'.format(inst)
+            output_file_location = os.path.join(self.output_folder, output_filename)
+            output_file_location = validator_lib.utilities.get_unused_filename(output_file_location)
+            with open(output_file_location, 'w', encoding='utf8', newline='') as fout:
+                cout = csv.writer(fout, delimiter='\t', lineterminator=os.linesep)
+                cout.writerow(header)
+                for output_row in output[inst]:
+                    cout.writerow(output_row)
+
+
     def print_headless_output(self, checklist_data, headless_output_filename):
         header_row = checklist_data['data'][0]
-        fout = open(headless_output_filename, 'w', encoding='utf8')
-        cout = csv.writer(fout, delimiter='\t')
+        fout = open(headless_output_filename, 'w', encoding='utf8', newline='')
+        cout = csv.writer(fout, delimiter='\t', lineterminator=os.linesep)
         for row in checklist_data['data']:
             if row[1] == '1':
                 continue

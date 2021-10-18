@@ -42,7 +42,6 @@ class MrkProcessRunner:
             if seqnum % 5000 == 0:
                 logging.info('   ...reached record {} in {}'.format(seqnum, self.input_file))
             record_dict = self.get_data_from_record(record, seqnum)
-            record_dict['marc'] = record
             if '583' in self.input_fields and self.input_fields['583']:
                 record_dict['583_in_file'] = True
                 self.line_583_validator.validate_583_lines_in_record(record, record_dict)
@@ -65,12 +64,14 @@ class MrkProcessRunner:
         mf = MarcFields(record, log_warnings=True, debug_info='from {}'.format(self.input_file))
 
         record_dict = {
+            'marc': record,
             'bad_863_field': '',
             'bib_id': self.get_field_from_marc('bib_id', record),
             'dangling_subfield': '',
             'errors': [],
             'field_583': '',
             'field_852a': get_field_subfield(record, '852a'),
+            'field_852b': get_field_subfield(record, '852b'),
             'filename': self.input_file,
             'holdings_1': '',
             'holdings_2': '',
