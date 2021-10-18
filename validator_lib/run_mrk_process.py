@@ -42,6 +42,7 @@ class MrkProcessRunner:
             if seqnum % 5000 == 0:
                 logging.info('   ...reached record {} in {}'.format(seqnum, self.input_file))
             record_dict = self.get_data_from_record(record, seqnum)
+            record_dict['marc'] = record
             if '583' in self.input_fields and self.input_fields['583']:
                 record_dict['583_in_file'] = True
                 self.line_583_validator.validate_583_lines_in_record(record, record_dict)

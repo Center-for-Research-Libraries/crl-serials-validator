@@ -106,8 +106,15 @@ class InputDataProcessor:
         for marc_issue in self.marc_issues_to_check:
             if marc_issue in title_dict['errors'] and marc_issue in self.disqualifying_issue_categories:
                 title_dict['invalid_record'] = '1'
-                title_dict['disqualifying_errors'].append(marc_issue)         
+                title_dict['disqualifying_errors'].append(marc_issue)
         title_dict['error_category'] = '; '.join(title_dict['errors'])
+        title_dict['ignored_errors'] = title_dict['errors'].copy()
+        for disqualifying_error in title_dict['disqualifying_errors']:
+            try:
+                title_dict['ignored_errors'].remove(disqualifying_error)
+            except ValueError:
+                pass
+        title_dict['ignored_error_category'] = '; '.join(title_dict['ignored_errors'])
         title_dict['disqualifying_error_category'] = '; '.join(title_dict['disqualifying_errors'])
         title_dict['has_disqualifying_error'] = ''
         if title_dict['disqualifying_error_category']:

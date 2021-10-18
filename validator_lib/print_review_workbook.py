@@ -9,12 +9,22 @@ import validator_lib.utilities
 
 
 class ReviewWorkbookPrinter:
-    def __init__(self, title_dicts, line_583_validation_output, running_headless, print_errors_only=False):
+    def __init__(
+        self, title_dicts, line_583_validation_output, running_headless, 
+        print_errors_only=False, 
+        print_originally_from=False,
+        print_issues_worksheets=False,
+        print_for_review=False):
 
         self.running_headless = running_headless
-        
+        self.print_originally_from = print_originally_from
+        self.print_issues_worksheets = print_issues_worksheets
+        self.print_for_review = print_for_review
+
         # if we have KeyErrors with dict keys containing "issn_db" we'll know the database isn't installed
         self.issn_db_not_seen = False
+
+        self.good_marc = defaultdict(list)
 
         self.title_dicts = title_dicts
         self.print_errors_only = print_errors_only
@@ -24,25 +34,76 @@ class ReviewWorkbookPrinter:
         self.check_for_583s_in_files()
 
         self.checklist_cats = [
-            'error_category', 'has_disqualifying_error', 'seqnum', 'bib_id', 'holdings_id', 'local_oclc', 'wc_oclc', 
+            'disqualifying_error_category',
+            'has_disqualifying_error',
+            'ignored_error_category',
+            'seqnum',
+            'bib_id',
+            'holdings_id',
+            'local_oclc',
+            'wc_oclc',
             'oclc_mismatch',
-            'local_oclc_repeated', 'wc_oclc_repeated', 'oclcs_019', 'local_issn', 'invalid_local_issn', 'wc_issn_a',
-            'local_issn_does_not_match_wc_issn_a', 'issn_l', 'local_title', 'wc_title', 'title_mismatch',
+            'local_oclc_repeated',
+            'wc_oclc_repeated',
+            'oclcs_019',
+            'local_issn',
+            'invalid_local_issn',
+            'wc_issn_a',
+            'local_issn_does_not_match_wc_issn_a',
+            'issn_l',
+            'local_title',
+            'wc_title',
+            'title_mismatch',
             'uniform_title',
-            'title_h', 'publisher', 'form', 'bib_lvl', 'serial_type', 'carrier_type', 'media_type', 'place', 'lang',
-            'govt_pub', 'authentication_code', 'cat_agent', 'cat_lang', 'lc_class', 'dewey', '008_year_1', '008_year_2',
-            'start_including_362', 'end_including_362', 'holdings_start', 'holdings_end', 'start_problem',
-            'end_problem', 'holdings_out_of_range', 'holdings_have_no_years', 'local_holdings', 
-            'nonpublic_notes',  'public_notes',
-            'completeness_words_in_holdings', 'binding_words_in_holdings', 'nonprint_words_in_holdings', 
-            'wc_line_362', 'current_freq', 'former_freq', 
+            'title_h',
+            'publisher',
+            'form',
+            'bib_lvl',
+            'serial_type',
+            'carrier_type',
+            'media_type',
+            'place',
+            'lang',
+            'govt_pub',
+            'authentication_code',
+            'cat_agent',
+            'cat_lang',
+            'lc_class',
+            'dewey',
+            '008_year_1',
+            '008_year_2',
+            'start_including_362',
+            'end_including_362',
+            'holdings_start',
+            'holdings_end',
+            'start_problem',
+            'end_problem',
+            'holdings_out_of_range',
+            'holdings_have_no_years',
+            'local_holdings',
+            'nonpublic_notes',
+            'public_notes',
+            'completeness_words_in_holdings',
+            'binding_words_in_holdings',
+            'nonprint_words_in_holdings',
+            'wc_line_362',
+            'current_freq',
+            'former_freq',
             'preceding_oclcs',
-            'succeeding_oclcs', 'other_oclcs', 'numbering_peculiarities', 
+            'succeeding_oclcs',
+            'other_oclcs',
+            'numbering_peculiarities',
             'title_in_jstor',
             'issn_db_issn',
-            'local_issn_mismatches_issn_db_issn', 'wc_issn_mismatches_issn_db_issn', 'issn_db_title', 'issn_db_format',
-            'issn_db_serial_type', 'issn_db_year_1', 'issn_db_year_2', 'holdings_out_of_issn_db_date_range'
-            ]
+            'local_issn_mismatches_issn_db_issn',
+            'wc_issn_mismatches_issn_db_issn',
+            'issn_db_title',
+            'issn_db_format',
+            'issn_db_serial_type',
+            'issn_db_year_1',
+            'issn_db_year_2',
+            'holdings_out_of_issn_db_date_range'
+        ]
 
         self.for_review_header = ['Record ID',
                                   'Reason for Review',
@@ -84,8 +145,10 @@ class ReviewWorkbookPrinter:
 
         for title_dict in self.title_dicts:
             self.organize_by_errors(title_dict)
-        self.make_originally_from_outputs()
+        if self.print_originally_from is True:
+            self.make_originally_from_outputs()
         self.make_workbooks()
+        self.print_good_marc_output()
 
     def remove_issn_db_from_checklist_cats(self):
         new_checklist_cats = []
@@ -145,6 +208,11 @@ class ReviewWorkbookPrinter:
             inst = self.get_inst_from_dict(title_dict)
             if not title_dict['disqualifying_error_category']:
                 self.disqualifying_error_counter[inst]['No errors'] += 1
+                try:
+                    marc = title_dict['marc']
+                    self.good_marc[inst].append(marc)
+                except KeyError:
+                    pass
             else:
                 self.disqualifying_error_counter[inst][title_dict['disqualifying_error_category']] += 1
 
@@ -200,10 +268,9 @@ class ReviewWorkbookPrinter:
                                ['Supplied by {}'.format(inst), overview_dict[inst]['total']], ['', ''],
                                ['No issues preventing ingestion', overview_dict[inst]['no_issues']], ['', ''],
                                ['For review', overview_dict[inst]['for_review']]]
-            self.outputs[inst] = {
-                'All issues': overview_output,
-                'originally_from': [self.originally_from_header]
-            }
+            self.outputs[inst] = {'All issues': overview_output}
+            if self.print_originally_from is True:
+                self.outputs[inst]['originally_from'] = [self.originally_from_header]
 
     def make_error_worksheet(self, inst_data):
         output_list = [self.for_review_header]
@@ -239,6 +306,9 @@ class ReviewWorkbookPrinter:
         return output
 
     def make_originally_from_outputs(self):
+        """
+        Make workbook listing everything in the original file. By default this is not made or printed, and must be turned on via the print_originally_from variable.
+        """
         for title_dict in self.title_dicts:
             inst = self.get_inst_from_dict(title_dict)
 
@@ -298,6 +368,16 @@ class ReviewWorkbookPrinter:
         for inst in insts:
             self.checklist_outputs[inst].insert(0, self.checklist_cats)
 
+    def print_good_marc_output(self):
+        for inst in self.good_marc:
+            output_filename = '{} good records.mrk'.format(inst)
+            output_file_location = os.path.join(self.output_folder, output_filename)
+            output_file_location = validator_lib.utilities.get_unused_filename(output_file_location)
+
+            with open(output_file_location, 'w', encoding='utf8') as fout:
+                for marc in self.good_marc[inst]:
+                    fout.write(marc + '\n\n')
+
     def make_workbooks(self):
         for inst in self.outputs:
             output_filename = '{} for review.xlsx'.format(inst)
@@ -313,16 +393,18 @@ class ReviewWorkbookPrinter:
                 ({'bold': True, 'bg_color': '#FBE5D6', 'font_size': '14'}, for_review_special_rows)
             ]
 
-            output_pages = {
-                'Notes': {'data': self.outputs[inst]['All issues']},
-                'All issues': {'data': error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True},
-                                                                                [2])]},
-                'Disqualifying issues': {'data': disqualifying_error_count_output,
-                                         'special_formats': [({'bold': True, 'text_wrap': True}, [2])]},
-                'Checklist': {'data': self.checklist_outputs[inst]},
-                'For review': {'data': for_review_list, 'special_formats': for_review_special_formats},
-                'Orig from {}'.format(inst): {'data': self.outputs[inst]['originally_from']}
-            }
+            output_pages = {}
+            output_pages['Notes'] = {'data': self.outputs[inst]['All issues']}
+
+            if self.print_issues_worksheets is True:
+                output_pages['All issues'] = {'data': error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True}, [2])]}
+                output_pages['Disqualifying issues'] = {'data': disqualifying_error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True}, [2])]}
+
+            output_pages['Checklist'] = {'data': self.checklist_outputs[inst]}
+
+            if self.print_for_review is True:
+                output_pages['For review'] = {'data': for_review_list, 'special_formats': for_review_special_formats}
+            
             if inst in self.print_line_583_output:
                 if self.line_583_validation_output and self.print_errors_only is False:
                     output_pages['Line 583 validation'] = {'data': self.line_583_validation_output}
