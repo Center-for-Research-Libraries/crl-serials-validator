@@ -89,7 +89,7 @@ class ValidatorController(ValidatorFileLocations):
 
     def set_api_keys(self):
         self.print_popunder_window_warning()
-        ApiKeySetter(self.data_storage_folder)
+        ApiKeySetter(self.crl_folder)
     
     def scan_input_files(self):
         InputFileScanner(self.input_files)

@@ -45,7 +45,8 @@ class ValidatorFileLocations:
         self.look_for_validator_data_folder()
         if not portable_install:
             self.look_for_crl_marc_machine_folder()
-            self.look_for_user_data_dir()
+            self.look_for_crl_folder()
+            # self.look_for_user_data_dir()
 
         if not self.data_storage_folder:
             self.data_storage_folder = self.validator_data_folder
