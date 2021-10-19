@@ -426,6 +426,7 @@ class ReviewWorkbookPrinter:
         output = defaultdict(list)
 
         header = [
+            'Seqnum',
             'Title',
             'Notes',
             'OCLC_Number',
