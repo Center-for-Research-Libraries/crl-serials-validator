@@ -5,4 +5,3 @@ openpyxl
 requests
 appdirs
 pyyaml
-ttkbootstrap
