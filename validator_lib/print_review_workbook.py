@@ -15,17 +15,22 @@ class ReviewWorkbookPrinter:
         print_errors_only=False, 
         print_originally_from=False,
         print_issues_worksheets=False,
-        print_for_review=False):
+        print_for_review=False,
+        print_583_output=True,
+        print_good_marc_output=True):
 
         self.running_headless = running_headless
         self.print_originally_from = print_originally_from
         self.print_issues_worksheets = print_issues_worksheets
         self.print_for_review = print_for_review
+        self.print_583_output = print_583_output
+        self.print_good_marc_output = print_good_marc_output
 
         # if we have KeyErrors with dict keys containing "issn_db" we'll know the database isn't installed
         self.issn_db_not_seen = False
 
         self.good_marc = defaultdict(list)
+        self.bad_marc = defaultdict(list)
 
         self.title_dicts = title_dicts
         self.print_errors_only = print_errors_only
@@ -148,8 +153,12 @@ class ReviewWorkbookPrinter:
             self.organize_by_errors(title_dict)
         if self.print_originally_from is True:
             self.make_originally_from_outputs()
+
         self.make_workbooks()
-        self.print_good_marc_output()
+
+        self.make_good_bad_marc_output('good')
+        self.make_good_bad_marc_output('bad')
+
         self.make_583_output()
 
     def remove_issn_db_from_checklist_cats(self):
@@ -208,15 +217,17 @@ class ReviewWorkbookPrinter:
         """Tally the issues in the input files."""
         for title_dict in title_dicts:
             inst = self.get_inst_from_dict(title_dict)
+            try:
+                marc = title_dict['marc']
+            except KeyError:
+                pass
             if not title_dict['disqualifying_error_category']:
                 self.disqualifying_error_counter[inst]['No errors'] += 1
-                try:
-                    marc = title_dict['marc']
+                if marc:
                     self.good_marc[inst].append(marc)
-                except KeyError:
-                    pass
             else:
                 self.disqualifying_error_counter[inst][title_dict['disqualifying_error_category']] += 1
+                self.bad_marc[inst].append(marc)
 
     def organize_by_errors(self, title_dict):
         inst = self.get_inst_from_dict(title_dict)
@@ -370,15 +381,21 @@ class ReviewWorkbookPrinter:
         for inst in insts:
             self.checklist_outputs[inst].insert(0, self.checklist_cats)
 
-    def print_good_marc_output(self):
+    def make_good_bad_marc_output(self, good_or_bad):
+        if self.print_good_marc_output is False:
+            return
         for inst in self.good_marc:
-            output_filename = '{} good records.mrk'.format(inst)
+            output_filename = '{} {} records.mrk'.format(inst, good_or_bad)
             output_file_location = os.path.join(self.output_folder, output_filename)
             output_file_location = validator_lib.utilities.get_unused_filename(output_file_location)
 
             with open(output_file_location, 'w', encoding='utf8') as fout:
-                for marc in self.good_marc[inst]:
-                    fout.write(marc + '\n\n')
+                if good_or_bad == 'good':
+                    for marc in self.good_marc[inst]:
+                        fout.write(marc + '\n\n')
+                elif good_or_bad == 'bad':
+                    for marc in self.bad_marc[inst]:
+                        fout.write(marc + '\n\n')
 
     def make_workbooks(self):
         for inst in self.outputs:
@@ -402,7 +419,9 @@ class ReviewWorkbookPrinter:
                 output_pages['All issues'] = {'data': error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True}, [2])]}
                 output_pages['Disqualifying issues'] = {'data': disqualifying_error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True}, [2])]}
 
-            output_pages['Checklist'] = {'data': self.checklist_outputs[inst]}
+            checklist_number_columns = {1, 3, 6, 7}  # has_disqualifying_error, seqnum, local_oclc, wc_oclc
+            checklist_number_columns = {1, 3, 6, 7}  # has_disqualifying_error, seqnum, local_oclc, wc_oclc
+            output_pages['Checklist'] = {'data': self.checklist_outputs[inst], 'number_columns': checklist_number_columns}
 
             if self.print_for_review is True:
                 output_pages['For review'] = {'data': for_review_list, 'special_formats': for_review_special_formats}
@@ -414,13 +433,13 @@ class ReviewWorkbookPrinter:
             # TODO: temporary, until "headless" output can also be made a manual option
             # if self.running_headless:
             if True:
-                headless_output_filename = output_file_location.replace('.xlsx', '.txt')
-                headless_output_filename = headless_output_filename.replace('review', 'loading')
-                self.print_headless_output(output_pages['Checklist'], headless_output_filename)
+                self.print_headless_output(output_pages['Checklist'], output_file_location.replace('.xlsx', '.txt'))
 
             CRLXlsxWriter(output_file_location, output_pages)
 
     def make_583_output(self):
+        if self.print_583_output is False:
+            return
         if not self.line_583_validation_output:
             return
         output = defaultdict(list)
@@ -494,9 +513,19 @@ class ReviewWorkbookPrinter:
 
     def print_headless_output(self, checklist_data, headless_output_filename):
         header_row = checklist_data['data'][0]
-        fout = open(headless_output_filename, 'w', encoding='utf8', newline='')
-        cout = csv.writer(fout, delimiter='\t', lineterminator=os.linesep)
+        good_output = []
+        bad_output = []
         for row in checklist_data['data']:
-            if row[1] == '1':
-                continue
-            cout.writerow(row)
+            if row[1] != '1':
+                good_output.append(row)
+            else:
+                bad_output.append(row)
+        
+        if good_output:
+            good_headless_output_filename = headless_output_filename.replace('review', 'loading')
+            fout_good = open(headless_output_filename, 'w', encoding='utf8', newline='')
+            cout_good = csv.writer(fout_good, delimiter='\t', lineterminator=os.linesep)
+        if bad_output:
+            bad_headless_output_filename = headless_output_filename.replace('for review', 'failed')
+            fout_bad = open(headless_output_filename, 'w', encoding='utf8', newline='')
+            cout_bad = csv.writer(fout_bad, delimiter='\t', lineterminator=os.linesep)
