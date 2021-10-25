@@ -28,6 +28,9 @@ class CRLXlsxWriter:
         """
         print('Creating workbook {}'.format(workbook_name))
         self.workbook = xlsxwriter.Workbook(workbook_name)
+
+        # To force a cell to be treated as text by xlsxwriter need to set 'num_format' to '@'.
+        text_format = self.workbook.add_format({'num_format': '@'})
         for worksheet_name in worksheet_names_and_data:
             number_columns = set()
             if "number_columns" in worksheet_names_and_data[worksheet_name]:
@@ -37,7 +40,7 @@ class CRLXlsxWriter:
             standard_format = self.workbook.add_format({'text_wrap': True})
             # Default is a basic bold-faced header. This can be overridden with a special_format_tuple.
             special_formats = {
-                "bold": self.workbook.add_format({'bold': True, 'text_wrap': True})
+                "bold": self.workbook.add_format({'bold': True, 'text_wrap': True}),
             }
             special_format_rows = {
                 0: "bold"
@@ -76,9 +79,13 @@ class CRLXlsxWriter:
                     elif not output_cell:
                         worksheet.write_blank(row, column, None)
                     elif column in number_columns:
-                        worksheet.write_number(row, column, output_cell)
+                        try:
+                            output_data = int(output_cell)
+                            worksheet.write_number(row, column, output_data)
+                        except ValueError:
+                            worksheet.write_string(row, column, str(output_cell))
                     else:
-                        worksheet.write_string(row, column, str(output_cell))
+                        worksheet.write_string(row, column, str(output_cell), text_format)
                     column += 1
                 row += 1
             # apply word wrap to everything
