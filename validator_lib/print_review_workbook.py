@@ -523,9 +523,15 @@ class ReviewWorkbookPrinter:
         
         if good_output:
             good_headless_output_filename = headless_output_filename.replace('review', 'loading')
-            fout_good = open(headless_output_filename, 'w', encoding='utf8', newline='')
+            fout_good = open(good_headless_output_filename, 'w', encoding='utf8', newline='')
             cout_good = csv.writer(fout_good, delimiter='\t', lineterminator=os.linesep)
+            cout_good.writerow(header_row)
+            for row in good_output:
+                cout_good.writerow(row)
         if bad_output:
             bad_headless_output_filename = headless_output_filename.replace('for review', 'failed')
-            fout_bad = open(headless_output_filename, 'w', encoding='utf8', newline='')
+            fout_bad = open(bad_headless_output_filename, 'w', encoding='utf8', newline='')
             cout_bad = csv.writer(fout_bad, delimiter='\t', lineterminator=os.linesep)
+            cout_bad.writerow(header_row)
+            for row in bad_output:
+                cout_bad.writerow(row)
