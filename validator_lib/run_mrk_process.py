@@ -161,6 +161,9 @@ class MrkProcessRunner:
                 holdings.extend(field_holdings)
                 if field == '866':
                     regular_holdings_list.extend(field_holdings)
+                for i in range(0, len(field_holdings)):
+                    if field == '868' and 'ind' not in field_holdings[i].lower():
+                        field_holdings[i] = 'Index ' + field_holdings[i]
                 nonpublic_notes = re.findall(r"={}\s\s[^\n]*\$x([^$\n]+)", record)
                 holdings_nonpublic_notes.extend(nonpublic_notes)
                 public_notes = re.findall(r"={}\s\s[^\n]*\$z([^$\n]+)", record)
