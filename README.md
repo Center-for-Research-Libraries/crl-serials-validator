@@ -49,7 +49,9 @@ Put your input files in the input folder. They should all go in the top level fo
 
 ### Data files
 
-Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. These files will all be found in a folder called `CRL` in your user data folder. On Windows this will usually be found at `'C:\Users\USERNAME\AppData\Local\CRL'. On most Linux systems it will usually be at `/home/USERNAME/.local/share/CRL`.
+Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. The `validator_config.ini` will be put in the `data` folder in the CRL Serials Validator's main folder. The other two files will go in the user's data directory in a folder called `CRL`. On Windows this will usually be found at `'C:\Users\USERNAME\AppData\Local\CRL\CRL'. On most Linux systems it will usually be at `/home/USERNAME/.local/share/CRL`.
+
+To create a "portable" version of the application, move the `marc_database.db` and `api_keys.ini` files to the `data` folder in the main application folder. After that the application will default to using those files and won't try to create files in other places on the user's drive.
 
 If you hae a copy of the ISSN database, it should be put in the same directory that contains `marc_database.db`.
 
@@ -59,7 +61,7 @@ If you want the system to check whether or not a title is in JSTOR, add a file o
 
 ### ISSN Database
 
-The project can use, but does not require access to, a copy of the ISSN database. If you are running the project from a machine on CRL's internal network and have the Tech Services drive mapped, the program should be able to scan your drives and find the database there. Otherwise, contact Nate to get a copy. Users outside of CRL will need a separate license from the ISSN International Centre to use ISSN data.
+The project can use, but does not require, data from the ISSN International Centre stored in an SQLite database. Users outside of CRL will need a separate license from the ISSN International Centre to use ISSN data. Instructions on creating the ISSN database from raw ISSN MARC data will be included in a future version of the CRL Serials Validator. 
 
 ### Planned updates
 
