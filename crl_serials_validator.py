@@ -25,7 +25,7 @@ from validator_lib.validator_controller import ValidatorController
 from validator_lib.bulk_validator_preferences import run_bulk_config
 from validator_lib.command_line_api_keys import CommandLineApiKeys
 from validator_lib.ttk_theme import set_ttk_style
-
+from validator_lib.validator_file_locations import print_validator_file_locations
 
 class ValidatorTkinterInterface(tk.Tk):
     """
@@ -259,7 +259,7 @@ if __name__ == "__main__":
     args = parse_command_line_args()
 
     if args.file_locations is True:
-        print('file_locations argument is not yet implemented. Quitting.')
+        print_validator_file_locations()
         sys.exit()
     if args.set_keys is True:
         headless_api_keys()

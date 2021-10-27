@@ -19,6 +19,7 @@ import platform
 from appdirs import AppDirs
 import logging
 
+
 class ValidatorFileLocations:
 
     current_os = platform.system()
@@ -180,3 +181,36 @@ class ValidatorFileLocations:
             if not os.path.isfile(about_file_location):
                 with open(about_file_location, 'w') as fout:
                     fout.write('This folder contains data files for utilities from the Center for Research Libraries.\n')
+
+
+def print_validator_file_locations():
+    from termcolor import colored, cprint
+    import colorama
+    
+    file_locations = ValidatorFileLocations()
+
+    colorama.init()
+
+    name_color = 'blue'
+    highlight_color = 'yellow'
+    location_color = 'green'
+    not_installed_color = 'red'
+
+    header = '~~~~~~~~~~~~~~\n'
+    header += 'FILE LOCATIONS\n'
+    header += '~~~~~~~~~~~~~~'
+    cprint(header, highlight_color)
+    main_data_folder = colored('main data folder', name_color)
+    local_marc_database = colored('local MARC database', name_color)
+    issn_database = colored('ISSN database', name_color)
+    not_installed = colored('not installed', not_installed_color)
+
+    print('The {} is located at: '.format(main_data_folder), end='')
+    cprint(file_locations.data_storage_folder, location_color)
+    print('The {} is located at: '.format(local_marc_database), end='')
+    cprint(file_locations.marc_db_location, location_color)
+    if file_locations.issn_db_location:
+        print('The {} is located at: '.format(issn_database), end='')
+        cprint(file_locations.issn_db_location, location_color)
+    else:
+        print('The {} is {}.'.format(issn_database, not_installed))
