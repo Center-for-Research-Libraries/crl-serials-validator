@@ -58,9 +58,6 @@ class IssuesChooser(tk.Tk):
                 break_label.grid(row=row_no, column=col_no, sticky=tk.W)
                 row_no += 1
             self.int_vars[issue] = tk.IntVar()
-            if 'range' in issue:
-                print(issue)
-                print(self.validator_config.config['disqualifying_issues'][issue])
             if 'issn_db' in issue and self.issn_db_missing is True:
                 self.int_vars[issue].set(0)
                 ttk.Checkbutton(issues_frame, text=issue, state=tk.DISABLED, variable=self.int_vars[issue]).grid(row=row_no, column=col_no, sticky=tk.W, ipady=2)

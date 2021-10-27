@@ -26,12 +26,14 @@ class ValidatorConfig:
         
         First check if it exists and if it is valid YAML. If either of these is false, write a blank file and load that.
         """
+        config_changed_in_first_reading = False
         try:
             config = self._read_config()
             if isinstance(config, dict):
                 self.config = config
             else:
                 self.config = {}
+                config_changed_in_first_reading = True
         except FileNotFoundError:
             self.config = {}
         except yaml.io.UnsupportedOperation:
@@ -39,14 +41,31 @@ class ValidatorConfig:
             # TODO: this will erase the config file entirely. We should make a failure option, in case
             # the user has (badly) edited the YAML file by hand.
             self.config = {}
+            config_changed_in_first_reading = True
 
+        default_disqualifying_issues = self.get_default_disqualifying_issues()
         if 'disqualifying_issues' not in self.config:
-            disqualifying_issues = self.get_default_disqualifying_issues()
+            disqualifying_issues = default_disqualifying_issues.copy()
             # YAML can't write an OrderdDict, so convert to dict
             self.config['disqualifying_issues'] = dict(disqualifying_issues)
+            config_changed_in_first_reading = True
+
+        # in case we've added or removed any disqualifying issues since the last time the user has changed them, we'll compare against the defaults.
+        for disqualifying_issue in default_disqualifying_issues:
+            if disqualifying_issue not in self.config['disqualifying_issues']:
+                self.config['disqualifying_issues'][disqualifying_issue] = default_disqualifying_issues[disqualifying_issue]
+        disqualifying_issues_to_remove = []
+        for disqualifying_issue in self.config['disqualifying_issues']:
+            if disqualifying_issue not in default_disqualifying_issues:
+                disqualifying_issues_to_remove.append(disqualifying_issue)
+        if disqualifying_issues_to_remove:
+            config_changed_in_first_reading = True
+            for disqualifying_issue in disqualifying_issues_to_remove:
+                del(self.config['disqualifying_issues'][disqualifying_issue])
 
         if 'programs' not in self.config:
             self.config['programs'] = {}
+            config_changed_in_first_reading = True
         
         for program in self.config['programs']:
             program = program.lower()
@@ -59,6 +78,8 @@ class ValidatorConfig:
                     self.names_associated_to_programs_map[associated_name.lower()] = program
             except KeyError:
                 pass
+        if config_changed_in_first_reading:
+            self.write_validator_config_file()
 
     def _read_config(self):
         with open(self.config_file, 'r', encoding='utf8') as fin:
@@ -198,7 +219,6 @@ class ValidatorConfig:
 
             'holdings_out_of_range': True,
             'holdings_out_of_issn_db_date_range': True,
-            'holdings_have_no_years': False,
 
             'invalid_local_issn': True,
             'issn_mismatch': True,

@@ -118,16 +118,16 @@ class ValidatorController(ValidatorFileLocations):
         x = 0
         for input_file in self.input_files:
             x += 1
-            v = ValidatorConfig()
+            validator_config_object = ValidatorConfig()
 
-            input_fields = v.get_input_fields(input_file)       
-            disqualifying_issue_categories = v.get_disqualifying_issue_categories(input_file)
+            input_fields = validator_config_object.get_input_fields(input_file)       
+            disqualifying_issue_categories = validator_config_object.get_disqualifying_issue_categories(input_file)
 
             if not input_fields:
                 warning_message = 'No input fields set for file {}. Skipping.'.format(input_file)
                 logging.warning(warning_message)
                 continue
-            del(v)
+            del(validator_config_object)
 
             ChecksRunner(
                 input_file,

@@ -180,7 +180,6 @@ class ReviewWorkbookPrinter:
             'form_not_print': 'Form of title is not hard copy',
             'holdings_out_of_issn_db_date_range': 'Holdings are outside the ISSN database expected publication dates',
             'holdings_out_of_range': 'Holdings are outside the expected publication dates',
-            'holdings_have_no_years': 'No years found in holdings statement',
             'invalid_carrier_type': 'Carrier type of title is not hard copy',
             'invalid_local_issn': 'Local ISSN is not in a valid format',
             'invalid_media_type': 'Media type of title is not hard copy',

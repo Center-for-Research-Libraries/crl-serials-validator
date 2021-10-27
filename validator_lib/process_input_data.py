@@ -65,7 +65,7 @@ class InputDataProcessor:
     def get_issues_to_check(self):
         issues_to_check = [
             'bib_lvl_not_serial', 'binding_words_in_holdings', 'completeness_words_in_holdings', 'form_not_print', 
-            'holdings_have_no_years', 'holdings_out_of_range', 'title_in_jstor',
+            'holdings_out_of_range',
             'invalid_carrier_type', 'invalid_local_issn', 'invalid_media_type', 'issn_mismatch', 
             'nonprint_words_in_holdings', 'oclc_mismatch', 'record_type_not_language_material', 
             'serial_type_not_periodical', 'title_mismatch', 'title_in_jstor' ]
