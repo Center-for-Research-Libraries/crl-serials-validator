@@ -41,49 +41,11 @@ The CRL Serials Validator has been tested and used on Windows 10 and Linux (Ubun
 7. Tell the scripts what input fields your input files have.
 8. Validate the input data.
 
-## More information
-
-### Input files
-
-Put your input files in the input folder. They should all go in the top level folder, not in any subfolders. Input files can be MARC text (.mrk), Excel, csv, or tsv (with a ".tsv" or ".txt" extension).
-
-### Data files
-
-Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. The `validator_config.ini` will be put in the `data` folder in the CRL Serials Validator's main folder. The other two files will go in the user's data directory in a folder called `CRL`. On Windows this will usually be found at `'C:\Users\USERNAME\AppData\Local\CRL\CRL'. On most Linux systems it will usually be at `/home/USERNAME/.local/share/CRL`.
-
-To create a "portable" version of the application, move the `marc_database.db` and `api_keys.ini` files to the `data` folder in the main application folder. After that the application will default to using those files and won't try to create files in other places on the user's drive.
-
-If you hae a copy of the ISSN database, it should be put in the same directory that contains `marc_database.db`.
-
-### JSTOR
-
-If you want the system to check whether or not a title is in JSTOR, add a file of JSTOR ISSNs to the data folder. The file should be a text list of only jstor ISSNs, and should have a name starting with "jstor" and ending with ".txt". It doesn't have to be called `jstor.txt`, but that would be an obvious option.
-
-### ISSN Database
-
-The project can use, but does not require, data from the ISSN International Centre stored in an SQLite database. Users outside of CRL will need a separate license from the ISSN International Centre to use ISSN data. Tools for creating a database from raw ISSN MARC data will be included in a future version of the CRL Serials Validator. 
-
-### Test data
-
-There are test input files in the `test_inputs` folder. Copy some or all of them into the `input` folder to use them.
-
-### Planned updates
-
-* The next version of the CRL Serials Validator will have a full (non command line) GUI, and by default will run in graphical mode.
-* We will have a binary (.exe file) release of the CRL Serials Validator for Windows, so it can be run by clicking an icon rather than opening a command line.
-
-### Other documentation
-
-* Glossaries of...
-    - ...possible [disqualifying issues](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/disqualifying_issues.md).
-    - ...terms from ["Originally from" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/originally_from.md).
-    - ...terms from ["For review" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/for_review.md).
-    - ...terms from the ["Checklist" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/checklist.md).
-* How to run the CRL Serials Validator in [bulk/"headless" mode](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/bulk_mode.md).
-
 ## Running the CRL Serials Validator
 
-The CRL Serials Validator can be run by typing `python crl_serials_validator.py` in the command window. You may see a warning that says "Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning." This can be ignored.
+Put your input files in the input folder. They should all go in the top level folder, not in any subfolders. Input files can be MARC text (.mrk), Excel, csv, or tsv. A tsv file can have a ".tsv" or ".txt" extension.
+
+The CRL Serials Validator can be run by typing `python crl_serials_validator.py` in a command window. Note that MacOS and Linux users might have to use `python3` instead of `python`.
 
 From here, running the CRL Serials Validator should be relatively straightforward.
 
@@ -127,3 +89,38 @@ While the Validator is running, the process will download MARC records from the 
 
 For more on the outputs, see the glossary of terms for the ["Originally from" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/originally_from.md), the ["For review" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/for_review.md), and the the ["Checklist" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/checklist.md).
 
+## More information
+
+### Data files
+
+Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. The `validator_config.ini` will be put in the `data` folder in the CRL Serials Validator's main folder. The other two files will go in the user's data directory in a folder called `CRL`. On Windows this will usually be found at `'C:\Users\USERNAME\AppData\Local\CRL\CRL'. On most Linux systems it will usually be at `/home/USERNAME/.local/share/CRL`.
+
+To create a "portable" version of the application, move the `marc_database.db` and `api_keys.ini` files to the `data` folder in the main application folder. After that the application will default to using those files and won't try to create files in other places on the user's drive.
+
+If you hae a copy of the ISSN database, it should be put in the same directory that contains `marc_database.db`.
+
+### JSTOR
+
+If you want the system to check whether or not a title is in JSTOR, add a file of JSTOR ISSNs to the data folder. The file should be a text list of only jstor ISSNs, and should have a name starting with "jstor" and ending with ".txt". It doesn't have to be called `jstor.txt`, but that would be an obvious option.
+
+### ISSN Database
+
+The project can use, but does not require, data from the ISSN International Centre stored in an SQLite database. Users outside of CRL will need a separate license from the ISSN International Centre to use ISSN data. Tools for creating a database from raw ISSN MARC data will be included in a future version of the CRL Serials Validator. 
+
+### Test data
+
+There are test input files in the `test_inputs` folder. Copy some or all of them into the `input` folder to use them.
+
+### Planned updates
+
+* The next version of the CRL Serials Validator will have a full (non command line) GUI, and by default will run in graphical mode.
+* We will have a binary (.exe file) release of the CRL Serials Validator for Windows, so it can be run by clicking an icon rather than opening a command line.
+
+### Other documentation
+
+* Glossaries of...
+    - ...possible [disqualifying issues](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/disqualifying_issues.md).
+    - ...terms from ["Originally from" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/originally_from.md).
+    - ...terms from ["For review" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/for_review.md).
+    - ...terms from the ["Checklist" output worksheet](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/checklist.md).
+* How to run the CRL Serials Validator in [bulk/"headless" mode](https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/bulk_mode.md).
