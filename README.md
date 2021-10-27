@@ -91,6 +91,10 @@ For more on the outputs, see the glossary of terms for the ["Originally from" ou
 
 ## More information
 
+### Output files
+
+Output files will be in the `output` directory, with separate output files for each institution in the input set. The main output file of the CRL Serials Validator is a spreadsheet called something like `INSTITUTION_NAME for review.xlsx`. Currently additional outputs include separate tsv files with the validated (`INSTITUTION_NAME for loading.txt`) and failed (`INSTITUTION_NAME failed.txt`) records as printed in the spreadsheet file; separate files of validated and failed MARC records when a MARC input file is given; and a filed of specialized output for making Local Holdings Records for the validated titled.
+
 ### Data files
 
 Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. The `validator_config.ini` will be put in the `data` folder in the CRL Serials Validator's main folder. The other two files will go in the user's data directory in a folder called `CRL`. On Windows this will usually be found at `C:\Users\USERNAME\AppData\Local\CRL\CRL`. On most Linux systems it will be at `/home/USERNAME/.local/share/CRL`.
