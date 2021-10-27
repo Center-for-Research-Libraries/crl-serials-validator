@@ -3,5 +3,4 @@ thefuzz
 xlsxwriter
 openpyxl
 requests
-appdirs
 pyyaml

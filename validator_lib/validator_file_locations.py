@@ -16,7 +16,6 @@ and store data in the Linux directory structure.
 
 import os
 import platform
-from appdirs import AppDirs
 import logging
 
 class ValidatorFileLocations:
@@ -46,7 +45,6 @@ class ValidatorFileLocations:
         if not portable_install:
             self.look_for_crl_marc_machine_folder()
             self.look_for_crl_folder()
-            # self.look_for_user_data_dir()
 
         if not self.data_storage_folder:
             self.data_storage_folder = self.validator_data_folder
@@ -92,21 +90,6 @@ class ValidatorFileLocations:
     def look_for_crl_folder(self):
         crl_folder = os.path.join(self.home_folder, 'CRL')
         self.check_folder(crl_folder)
-
-    def look_for_user_data_dir(self):
-        """
-        The plan now is to store any new system-wide databases in the user's data directory in a 
-        subdiectory called CRL. On Linux this requires and app name of "CRL". On Windows the top folder level
-        is the app author, and an app name would be a lower level if we added it.
-        """
-        if self.current_os == 'Windows':
-            a = AppDirs(appauthor='CRL')
-        elif self.current_os == 'Linux':
-            a = AppDirs(appname='CRL')
-        elif self.current_os == 'Darwin':
-            # This might be wrong; don't have access to a Mac OS computer to test with
-            a = AppDirs(appname='CRL')
-        self.check_folder(a.user_data_dir)
 
     def get_input_files(self):
         all_input_files = os.listdir(self.validator_input_folder)
