@@ -191,7 +191,7 @@ def print_validator_file_locations():
 
     colorama.init()
 
-    name_color = 'blue'
+    name_color = 'cyan'
     highlight_color = 'yellow'
     location_color = 'green'
     not_installed_color = 'red'
@@ -203,7 +203,7 @@ def print_validator_file_locations():
     main_data_folder = colored('main data folder', name_color)
     local_marc_database = colored('local MARC database', name_color)
     issn_database = colored('ISSN database', name_color)
-    not_installed = colored('not installed', not_installed_color)
+    not_installed = colored('not installed', not_installed_color, 'on_white')
 
     print('The {} is located at: '.format(main_data_folder), end='')
     cprint(file_locations.data_storage_folder, location_color)
