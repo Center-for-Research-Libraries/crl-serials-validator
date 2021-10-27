@@ -3,6 +3,7 @@ import os
 import datetime
 import webbrowser
 import sys
+import gc
 
 from validator_lib.validator_file_locations import ValidatorFileLocations
 from validator_lib.choose_input_file_fields import InputFieldsChooser
@@ -89,8 +90,10 @@ class ValidatorController(ValidatorFileLocations):
 
     def set_api_keys(self):
         self.print_popunder_window_warning()
-        ApiKeySetter(self.data_storage_folder)
-    
+        api_setter_obj = ApiKeySetter(self.data_storage_folder)
+        del api_setter_obj.api_keys
+        gc.collect()
+
     def scan_input_files(self):
         InputFileScanner(self.input_files)
 

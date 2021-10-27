@@ -76,7 +76,7 @@ class WcApi:
     def __init__(self, user_name=None, data_folder=None):
         self._name = user_name
         self.crl_marcxml = crl_lib.marcxml.CrlMarcXML()
-        self.api_keys = OclcApiKeys(data_folder=data_folder, name_for_key=user_name)
+        self.api_keys = OclcApiKeys(api_key_config_file_location=data_folder, name_for_key=user_name)
         self._create_base_search_urls()
         self.search_type_map = {
             "oclc": "oclc",

@@ -1,10 +1,10 @@
 import random
 import os
+import configparser
+import sys
 
-from crl_lib.preferences import Preferences
 
-
-class OclcApiKeys(Preferences):
+class OclcApiKeys:
 
     """
     Class for getting WorldCat Search API keys from a preferences file.
@@ -18,16 +18,30 @@ class OclcApiKeys(Preferences):
         k2 = OclcApiKeys('constance')
 
     """
+    api_keys = {}
 
-    def __init__(self, data_folder, name_for_key=None):
+    def __init__(self, api_key_config_file_location, name_for_key=None):
         
-        if not os.path.isdir(data_folder):
-            raise Exception('Invalid data folder sent to api_keys. Folder is {}'.format(data_folder))
+        if os.path.isdir(api_key_config_file_location):
+            api_key_config_file_location = os.path.join(api_key_config_file_location, 'api_keys.ini')
         
-        super().__init__(data_folder=data_folder, preferences_file_name='api_keys.ini')
-        self.api_keys = {}
+        self.name_for_key = name_for_key
+
+        self.api_key_config_file_location = api_key_config_file_location
+
+        self.check_api_key_config_file_location()
+
+        self.read_config_file()
+
+    def __del__(self):
+        pass
+
+    def read_config_file(self):
+        self.config = configparser.ConfigParser()
+        self.config.read(self.api_key_config_file_location)
+
         self.get_all_api_keys()
-        self.api_key_name = self.set_api_key_name(name_for_key)
+        self.api_key_name = self.set_api_key_name(self.name_for_key)
 
     @property
     def api_key(self):
@@ -52,7 +66,19 @@ class OclcApiKeys(Preferences):
             # Add section, so that a segment will at least be added to config.ini
             self.config.add_section('API KEYS')
 
-    def set_preferredapi_key_name(self, name):
+    def check_api_key_config_file_location(self):
+        if not os.path.isfile(self.api_key_config_file_location):
+            try:
+                fout = open(self.api_key_config_file_location, "w", encoding="utf8")
+                fout.close()
+            except FileNotFoundError:
+                print('API config file could not be created. Non-existent folder location?')
+                sys.exit('Location is {}'.format(self.api_key_config_file_location))
+            except PermissionError:
+                print('API config file could not be created due to PermissionError.')
+                sys.exit('Location is {}'.format(self.api_key_config_file_location))
+                
+    def set_preferred_api_key_name(self, name):
         """
         Set the preferred API key name in the preferences. To make this permanent,
         the preferences file should be re-written at some point after this.
@@ -92,3 +118,13 @@ class OclcApiKeys(Preferences):
         # Fallback, choose a random name if none preferred.
         name = random.choice(list(self.api_keys.keys()))
         return name
+
+    def remove_preference_key(self, section, key):
+        try:
+            self.config[section].pop(key)
+        except KeyError:
+            pass
+
+    def write_preferences_to_file(self):
+        with open(self.api_key_config_file_location, "w", encoding="utf8") as fout:
+            self.config.write(fout)

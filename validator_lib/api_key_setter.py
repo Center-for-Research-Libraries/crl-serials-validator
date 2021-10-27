@@ -25,8 +25,11 @@ class ApiKeySetter(tk.Tk):
         style is an optional ttk style.
         """
         super().__init__()
+        self.make_gui(data_folder)
+
+    def make_gui(self, data_folder):
         self.api_keys = OclcApiKeys(data_folder)
-        self.names = list(self.api_keys.api_keys.keys())
+        self.get_names()
 
         # in case the window pops under the terminal
         print("Opening separate API key setter window.")
@@ -89,24 +92,25 @@ class ApiKeySetter(tk.Tk):
 
         self.mainloop()
 
+    def get_names(self):
+        self.api_keys.read_config_file()
+        self.names = []
+        self.api_keys.get_all_api_keys()
+        for name in self.api_keys.config['API KEYS']:
+            self.names.append(name)
+
     def clicked(self):
         """Save clicked. Look for API keys and default key set and save to config file."""
-        new_api_keys = {}
         default_key = self.selected.get()
         default_key_name = None
+        self.api_keys.config['API KEYS'] = {}
         for i in range(0, 6):
             name = self.inputs[i]["name"].get()
             api_key = self.inputs[i]["key"].get()
             if name and api_key:
-                new_api_keys[name] = api_key
+                self.api_keys.config['API KEYS'][name] = api_key
                 if i == default_key:
-                    default_key_name = name
-        if new_api_keys:
-            self.api_keys.config['API KEYS'] = {}
-            for name in new_api_keys:
-                self.api_keys.config['API KEYS'][name] = new_api_keys[name]
-        if default_key_name:
-            self.api_keys.config['Preferred API Key'] = {default_key_name: 1}
+                    self.api_keys.config['Preferred API Key'] = {name: 1}
 
         self.api_keys.write_preferences_to_file()
         self.destroy()
