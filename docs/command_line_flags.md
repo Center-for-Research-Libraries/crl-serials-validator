@@ -1,7 +1,6 @@
 ## Command line flags
 
-
-Running without any flags will cause 
+All flags are optional, and probably not necessary for the majority of users.
 
 - `-h`, `--help`: show a help message and exit.
 - `--headless`, `-a`: Run in "headless" (automated or bulk) mode.
