@@ -93,7 +93,7 @@ For more on the outputs, see the glossary of terms for the ["Originally from" ou
 
 ### Data files
 
-Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. The `validator_config.ini` will be put in the `data` folder in the CRL Serials Validator's main folder. The other two files will go in the user's data directory in a folder called `CRL`. On Windows this will usually be found at `C:\Users\USERNAME\AppData\Local\CRL\CRL`. On most Linux systems it will usually be at `/home/USERNAME/.local/share/CRL`.
+Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. The `validator_config.ini` will be put in the `data` folder in the CRL Serials Validator's main folder. The other two files will go in the user's data directory in a folder called `CRL`. On Windows this will usually be found at `C:\Users\USERNAME\AppData\Local\CRL\CRL`. On most Linux systems it will be at `/home/USERNAME/.local/share/CRL`.
 
 To create a "portable" version of the application, move the `marc_database.db` and `api_keys.ini` files to the `data` folder in the main application folder. After that the application will default to using those files and won't try to create files in other places on the user's drive.
 
