@@ -224,6 +224,7 @@ def parse_command_line_args():
     parser.add_argument("--graphical", "-g", action="store_true", help="Run in graphical (GUI) mode. (Experimental)")
     parser.add_argument("--bulk_prefs", "-b", action="store_true", help="Set bulk (headless) preferences.")
     parser.add_argument("--set_keys", "-s", action="store_true", help="Set API keys on the command line.")
+    parser.add_argument("--file_locations", "-f", action="store_true", help="Show the location of the application's data files. (Not yet implemented.)")
     args = parser.parse_args()
     return args
 
@@ -257,6 +258,9 @@ def command_line_app():
 if __name__ == "__main__":
     args = parse_command_line_args()
 
+    if args.file_locations is True:
+        print('file_locations argument is not yet implemented. Quitting.')
+        sys.exit()
     if args.set_keys is True:
         headless_api_keys()
     elif args.bulk_prefs is True:
