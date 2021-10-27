@@ -63,6 +63,10 @@ If you want the system to check whether or not a title is in JSTOR, add a file o
 
 The project can use, but does not require, data from the ISSN International Centre stored in an SQLite database. Users outside of CRL will need a separate license from the ISSN International Centre to use ISSN data. Tools for creating a database from raw ISSN MARC data will be included in a future version of the CRL Serials Validator. 
 
+### Test data
+
+There are test input files in the `test_inputs` folder. Copy some or all of them into the `input` folder to use them.
+
 ### Planned updates
 
 * The next version of the CRL Serials Validator will have a full (non command line) GUI, and by default will run in graphical mode.
