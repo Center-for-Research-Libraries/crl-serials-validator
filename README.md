@@ -61,7 +61,7 @@ If you want the system to check whether or not a title is in JSTOR, add a file o
 
 ### ISSN Database
 
-The project can use, but does not require, data from the ISSN International Centre stored in an SQLite database. Users outside of CRL will need a separate license from the ISSN International Centre to use ISSN data. Instructions on creating the ISSN database from raw ISSN MARC data will be included in a future version of the CRL Serials Validator. 
+The project can use, but does not require, data from the ISSN International Centre stored in an SQLite database. Users outside of CRL will need a separate license from the ISSN International Centre to use ISSN data. Tools for creating a database from raw ISSN MARC data will be included in a future version of the CRL Serials Validator. 
 
 ### Planned updates
 
