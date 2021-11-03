@@ -74,7 +74,7 @@ A year was found in the holdings data outside of the publication years as determ
 
 ***invalid_local_issn***
 
-The ISSN in the local input data fails the algorithm for checking for valid ISSNs.
+The ISSN in the local input data fails the [algorithm for checking for valid ISSNs](https://en.wikipedia.org/wiki/International_Standard_Serial_Number#Code_format).
 
 ***issn_mismatch***
 
