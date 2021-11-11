@@ -219,7 +219,7 @@ class ReviewWorkbookPrinter:
             try:
                 marc = title_dict['marc']
             except KeyError:
-                pass
+                marc = None
             if not title_dict['disqualifying_error_category']:
                 self.disqualifying_error_counter[inst]['No errors'] += 1
                 if marc:
