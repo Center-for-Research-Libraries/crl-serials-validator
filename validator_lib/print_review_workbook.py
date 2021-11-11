@@ -226,7 +226,8 @@ class ReviewWorkbookPrinter:
                     self.good_marc[inst].append(marc)
             else:
                 self.disqualifying_error_counter[inst][title_dict['disqualifying_error_category']] += 1
-                self.bad_marc[inst].append(marc)
+                if marc:
+                    self.bad_marc[inst].append(marc)
 
     def organize_by_errors(self, title_dict):
         inst = self.get_inst_from_dict(title_dict)
