@@ -4,6 +4,8 @@ import datetime
 import webbrowser
 import sys
 import gc
+from termcolor import colored, cprint
+import colorama
 
 from validator_lib.validator_file_locations import ValidatorFileLocations
 from validator_lib.choose_input_file_fields import InputFieldsChooser
@@ -24,11 +26,15 @@ class ValidatorController(ValidatorFileLocations):
     Controller for the validation process, meant to be agnositc about a front end.
     """
 
+    popunder_warning_bar = colored('========================================================', 'blue')
+
     viable_input_formats = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
     docs_url = 'https://github.com/Center-for-Research-Libraries/validator/blob/main/README.md'
 
     def __init__(self, headless_mode=False, log_level='info', portable_install=False, single_file_run=False):
         super().__init__(portable_install=False)
+
+        colorama.init()
 
         self.headless_mode = headless_mode
         self.log_level = log_level
@@ -148,10 +154,10 @@ class ValidatorController(ValidatorFileLocations):
         disqualifying issues. If a GUI or web frontend is added to the project then this function can probably be 
         removed.
         """
-        print('========================================================')
-        print("Opening a new program window.")
-        print("If you don't see it, please look for it in your taskbar.")
-        print('========================================================')
+        print(self.popunder_warning_bar)
+        cprint("Opening a new program window.", 'yellow')
+        cprint("If you don't see it, please look for it in your taskbar.", 'yellow')
+        print(self.popunder_warning_bar)
 
 
     def check_if_run_is_possible(self):
