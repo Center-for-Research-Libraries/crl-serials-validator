@@ -16,98 +16,14 @@ Usage:
 import sys
 import os
 import argparse
-from tkinter import Label, ttk
-import tkinter as tk
 from contextlib import redirect_stdout
 import io
+from termcolor import colored, cprint
 
 from validator_lib.validator_controller import ValidatorController
 from validator_lib.bulk_validator_preferences import run_bulk_config
 from validator_lib.command_line_api_keys import CommandLineApiKeys
-from validator_lib.ttk_theme import set_ttk_style
 from validator_lib.validator_file_locations import print_validator_file_locations
-
-class ValidatorTkinterInterface(tk.Tk):
-    """
-    Basic GUI interface for the Validator.
-
-    Currently the "process input" part does not run in the GUI window, so this option should be considered incomplete.
-    """
-
-    docs_text = 'Visit the documentation in a web browser'
-    api_text = 'Set up your WorldCat Search API keys'
-    scan_text = 'Do a quick scan of any MARC input files to find important fields'
-    fields_text = 'Specify fields in input files'
-    issues_text = 'Specify disqualifying issues'
-    process_text = 'Process input and WorldCat MARC to create outputs'
-
-    def __init__(self):
-        super().__init__()
-
-        self.validator_controller = ValidatorController()
-
-        style = set_ttk_style()
-
-        self.issn_database_note_printed = False
-
-        self.resizable(1, 1)
-        self.title('CRL Serials Validator')
-    
-        ttk.Button(text=self.api_text, style='primary.TButton', command=self.run_api_keys).pack(padx=5, pady=5, fill='x')
-        ttk.Button(text=self.scan_text, style='primary.TButton', command=self.scan_files).pack(padx=5, pady=5, fill='x')
-        ttk.Button(text=self.fields_text, style='primary.TButton', command=self.select_fields).pack(padx=5, pady=5, fill='x')
-        ttk.Button(text=self.issues_text, style='primary.TButton', command=self.select_issues).pack(padx=5, pady=5, fill='x')
-        ttk.Button(text=self.process_text, style='primary.TButton', command=self.process_files).pack(padx=5, pady=5, fill='x')
-        ttk.Button(text=self.docs_text, style='info.TButton', command=self.load_docs).pack(padx=5, pady=5, fill='x')
-
-        ttk.Button(text='Quit', style="warning.TButton", command=self.cancel).pack(padx=5, pady=5)
-
-        self.mainloop()
-
-    def run_api_keys(self):
-        self.cancel()
-        self.validator_controller.set_api_keys()
-        self.create_main_window()
-
-    def scan_files(self):
-        """
-        Temporary working version with redirected output.
-        """
-        self.cancel()
-        f = io.StringIO()
-        with redirect_stdout(f):
-            self.validator_controller.scan_input_files()
-        s = f.getvalue()
-        print(s)
-        w = tk.Tk()
-        ttk.Label(w, text=s).pack()
-        w.mainloop()
-        self.create_main_window()
-
-    def select_fields(self):
-        self.cancel()
-        self.validator_controller.choose_input_fields()
-        self.create_main_window()
-
-    def select_issues(self):
-        self.cancel()
-        self.validator_controller.set_disqualifying_issues()
-        self.create_main_window()
-
-    def process_files(self):
-        self.cancel()
-        self.validator_controller.run_checks_process()
-        self.create_main_window()
-
-    def load_docs(self):
-        self.validator_controller.open_project_docs()
-
-    def cancel(self):
-        self.destroy()
-
-    def create_main_window(self):
-        self.__init__()
-
 
 
 class SimpleValidatorInterface:
@@ -123,9 +39,14 @@ class SimpleValidatorInterface:
         self.controller = ValidatorController(headless_mode=False)
 
         question_map = self.get_question_map()
-
+        
         while True:
+            os.system('cls' if os.name == 'nt' else 'clear')
             response = self.get_wanted_action(question_map)
+            if response == "quit":
+                print("Quitting.")
+                sys.exit()
+            os.system('cls' if os.name == 'nt' else 'clear')
             if response == "visit_docs":
                 self.controller.open_project_docs()
             elif response == "set_key":
@@ -152,27 +73,19 @@ class SimpleValidatorInterface:
                             self.command_line_pause()
                             continue
                     self.controller.run_checks_process()
-            elif response == "quit":
-                print("Quitting.")
-                sys.exit()
-
-    @staticmethod
-    def clear_screen():
-        """Clear the screen so that there isn't an endless scroll of the question list."""
-        if os.name == "nt":
-            os.system("cls")
-        else:
-            os.system("clear")
+                    input('Press enter to continue.')
 
     def get_wanted_action(self, question_map):
         """
         Print out the question list and get a response.
         """
         while True:
-            print("\nWhat would you like to do?")
+            cprint('Welcome to the CRL Serials Validator', 'yellow', 'on_blue')
+            print('')
+            cprint('What would you like to do?', 'cyan')
             for i in range(1, len(question_map)):
-                print("{}. {}".format(i, question_map[i][0]))
-            print("q. Quit.")
+                print("{}. {}".format(colored(str(i), 'yellow'), question_map[i][0]))
+            print("{}.  Quit.".format(colored('q', 'yellow')))
             input_result = input()
             input_result = input_result.strip()
             if input_result.lower() == "q":
@@ -184,7 +97,7 @@ class SimpleValidatorInterface:
                 except IndexError:
                     print("I didn't understand that.")
                     self.command_line_pause()
-                    self.clear_screen()
+            os.system('cls' if os.name == 'nt' else 'clear')
 
     def get_question_map(self):
         """

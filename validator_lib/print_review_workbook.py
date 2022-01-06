@@ -53,7 +53,6 @@ class ReviewWorkbookPrinter:
             'wc_oclc_repeated',
             'oclcs_019',
             'local_issn',
-            'invalid_local_issn',
             'wc_issn_a',
             'local_issn_does_not_match_wc_issn_a',
             'issn_l',
@@ -320,7 +319,8 @@ class ReviewWorkbookPrinter:
 
     def make_originally_from_outputs(self):
         """
-        Make workbook listing everything in the original file. By default this is not made or printed, and must be turned on via the print_originally_from variable.
+        Make workbook listing everything in the original file. By default this is not made or printed, and must be 
+        turned on via the print_originally_from variable.
         """
         for title_dict in self.title_dicts:
             inst = self.get_inst_from_dict(title_dict)

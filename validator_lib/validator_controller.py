@@ -5,7 +5,6 @@ import webbrowser
 import sys
 import gc
 from termcolor import colored, cprint
-import colorama
 
 from validator_lib.validator_file_locations import ValidatorFileLocations
 from validator_lib.choose_input_file_fields import InputFieldsChooser
@@ -14,7 +13,6 @@ from validator_lib.run_checks_process import ChecksRunner
 from validator_lib.choose_disqualifying_issues import IssuesChooser
 from validator_lib.validator_config import ValidatorConfig
 from validator_lib.api_key_setter import ApiKeySetter
-from validator_lib.command_line_ui_utilities import print_breaking_bar
 
 from crl_lib.api_keys import OclcApiKeys
 
@@ -27,19 +25,17 @@ class ValidatorController(ValidatorFileLocations):
     Controller for the validation process, meant to be agnositc about a front end.
     """
 
-    popunder_warning_bar = colored('========================================================', 'blue')
-
     viable_input_formats = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
     docs_url = 'https://github.com/Center-for-Research-Libraries/validator/blob/main/README.md'
 
-    def __init__(self, headless_mode=False, log_level='info', portable_install=False, single_file_run=False):
+    def __init__(
+        self, headless_mode=False, log_level='info', gui_mode=False, portable_install=False, single_file_run=False):
         super().__init__(portable_install=False)
-
-        colorama.init()
 
         self.headless_mode = headless_mode
         self.log_level = log_level
         self.debug_mode = DEBUG_MODE
+        self.gui_mode = gui_mode
 
         if self.headless_mode is True:
             self.log_level = 'warning'
@@ -81,6 +77,15 @@ class ValidatorController(ValidatorFileLocations):
             level=log_levels[self.log_level], 
             filemode='a', format='%(asctime)s\t%(message)s', datefmt="%Y-%m-%d %H:%M:%S")
 
+    def print_break_line(self, line_before=False, line_length=120):
+        if not self.gui_mode:
+            if line_before is True:
+                print('')
+            break_line = ''
+            for _ in range(0, line_length):
+                break_line += '~'
+            cprint(break_line, 'yellow')
+
     def check_input_folder(self):
         if not self.input_files:
             logging.warning('No input files found.')
@@ -96,20 +101,20 @@ class ValidatorController(ValidatorFileLocations):
         webbrowser.open(self.docs_url)
 
     def set_api_keys(self):
-        self.print_popunder_window_warning()
+        self.print_break_line()
         api_setter_obj = ApiKeySetter(self.data_storage_folder)
         del api_setter_obj.api_keys
         gc.collect()
+        self.print_break_line(line_before=True)
 
     def scan_input_files(self):
-        InputFileScanner(self.input_files)
+        input_file_scanner = InputFileScanner(self.input_files)
+        input_file_scanner.scan_input_files()
 
     def choose_input_fields(self):
-        self.print_popunder_window_warning()
         InputFieldsChooser(self.input_files)
 
     def set_disqualifying_issues(self):
-        self.print_popunder_window_warning()
         if self.issn_db_location is None:
             IssuesChooser(issn_db_missing=True)
         else:
@@ -148,20 +153,6 @@ class ValidatorController(ValidatorFileLocations):
                 self.validator_output_folder, 
                 self.issn_db_location,
                 running_headless=self.headless_mode)
-
-    def print_popunder_window_warning(self):
-        """
-        When printing to screen, print a warning about potential popunders when setting API keys, wanted fields, or 
-        disqualifying issues. If a GUI or web frontend is added to the project then this function can probably be 
-        removed.
-        """
-        print_color = 'blue'
-        highlight_color = None
-        print_breaking_bar(breaking_character='=', bar_length=56, breaking_color='blue')
-        cprint("Opening a new program window.", print_color, highlight_color)
-        cprint("If you don't see it, please look for it in your taskbar.", print_color, highlight_color)
-        print_breaking_bar(breaking_character='=', bar_length=56, breaking_color='blue')
-
 
     def check_if_run_is_possible(self):
         """
