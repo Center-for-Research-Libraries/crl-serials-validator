@@ -85,7 +85,7 @@ class SimpleValidatorInterface:
             cprint('What would you like to do?', 'cyan')
             for i in range(1, len(question_map)):
                 print("{}. {}".format(colored(str(i), 'yellow'), question_map[i][0]))
-            print("{}.  Quit.".format(colored('q', 'yellow')))
+            print("{}. Quit.".format(colored('q', 'yellow')))
             input_result = input()
             input_result = input_result.strip()
             if input_result.lower() == "q":
@@ -134,7 +134,7 @@ class SimpleValidatorInterface:
 def parse_command_line_args():
     parser = argparse.ArgumentParser(description="Validate shared print holdings data.")
     parser.add_argument("--headless", "-a", action="store_true", help="Run in headless (automated) mode.")
-    parser.add_argument("--graphical", "-g", action="store_true", help="Run in graphical (GUI) mode. (Experimental)")
+    # parser.add_argument("--graphical", "-g", action="store_true", help="Run in graphical (GUI) mode. (Experimental)")
     parser.add_argument("--bulk_prefs", "-b", action="store_true", help="Set bulk (headless) preferences.")
     parser.add_argument("--set_keys", "-s", action="store_true", help="Set API keys on the command line.")
     parser.add_argument("--file_locations", "-f", action="store_true", help="Show the location of the application's data files. (Not yet implemented.)")
@@ -160,10 +160,6 @@ def bulk_preferences():
     run_bulk_config()
 
 
-def gui_app():
-    ValidatorTkinterInterface()
-
-
 def command_line_app():
     SimpleValidatorInterface()
 
@@ -180,7 +176,5 @@ if __name__ == "__main__":
         bulk_preferences()
     elif args.headless is True:
         headless_app()
-    elif args.graphical is True:
-        gui_app()
     else:
         command_line_app()
