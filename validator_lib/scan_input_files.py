@@ -25,8 +25,14 @@ class InputFileScanner:
         
         self.data = {}
         self.input_dir = os.path.join(os.getcwd(), 'input')
+        self.input_files = input_files
+        self.cats = [
+            "Total records", "Have 001 field", "Have 004 field", "Have 035", "OCLC in 035", "Have 583", 
+            "Have 863/864/865", "Have 866/867/868"]
+
+    def scan_input_files(self):
         logging.debug("Scanning input files.")
-        for input_file in input_files:
+        for input_file in self.input_files:
             if input_file.endswith(".mrk"):
                 logging.debug("Scanning {}".format(input_file))
                 self.marc_scanner(input_file)
@@ -61,22 +67,21 @@ class InputFileScanner:
             if "=866  " in marc or "=867  " in marc or "=868  " in marc:
                 file_data["Have 866/867/868"] += 1
 
-        cats = ["Total records", "Have 001 field", "Have 004 field", "Have 035", "OCLC in 035", "Have 583",
-                "Have 863/864/865", "Have 866/867/868"]
-
         # skip blank file
         if file_data["Total records"] == 0:
             logging.warning('No records found in {}. Blank file?'.format(input_file))
             return
         
+        self.print_file_scan_results(input_file, file_data)
+
+    def print_file_scan_results(self, input_file, file_data):
         logging.info('Quick scan of file {}'.format(input_file))
         print('\nQuick scan of file {}'.format(input_file))
-        for cat in cats:
+        for cat in self.cats:
             output = [cat, file_data[cat], "{:.1%}".format(file_data[cat]/file_data["Total records"])]
             output_string = '{}{}\t{}'.format(str(output[0]).ljust(16), str(output[1]).rjust(5), str(output[2]).rjust(7))
             logging.info(output_string)
             print(output_string)
-        return file_data
 
     def text_scanner(self, input_file):
         # TODO:

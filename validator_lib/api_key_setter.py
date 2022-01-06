@@ -1,123 +1,140 @@
-import tkinter as tk
-import tkinter.ttk as ttk
+import os
+import sys
+from termcolor import colored, cprint
+from collections import OrderedDict
 
-from validator_lib.ttk_theme import set_ttk_style
+
 from crl_lib.api_keys import OclcApiKeys
 
 
-class ApiKeySetter(tk.Tk):
-    """
-    Very simple Tkinter class to allow the user to more easily set API keys.
-
-    Usage:
-
-        a = ApiKeySetter()
-
-    Then copy and paste your keys. That's it!
-
-    The script will print a copy of your names/keys to the console, if it is
-    run from a command line.
-    """
+class ApiKeySetter:
     def __init__(self, data_folder):
         """
         data_folder should be the location (or desired location) of the API keys config file.
-
-        style is an optional ttk style.
         """
         super().__init__()
-        self.make_gui(data_folder)
+        self.data_folder = data_folder
+        self.make_gui()
 
-    def make_gui(self, data_folder):
-        self.api_keys = OclcApiKeys(data_folder)
-        self.get_names()
+    @staticmethod
+    def print_row_to_terminal(number_column, name, api_key, is_default_print, header_row=False):
+        print('{}\t{}\t{}\t{}'.format(colored(str(number_column), 'yellow').ljust(4), name.ljust(12), api_key.ljust(80), is_default_print))
+        if header_row is True:
+            for _ in range(0, 120):
+                print('-', end='')
+            print('')
 
-        # in case the window pops under the terminal
-        print("Opening separate API key setter window.")
+    def make_gui(self):
+        self.api_keys = OclcApiKeys(self.data_folder)
+        
+        while True:
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print('Set API Keys')
+            cprint('~~~~~~~~~~~~', 'yellow')
+            self.get_names()
+            self.print_row_to_terminal(' ', 'Name', 'API Key', '', header_row=True)
 
-        self.title("Set WorldCat Search API keys")
+            i = 0
+            for name in self.names_and_keys:
+                if not name:
+                    continue
+                i += 1
+                is_default_print = ''
+                if name == self.default_key:
+                    is_default_print = colored('default', 'white', 'on_blue')
+                self.print_row_to_terminal(i, name, self.names_and_keys[name]['api_key'], is_default_print)
 
-        style = set_ttk_style(self)
+            print('')
+            print('{}. Add a new key.'.format(colored('a', 'yellow')))
+            print('{}. Remove a key.'.format(colored('r', 'yellow')))
+            print('{}. Set a new default key.'.format(colored('d', 'yellow')))
+            print('{}. Back to the main menu.'.format(colored('m', 'yellow')))
+            print('{}. Quit the Validator.'.format(colored('q', 'yellow')))
+            print('')
+            choice_result = input('Your choice? ')
 
-        # lbl = ttk.Label(self, text="Set WorldCat Search API keys", font=("Arial Bold", 14))
-        # lbl.grid(column=1, row=0)
+            if choice_result.lower() == 'a':
+                new_name = input('{} name for key: '.format(colored('Enter', 'yellow')))
+                new_key = input('{} API key: '.format(colored('Enter', 'yellow')))
+                new_is_default = input('Make default key? ({}/{}) '.format(colored('y', 'yellow'), colored('n', 'yellow')))
+                if not new_name:
+                    print('No name given; key not added.')
+                elif not new_key:
+                    print('No key input; nothing added.')
+                else:
+                    if new_is_default.lower().startswith('y'):
+                        make_default = True
+                    else:
+                        make_default = False
+                    self.add_key(new_name, new_key, make_default)
+                
+            elif choice_result.lower() == 'r':
+                to_delete = input('{} number to delete: '.format(colored('Enter', 'yellow')))
+                try:
+                    int(to_delete)
+                    self.delete_key(to_delete)
+                except (ValueError, TypeError):
+                    print('Must enter a number to delete.')
+                    input('Press Enter to continue.')
+            elif choice_result.lower() == 'd':
+                new_default = input('{} number to set as default: '.format(colored('Enter', 'yellow')))
+                try:
+                    int(new_default)
+                    self.set_default_key(int(new_default))
+                except (ValueError, TypeError):
+                    print('Must enter a number to set default key.')
+                    input('Press Enter to continue.')
+            elif choice_result.lower() == 'm':
+                break
+            elif choice_result.lower() == 'q':
+                sys.exit()
+            else:
+                print("I didn't understand that.")
+            print('')
 
-        label_name = ttk.Label(self, text="Name")
-        label_key = ttk.Label(self, text="API Key")
-        label_name.grid(column=0, row=1)
-        label_key.grid(column=1, row=1)
+    def add_key(self, new_name, new_key, make_default):
+        self.names_and_keys[new_name] = {'api_key': new_key}
+        if make_default is True:
+            self.default_key = new_name
+        self.save_api_keys()
 
-        self.selected = tk.IntVar()
+    def delete_key(self, number_to_delete):
+        for name in self.names_and_keys:
+            if int(number_to_delete) == self.names_and_keys[name]['number']:
+                self.names_and_keys.pop(name)
+                if self.default_key == 'name':
+                    self.default_key = None
+        self.save_api_keys()
 
-        self.inputs = []
-        for i in range(0, 6):
-            is_default = False
-            try:
-                name = self.names[i]
-                api_key = self.api_keys.api_keys[name]
-                if self.api_keys.api_key_name == name:
-                    is_default = True
-            except IndexError:
-                name = ""
-                api_key = ""
-            self.inputs.append({
-                "name": ttk.Entry(self, width=10),
-                "key": ttk.Entry(self, width=100),
-                "radio": ttk.Radiobutton(text='Default', value=i, variable=self.selected)
-            })
-            self.inputs[i]["name"].insert(0, name)
-            self.inputs[i]["key"].insert(0, api_key)
-            if is_default:
-                self.inputs[i]["radio"].invoke()
-
-            self.inputs[i]["name"].grid(column=0, row=i+2)
-            self.inputs[i]["key"].grid(column=1, row=i+2)
-            self.inputs[i]["radio"].grid(column=2, row=i+2)
-
-        btn_frame = ttk.Frame()
-        btn_save = ttk.Button(btn_frame, text="Save", command=self.clicked, style='success.TButton')
-        spacer = ttk.Label(btn_frame)
-        btn_cancel = ttk.Button(btn_frame, text="Cancel", command=self.cancelled, style='warning.TButton')
-        btn_save.grid(column=0, row=0)
-        spacer.grid(column=1, row=0)
-        btn_cancel.grid(column=2, row=0)
-        btn_frame.grid(row=9, column=2)
-
-        # put the window more towards the center of the screen
-        ws = self.winfo_screenwidth()
-        hs = self.winfo_screenheight()
-        x = (ws / 4)
-        y = (hs / 4)
-        self.geometry('+%d+%d' % (x, y))
-        self.lift()
-
-        self.mainloop()
+    def set_default_key(self, number_as_default):
+        for name in self.names_and_keys:
+            if self.names_and_keys[name]['number'] == number_as_default:
+                self.default_key = name
+        self.save_api_keys()
 
     def get_names(self):
         self.api_keys.read_config_file()
-        self.names = []
+        self.names_and_keys = OrderedDict()
+        self.default_key = None
         self.api_keys.get_all_api_keys()
+        number = 0
         for name in self.api_keys.config['API KEYS']:
-            self.names.append(name)
+            number += 1
+            api_key = self.api_keys.api_keys[name]
+            if self.api_keys.api_key_name == name:
+                self.default_key = name
+            self.names_and_keys[name] = {'api_key': api_key, 'number': number}
 
-    def clicked(self):
-        """Save clicked. Look for API keys and default key set and save to config file."""
-        default_key = self.selected.get()
-        default_key_name = None
+    def save_api_keys(self):
+        """Look for API keys and default key set and save to config file."""
         self.api_keys.config['API KEYS'] = {}
-        for i in range(0, 6):
-            name = self.inputs[i]["name"].get()
-            api_key = self.inputs[i]["key"].get()
-            if name and api_key:
-                self.api_keys.config['API KEYS'][name] = api_key
-                if i == default_key:
+        self.api_keys.config['Preferred API Key'] = {}
+        for name in self.names_and_keys:
+            if name and self.names_and_keys[name]['api_key']:
+                self.api_keys.config['API KEYS'][name] = self.names_and_keys[name]['api_key']
+                if name == self.default_key:
                     self.api_keys.config['Preferred API Key'] = {name: 1}
-
         self.api_keys.write_preferences_to_file()
-        self.destroy()
-
-    def cancelled(self):
-        """Cancel pressed. Close the window."""
-        self.destroy()
 
 
 if __name__ == "__main__":

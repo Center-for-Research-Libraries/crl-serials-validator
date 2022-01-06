@@ -3,14 +3,15 @@ Class to allow the user to decide that some issues with the input data will be n
 fail checks.
 """
 
-import tkinter as tk
-import tkinter.ttk as ttk
 import webbrowser
+from pprint import pprint
+from termcolor import colored, cprint
+import os
+import sys
 
 from validator_lib.validator_config import ValidatorConfig
-from validator_lib.ttk_theme import set_ttk_style
 
-class IssuesChooser(tk.Tk):
+class IssuesChooser:
 
     error_glossary_url = 'https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/disqualifying_issues.md'
 
@@ -18,9 +19,6 @@ class IssuesChooser(tk.Tk):
     break_categories = {
         'binding_words_in_holdings', 'duplicate_holdings_id', 'holdings_out_of_range', 'title_in_jstor', 
         'invalid_local_issn', 'oclc_mismatch', 'line_583_error' }
-
-    window_width = 640
-    window_height = 640
 
     title_text = 'Select Disqualifying Issues'
 
@@ -33,67 +31,74 @@ class IssuesChooser(tk.Tk):
         self.warnings = []
         self.int_vars = {}
 
-        style = set_ttk_style(self)
+        self.make_gui()
 
-        start_x, start_y = self.get_center_location()
-        self.resizable(1, 1)
-        self.title('Select disqualifying_issues')
-                
-        spacer_top = tk.Label(text='')
-        spacer_top.pack()
-        docs_link_label = ttk.Button(self, text="Click here to visit a glossary of issue codes in a web browser")
-        docs_link_label['style'] = 'info.TButton'
-        docs_link_label.pack(fill='x')
-        docs_link_label.bind("<Button-1>", lambda e: webbrowser.open(self.error_glossary_url))
+    def make_gui(self):
+        
+        yes_symbol = colored('yes', 'white', 'on_blue')
+        no_symbol = colored('no', 'white', 'on_red')
+        disabled_symbol = colored('n/a', 'magenta')
 
-        issues_frame = ttk.Frame()
+        while True:
+            os.system('cls' if os.name == 'nt' else 'clear')
 
-        row_no = 1
-        col_no = 0
-        for issue in self.validator_config.issue_categories:
-            if issue in self.break_categories:
-                col_no = 0
-                row_no += 1
-                break_label = ttk.Label(issues_frame, text='')
-                break_label.grid(row=row_no, column=col_no, sticky=tk.W)
-                row_no += 1
-            self.int_vars[issue] = tk.IntVar()
-            if 'issn_db' in issue and self.issn_db_missing is True:
-                self.int_vars[issue].set(0)
-                ttk.Checkbutton(issues_frame, text=issue, state=tk.DISABLED, variable=self.int_vars[issue]).grid(row=row_no, column=col_no, sticky=tk.W, ipady=2)
-            else:
-                self.int_vars[issue].set(self.validator_config.config['disqualifying_issues'][issue])
-                ttk.Checkbutton(issues_frame, text=issue, variable=self.int_vars[issue]).grid(row=row_no, column=col_no, sticky=tk.W, ipady=2)
+            column = 0
+            issue_no = 0
+            print('Select Disqualifying Issues')
+            cprint('~~~~~~~~~~~~~~~~~~~~~~~~~~~', 'yellow')
 
-            col_no += 1
-            if col_no == 2:
-                row_no += 1
-                col_no = 0
-        row_no += 1
+            for issue in self.validator_config.issue_categories:
+                issue_no += 1
 
-        issues_frame.pack(anchor=tk.W, fill=tk.X, padx=5, pady=5)
+                if issue in self.break_categories:
+                    print('')
+                    column = 0
+                if column %2 == 0:
+                    line_end = '\t\t'
+                else:
+                    line_end = '\n'
+                column += 1
 
-        btn_frame = ttk.Frame(padding='10')
-        btn_save = ttk.Button(btn_frame, text="Save", style="success.TButton", command=self.ok_clicked)
-        btn_cancel = ttk.Button(btn_frame, text="Cancel", style="warning.TButton",  command=self.cancelled)
-        btn_reset = ttk.Button(btn_frame, text="Defaults", style="danger.TButton",  command=self.reset_fields)
-        btn_save.grid(column=0, row=0)
-        spacer1 = tk.Label(btn_frame)
-        spacer1.grid(column=1, row=0)
-        btn_cancel.grid(column=2, row=0)
-        spacer2 = tk.Label(btn_frame)
-        spacer2.grid(column=3, row=0)
-        btn_reset.grid(column=4, row=0)
-        btn_frame.pack()
+                number_color = 'yellow'
+                if 'issn_db' in issue and self.issn_db_missing is True:
+                    print_symbol = disabled_symbol
+                    number_color = 'red'
+                    # self.int_vars[issue].set(0)
+                elif self.validator_config.config['disqualifying_issues'][issue] is True:
+                    print_symbol = yes_symbol
+                else:
+                    print_symbol = no_symbol
 
-        self.mainloop()
+                print('{}{}\t{}'.format(
+                    colored(str(issue_no).ljust(4), 
+                    number_color), issue.ljust(35), 
+                    print_symbol.ljust(4)), end=line_end)
 
-    def get_center_location(self):
-        width = self.winfo_screenwidth()
-        height = self.winfo_screenheight()
-        start_x = int((width / 2) - (self.window_width / 2))
-        start_y = int((height / 2) - (self.window_height / 2))
-        return start_x, start_y
+            print('')
+            print('')
+            print('{} to toggle the option between yes and no.'.format(colored('enter a number', 'yellow')))
+            print('{}. Reset all values to the defaults.'.format(colored('d', 'yellow')))
+            print('{}. Visit the Validator issues glossary in a web browser.'.format(colored('g', 'yellow')))
+            print('{}. Return to the main menu.'.format(colored('m', 'yellow')))
+            print('{}. Quit the Validator.'.format(colored('q', 'yellow')))
+            
+            user_choice = input(colored('Your choice: ', 'cyan'))
+
+            if user_choice.lower().startswith('g'):
+                self.open_glossary_on_wiki()
+            elif user_choice.lower().startswith('d'):
+                self.reset_fields()
+            elif user_choice.lower().startswith('m'):
+                break
+            elif user_choice.lower().startswith('q'):
+                sys.exit()
+            elif user_choice.isdigit() and int(user_choice) >= 1 and int(user_choice) <= issue_no:
+                issue = self.validator_config.issue_categories[int(user_choice) - 1]
+                if  self.validator_config.config['disqualifying_issues'][issue] is True:
+                     self.validator_config.config['disqualifying_issues'][issue] = False
+                else:
+                     self.validator_config.config['disqualifying_issues'][issue] = True
+                self.validator_config.write_validator_config_file()
 
     def open_glossary_on_wiki(self):
         webbrowser.open(self.error_glossary_url)
@@ -114,7 +119,6 @@ class IssuesChooser(tk.Tk):
         # YAML can't write OrderedDict, so convert to regular dict
         self.validator_config.config['disqualifying_issues'] = dict(disqualifying_issues)
         self.validator_config.write_validator_config_file()
-        self.cancelled()
         self.__init__(self.issn_db_missing)
 
 

@@ -55,6 +55,5 @@ class ChecksRunner:
 
             for data_cat in worldcat_data:
                 input_file_data[i][data_cat] = worldcat_data[data_cat]
-        sys.stdout.write('\r')
-        sys.stdout.flush()
+        print()
         self.worldcat_data_getter.log_worldcat_data_not_found()

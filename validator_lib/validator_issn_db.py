@@ -54,7 +54,7 @@ class ValidatorIssnDb:
             if title_dict['local_issn']:
                 if check_for_valid_issn(title_dict['local_issn']) is False:
                     title_dict['invalid_issn'] = '1'
-            print()
+        print()
 
     @staticmethod
     def process_dict_without_issn_db_access(title_dict):
