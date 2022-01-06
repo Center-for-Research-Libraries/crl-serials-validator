@@ -33,7 +33,6 @@ class ValidatorIssnDb:
                 self.process_dict_without_issn_db_access(title_dict)
                 continue
             sys.stdout.write('\rISSN db work at {0:.1%}'.format(n/len(title_dicts)))
-            sys.stdout.flush()
             db_data_local = self.get_issn_db_data(title_dict['local_issn'], title_dict['holdings_start'],
                                                   title_dict['holdings_end'])
             db_data_wc = self.get_issn_db_data(title_dict['wc_issn_a'], title_dict['008_year_1'],
@@ -54,7 +53,7 @@ class ValidatorIssnDb:
             if title_dict['local_issn']:
                 if check_for_valid_issn(title_dict['local_issn']) is False:
                     title_dict['invalid_issn'] = '1'
-            print()
+        print()
 
     @staticmethod
     def process_dict_without_issn_db_access(title_dict):

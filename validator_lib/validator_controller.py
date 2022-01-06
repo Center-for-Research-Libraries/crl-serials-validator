@@ -14,6 +14,7 @@ from validator_lib.run_checks_process import ChecksRunner
 from validator_lib.choose_disqualifying_issues import IssuesChooser
 from validator_lib.validator_config import ValidatorConfig
 from validator_lib.api_key_setter import ApiKeySetter
+from validator_lib.command_line_ui_utilities import print_breaking_bar
 
 from crl_lib.api_keys import OclcApiKeys
 
@@ -154,10 +155,12 @@ class ValidatorController(ValidatorFileLocations):
         disqualifying issues. If a GUI or web frontend is added to the project then this function can probably be 
         removed.
         """
-        print(self.popunder_warning_bar)
-        cprint("Opening a new program window.", 'yellow')
-        cprint("If you don't see it, please look for it in your taskbar.", 'yellow')
-        print(self.popunder_warning_bar)
+        print_color = 'blue'
+        highlight_color = None
+        print_breaking_bar(breaking_character='=', bar_length=56, breaking_color='blue')
+        cprint("Opening a new program window.", print_color, highlight_color)
+        cprint("If you don't see it, please look for it in your taskbar.", print_color, highlight_color)
+        print_breaking_bar(breaking_character='=', bar_length=56, breaking_color='blue')
 
 
     def check_if_run_is_possible(self):

@@ -2,6 +2,7 @@ import sys
 import re
 import os
 import logging
+from termcolor import cprint, colored
 
 from crl_lib.year_utilities import find_years_first_last
 from validator_lib.validator_config import ValidatorConfig

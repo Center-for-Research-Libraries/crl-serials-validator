@@ -15,6 +15,7 @@ import os
 import csv
 from collections import Counter
 import logging
+from termcolor import colored, cprint
 
 from crl_lib.marc_file_reader import MarcFileReader
 from crl_lib.marc_fields import MarcFields
@@ -43,37 +44,56 @@ class InputFileScanner:
         file_data = Counter()
         mfr = MarcFileReader(input_file_loc)
         for marc in mfr:
-            file_data["Total records"] += 1
+            file_data['total'] += 1
             mf = MarcFields(marc)
             if "=001  " in marc:
-                file_data["Have 001 field"] += 1
+                file_data['001'] += 1
             if "004  " in marc:
-                file_data["Have 004 field"] += 1
+                file_data['004'] += 1
             if mf.oclc_035:
-                file_data["Have 035"] += 1
-                file_data["OCLC in 035"] += 1
+                file_data['035'] += 1
+                file_data['oclc_035'] += 1
             elif "=035  " in marc:
-                file_data["Have 035"] += 1
+                file_data['035'] += 1
             if "=583  " in marc:
-                file_data["Have 583"] += 1
+                file_data['583'] += 1
             if "=863  " in marc or "=864  " in marc or "=865  " in marc:
-                file_data["Have 863/864/865"] += 1
+                file_data['863'] += 1
             if "=866  " in marc or "=867  " in marc or "=868  " in marc:
-                file_data["Have 866/867/868"] += 1
+                file_data['866'] += 1
 
-        cats = ["Total records", "Have 001 field", "Have 004 field", "Have 035", "OCLC in 035", "Have 583",
-                "Have 863/864/865", "Have 866/867/868"]
+        label_color = 'green'
+        cat_labels = {
+            'total': colored('Total records   ', label_color),
+            '001': 'Have {} field  '.format(colored('001', label_color)),
+            '004': 'Have {} field  '.format(colored('004', label_color)),
+            '035': 'Have {} field  '.format(colored('035', label_color)),
+            'oclc_035': '{} in 035     '.format(colored('OCLC', label_color)),
+            '583': 'Have {}        '.format(colored('583', label_color)),
+            '863': 'Have {}/{}/{}'.format(colored('863', label_color), colored('864', label_color), colored('865', label_color)),
+            '866': 'Have {}/{}/{}'.format(colored('866', label_color), colored('867', label_color), colored('868', label_color)),
+        }
+
+        cats = ['001', '004', '035', 'oclc_035', '583', '863', '866', 'total']
 
         # skip blank file
-        if file_data["Total records"] == 0:
+        if file_data['total'] == 0:
             logging.warning('No records found in {}. Blank file?'.format(input_file))
             return
         
         logging.info('Quick scan of file {}'.format(input_file))
-        print('\nQuick scan of file {}'.format(input_file))
+        scan_notice_bar = '-------------------'
+        for _ in input_file:
+            scan_notice_bar = scan_notice_bar + '-'
+        print('\nQuick scan of file {}'.format(colored(input_file, 'cyan')))
+        cprint(scan_notice_bar, 'blue')
         for cat in cats:
-            output = [cat, file_data[cat], "{:.1%}".format(file_data[cat]/file_data["Total records"])]
-            output_string = '{}{}\t{}'.format(str(output[0]).ljust(16), str(output[1]).rjust(5), str(output[2]).rjust(7))
+            cat_label = cat_labels[cat]
+            if cat == 'total':
+                output_pct = ''
+            else:
+                output_pct = '{:.1%}'.format(file_data[cat]/file_data['total'])
+            output_string = '{}{}{}'.format(cat_label.ljust(12), str(file_data[cat]).rjust(8), output_pct.rjust(10))
             logging.info(output_string)
             print(output_string)
         return file_data
