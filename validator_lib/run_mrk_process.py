@@ -24,7 +24,7 @@ class MrkProcessRunner:
 
         self.line_583_validator = Line583Validator()
 
-        self.marc_error_log_header_list = [
+        self.error_log_header_list = [
             "Record #",
             "Bib id",
             "Holdings id",
@@ -34,7 +34,7 @@ class MrkProcessRunner:
         ]
 
         self.errors_this_record = []
-        self.marc_errors_fout = None
+        self.error_log_fout = {'marc': None, '583': None}
 
         # needed holdings fields
         self.other_holdings_fields = []
@@ -44,13 +44,11 @@ class MrkProcessRunner:
             if 'holdings_2' in self.input_fields:
                 self.other_holdings_fields.append(self.input_fields['holdings_2'])
 
-    def open_error_log_file(self, log_type='marc'):
+    def open_error_log_file(self, log_type):
         error_log_file_name = '{}_{}_errors_{:%Y-%m-%d}.log'.format(self.input_file, log_type, datetime.datetime.now())
         error_log_file_location = os.path.join(os.getcwd(), 'logs', error_log_file_name)
-        if not os.path.isfile(error_log_file_location):
-            if log_type == 'marc':
-                self.marc_errors_fout = open(error_log_file_location, 'a', encoding='utf8')
-                self.marc_errors_fout.write('\t'.join(self.marc_error_log_header_list) + '\n')
+        self.error_log_fout[log_type] = open(error_log_file_location, 'a', encoding='utf8')
+        self.error_log_fout[log_type].write('\t'.join(self.error_log_header_list) + '\n')
 
     def get_data_from_marc(self):
         seqnum = 0
@@ -68,6 +66,7 @@ class MrkProcessRunner:
                     record_dict['errors'].append('line_583_error')
                     record_dict['line_583_error'] = True
                     record_dict['583_lines_validate'] = False
+                    self.log_583_errors(seqnum, record_dict)
                 elif '=583  ' in record:
                     record_dict['line_583_error'] = False
                     record_dict['583_lines_validate'] = True
@@ -220,18 +219,28 @@ class MrkProcessRunner:
 
     def log_marc_errors(self, seqnum, record_dict):
         if self.errors_this_record:
-            if not self.marc_errors_fout:
-                self.open_error_log_file(log_type='marc')
+            if not self.error_log_fout['marc']:
+                self.open_error_log_file('marc')
             record_dict['marc_validation_error'] = True
             record_dict['errors'].append('marc_validation_error')
 
-            for my_error in self.errors_this_record:
-                output_list = [
-                    str(seqnum),
-                    record_dict['bib_id'],
-                    record_dict['holdings_id'],
-                    record_dict['local_oclc'],
-                    record_dict['local_title'],
-                    my_error
-                ]
-                self.marc_errors_fout.write('\t'.join(output_list) + '\n')
+            for error_str in self.errors_this_record:
+                self.write_error_to_log(seqnum, record_dict, 'marc', error_str)
+
+    def log_583_errors(self, seqnum, record_dict):
+        if record_dict['line_583_error']:
+            if not self.error_log_fout['583']:
+                self.open_error_log_file('583')
+            for error_str in record_dict['line_583_error']:
+                self.write_error_to_log(seqnum, record_dict, '583', error_str)
+
+    def write_error_to_log(self, seqnum, record_dict, log_type, error_str):
+        output_list = [
+            str(seqnum),
+            record_dict['bib_id'],
+            record_dict['holdings_id'],
+            record_dict['local_oclc'],
+            record_dict['local_title'],
+            error_str
+        ]
+        self.error_log_fout[log_type].write('\t'.join(output_list) + '\n')
