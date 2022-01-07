@@ -40,6 +40,7 @@ class Line583Validator:
 
         if not saw_committed_to_retain:
             record_dict['line_583_error'].append('no_committed_to_retain_in_583')
+            record_dict['line_583_error_details'].append('no_committed_to_retain_in_583')
 
         line_561_3s = get_fields_subfields(record, '561', '3')
         line_561_as = get_fields_subfields(record, '561', 'a')
