@@ -29,8 +29,9 @@ class ApiKeySetter:
         
         while True:
             os.system('cls' if os.name == 'nt' else 'clear')
-            print('Set API Keys')
-            cprint('~~~~~~~~~~~~', 'yellow')
+            cprint('Set API Keys', 'cyan')
+            cprint('~~~~~~~~~~~~', 'cyan')
+            print('')
             self.get_names()
             self.print_row_to_terminal(' ', 'Name', 'API Key', '', header_row=True)
 
