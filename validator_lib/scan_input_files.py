@@ -15,9 +15,11 @@ import os
 import csv
 from collections import Counter
 import logging
+from termcolor import cprint, colored
 
 from crl_lib.marc_file_reader import MarcFileReader
 from crl_lib.marc_fields import MarcFields
+from crl_lib.terminal_gui_utilities import print_terminal_page_header
 
 
 class InputFileScanner:
@@ -76,10 +78,14 @@ class InputFileScanner:
 
     def print_file_scan_results(self, input_file, file_data):
         logging.info('Quick scan of file {}'.format(input_file))
-        print('\nQuick scan of file {}'.format(input_file))
+        print_terminal_page_header('Quick scan of file {}'.format(input_file))
         for cat in self.cats:
             output = [cat, file_data[cat], "{:.1%}".format(file_data[cat]/file_data["Total records"])]
-            output_string = '{}{}\t{}'.format(str(output[0]).ljust(16), str(output[1]).rjust(5), str(output[2]).rjust(7))
+            output_string = '{}{}\t{}'.format(
+                colored(str(output[0]).ljust(20), 'yellow'), 
+                colored(str(output[1]).rjust(5), 'cyan'),
+                colored(str(output[2]).rjust(7), 'blue')
+            )
             logging.info(output_string)
             print(output_string)
 
