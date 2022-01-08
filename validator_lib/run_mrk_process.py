@@ -64,9 +64,9 @@ class MrkProcessRunner:
                 self.line_583_validator.validate_583_lines_in_record(record, record_dict)
                 if record_dict['line_583_error']:
                     record_dict['errors'].append('line_583_error')
+                    self.log_583_errors(seqnum, record_dict)
                     record_dict['line_583_error'] = True
                     record_dict['583_lines_validate'] = False
-                    self.log_583_errors(seqnum, record_dict)
                 elif '=583  ' in record:
                     record_dict['line_583_error'] = False
                     record_dict['583_lines_validate'] = True
