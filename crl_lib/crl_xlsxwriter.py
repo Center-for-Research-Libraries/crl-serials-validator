@@ -1,6 +1,7 @@
 import xlsxwriter
 import statistics
 import math
+from termcolor import colored
 
 
 class CRLXlsxWriter:
@@ -26,7 +27,7 @@ class CRLXlsxWriter:
 
         Setting header to True will cause the first row to be printed entirely as strings.
         """
-        print('Creating workbook {}'.format(workbook_name))
+        cprint('Creating workbook {}'.format(colored(workbook_name), 'cyan'))
         self.workbook = xlsxwriter.Workbook(workbook_name)
 
         # To force a cell to be treated as text by xlsxwriter need to set 'num_format' to '@'.

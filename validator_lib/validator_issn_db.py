@@ -2,6 +2,7 @@ from pprint import pprint
 import sys
 from collections import namedtuple
 import logging
+from termcolor import colored
 
 from crl_lib.crl_utilities import check_for_valid_issn
 from crl_lib.issn_db import IssnDb
@@ -32,7 +33,8 @@ class ValidatorIssnDb:
             if self.issn_db.conn is None:
                 self.process_dict_without_issn_db_access(title_dict)
                 continue
-            sys.stdout.write('\rISSN db work at {0:.1%}'.format(n/len(title_dicts)))
+            pct_done = colored(str('{0:.1%}'.format(n/len(title_dicts))), 'yellow')
+            sys.stdout.write('\rISSN db work at {}'.format(pct_done))
             db_data_local = self.get_issn_db_data(title_dict['local_issn'], title_dict['holdings_start'],
                                                   title_dict['holdings_end'])
             db_data_wc = self.get_issn_db_data(title_dict['wc_issn_a'], title_dict['008_year_1'],

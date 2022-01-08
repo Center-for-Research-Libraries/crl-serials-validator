@@ -4,7 +4,7 @@ import datetime
 import webbrowser
 import sys
 import gc
-from termcolor import colored, cprint
+from termcolor import cprint
 
 from validator_lib.validator_file_locations import ValidatorFileLocations
 from validator_lib.choose_input_file_fields import InputFieldsChooser
@@ -170,19 +170,19 @@ class ValidatorController(ValidatorFileLocations):
 
         return '', warning_messages
 
-
     def clear_output_folder(self):
         if self.headless_mode is not True:
+            cprint('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~', 'cyan')
             while True:
-                print('------------')
-                print('Should we erase all files in the output folder? (Y/N)')
+                cprint('Should we erase all files in the output folder? (y/n)', 'cyan')
                 clear_question = input()
                 if clear_question.lower().startswith('n'):
                     return
                 elif clear_question.lower().startswith('y'):
                     break
                 else:
-                    print("I didn't understand that.\n")
+                    cprint("I didn't understand that.", 'red')
+                    print('')
         output_files = os.listdir(self.validator_output_folder)
         for output_file in output_files:
             logging.info('Clearing output folder; deleting {}'.format(output_file))
@@ -193,3 +193,4 @@ class ValidatorController(ValidatorFileLocations):
                 os.remove(output_file_loc)
             except PermissionError:
                 logging.warning("Could not delete file {} due to permissions error".format(output_file))
+        os.system('cls' if os.name == 'nt' else 'clear')

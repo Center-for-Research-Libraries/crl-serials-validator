@@ -5,6 +5,7 @@ from collections import Counter
 import sys
 from pprint import pprint
 import logging
+from termcolor import cprint, colored
 
 from validator_lib.utilities import get_first_last_year_from_regular_holdings
 from validator_lib.supplements_and_indexes_functions import remove_indexes_from_holdings, remove_supplements_from_holdings
@@ -53,7 +54,7 @@ class SpreadsheetTsvCsvRunner:
         return input_data
 
     def extract_data_from_spreadsheet_file(self, iterator, input_file, input_fields):
-        print('Extracting data from {}'.format(input_file))
+        print('Extracting {}.'.format(colored('local data', 'cyan')))
         row_locations = self.get_row_locations(input_fields)
         input_data = []
         n = 0
@@ -63,7 +64,7 @@ class SpreadsheetTsvCsvRunner:
                 row_locations['header_to_skip'] = False
                 continue
             n += 1
-            sys.stdout.write('\rReading row {}'.format(n))
+            sys.stdout.write('\rReading row {}'.format(colored(str(n), 'yellow')))
             sys.stdout.flush()
             row_dict = {'filename': input_file}
             holdings_list = []
@@ -91,7 +92,7 @@ class SpreadsheetTsvCsvRunner:
                         dict_cat = 'local_' + cat
                         row_dict[dict_cat] = cat_data
                     else:
-                        row_dict[cat] = cat_data                
+                        row_dict[cat] = cat_data
 
             c[row_dict['institution']] += 1
             row_dict['seqnum'] = c[row_dict['institution']]
@@ -112,7 +113,9 @@ class SpreadsheetTsvCsvRunner:
             row_dict['public_notes'] = ''
             self.null_remover(row_dict)
             input_data.append(row_dict)
-        print('Finished loading {}'.format(input_file))
+
+        print('')
+        print('Done.')
         return input_data
 
     @staticmethod
