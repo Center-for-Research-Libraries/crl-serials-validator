@@ -174,9 +174,8 @@ def get_first_last_year_from_regular_holdings(regular_holdings_list):
     return first_year, last_year
 
 
-def print_terminal_page_header(header_str):
+def print_terminal_page_header(header_str, header_color='green'):
     header_bar = ''.join(['~' for _ in header_str])
-    header_color = 'green'
     cprint(header_bar, header_color)
     cprint(header_str, header_color)
     cprint(header_bar, header_color)
