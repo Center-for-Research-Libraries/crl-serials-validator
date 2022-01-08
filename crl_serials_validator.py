@@ -36,7 +36,7 @@ class SimpleValidatorInterface:
     def __init__(self):
 
         self.args = parse_command_line_args()
-        self.controller = ValidatorController(headless_mode=False)
+        self.controller = ValidatorController(headless_mode=False, papr_output=self.args.papr)
 
         question_map = self.get_question_map()
         
@@ -135,6 +135,7 @@ def parse_command_line_args():
     parser = argparse.ArgumentParser(description="Validate shared print holdings data.")
     parser.add_argument("--headless", "-a", action="store_true", help="Run in headless (automated) mode.")
     # parser.add_argument("--graphical", "-g", action="store_true", help="Run in graphical (GUI) mode. (Experimental)")
+    parser.add_argument("--papr", "-p", action="store_true", help="Create special output files for ingest into PAPR.")
     parser.add_argument("--bulk_prefs", "-b", action="store_true", help="Set bulk (headless) preferences.")
     parser.add_argument("--set_keys", "-s", action="store_true", help="Set API keys on the command line.")
     parser.add_argument("--file_locations", "-f", action="store_true", help="Show the location of the application's data files. (Not yet implemented.)")
@@ -165,7 +166,7 @@ def command_line_app():
 
 
 if __name__ == "__main__":
-    args = parse_command_line_args()
+    args = parse_command_line_args()        
 
     if args.file_locations is True:
         print_validator_file_locations()

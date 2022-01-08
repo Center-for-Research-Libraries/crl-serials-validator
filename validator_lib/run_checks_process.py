@@ -15,9 +15,10 @@ from validator_lib.process_input_data import InputDataProcessor
 class ChecksRunner:
     def __init__(
         self, input_file, input_fields, disqualifying_issue_categories, data_storage_folder, data_folder, output_dir, 
-        issn_db_location, running_headless=False):
+        issn_db_location, running_headless=False, papr_output=False):
 
         self.running_headless = running_headless
+        self.papr_output = papr_output
 
         self.output_dir = output_dir
 
@@ -42,7 +43,8 @@ class ChecksRunner:
         
         InputDataProcessor(
             input_file, input_file_data, input_fields, disqualifying_issue_categories, found_issn_db, self.jstor)
-        ReviewWorkbookPrinter(input_file_data, line_583_validation_output, self.running_headless)
+
+        ReviewWorkbookPrinter(input_file_data, line_583_validation_output, self.running_headless, self.papr_output)
 
     def add_worldcat_data_to_input_file_data_dicts(self, input_file_data, input_file):
         print("Getting WorldCat data for records in {}.".format(input_file))

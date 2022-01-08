@@ -11,7 +11,7 @@ import validator_lib.utilities
 
 class ReviewWorkbookPrinter:
     def __init__(
-        self, title_dicts, line_583_validation_output, running_headless, 
+        self, title_dicts, line_583_validation_output, running_headless, papr_output,
         print_errors_only=False, 
         print_originally_from=False,
         print_issues_worksheets=False,
@@ -20,6 +20,7 @@ class ReviewWorkbookPrinter:
         print_good_marc_output=True):
 
         self.running_headless = running_headless
+        self.papr_output = papr_output
         self.print_originally_from = print_originally_from
         self.print_issues_worksheets = print_issues_worksheets
         self.print_for_review = print_for_review
@@ -154,11 +155,12 @@ class ReviewWorkbookPrinter:
             self.make_originally_from_outputs()
 
         self.make_workbooks()
+        
+        if self.papr_output is True:
+            self.make_good_bad_marc_output('good')
+            self.make_good_bad_marc_output('bad')
 
-        self.make_good_bad_marc_output('good')
-        self.make_good_bad_marc_output('bad')
-
-        self.make_583_output()
+            self.make_583_output()
 
     def remove_issn_db_from_checklist_cats(self):
         new_checklist_cats = []
@@ -430,10 +432,8 @@ class ReviewWorkbookPrinter:
                 if self.line_583_validation_output and self.print_errors_only is False:
                     output_pages['Line 583 validation'] = {'data': self.line_583_validation_output}
 
-            # TODO: temporary, until "headless" output can also be made a manual option
-            # if self.running_headless:
-            if True:
-                self.print_headless_output(output_pages['Checklist'], output_file_location.replace('.xlsx', '.txt'))
+            if self.running_headless is True:
+                self.print_headless_checklist(output_pages['Checklist'], output_file_location.replace('.xlsx', '.txt'))
 
             CRLXlsxWriter(output_file_location, output_pages)
 
@@ -510,8 +510,10 @@ class ReviewWorkbookPrinter:
                 for output_row in output[inst]:
                     cout.writerow(output_row)
 
-
-    def print_headless_output(self, checklist_data, headless_output_filename):
+    def print_headless_checklist(self, checklist_data, headless_output_filename):
+        """
+        Special output files for ingest into CRL's PAPR database.
+        """
         header_row = checklist_data['data'][0]
         good_output = []
         bad_output = []

@@ -29,13 +29,13 @@ class ValidatorController(ValidatorFileLocations):
     docs_url = 'https://github.com/Center-for-Research-Libraries/validator/blob/main/README.md'
 
     def __init__(
-        self, headless_mode=False, log_level='info', gui_mode=False, portable_install=False, single_file_run=False):
+        self, headless_mode=False, log_level='info', portable_install=False, papr_output=False):
         super().__init__(portable_install=False)
 
         self.headless_mode = headless_mode
+        self.papr_output = papr_output
         self.log_level = log_level
         self.debug_mode = DEBUG_MODE
-        self.gui_mode = gui_mode
 
         if self.headless_mode is True:
             self.log_level = 'warning'
@@ -78,13 +78,12 @@ class ValidatorController(ValidatorFileLocations):
             filemode='a', format='%(asctime)s\t%(message)s', datefmt="%Y-%m-%d %H:%M:%S")
 
     def print_break_line(self, line_before=False, line_length=120):
-        if not self.gui_mode:
-            if line_before is True:
-                print('')
-            break_line = ''
-            for _ in range(0, line_length):
-                break_line += '~'
-            cprint(break_line, 'yellow')
+        if line_before is True:
+            print('')
+        break_line = ''
+        for _ in range(0, line_length):
+            break_line += '~'
+        cprint(break_line, 'yellow')
 
     def check_input_folder(self):
         if not self.input_files:
@@ -121,7 +120,6 @@ class ValidatorController(ValidatorFileLocations):
             IssuesChooser(issn_db_missing=False)
 
     def run_checks_process(self):
-
         error_message, warning_messages = self.check_if_run_is_possible()
         for warning_message in warning_messages:
             logging.warning(warning_message)
@@ -152,7 +150,8 @@ class ValidatorController(ValidatorFileLocations):
                 self.validator_data_folder,
                 self.validator_output_folder, 
                 self.issn_db_location,
-                running_headless=self.headless_mode)
+                running_headless=self.headless_mode,
+                papr_output=self.papr_output)
 
     def check_if_run_is_possible(self):
         """
