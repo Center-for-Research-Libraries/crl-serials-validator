@@ -11,6 +11,7 @@ import sys
 from yaml import warnings
 
 from validator_lib.validator_config import ValidatorConfig
+from crl_lib.terminal_gui_utilities import print_terminal_page_header
 
 
 class InputFields:
@@ -65,8 +66,7 @@ class InputFieldsChooser:
 
     def make_gui(self):
         while True:
-            print('Choose Input File Fields')
-            cprint('~~~~~~~~~~~~~~~~~~~~~~~~', 'yellow')
+            print_terminal_page_header('Choose Input File Fields')
 
             file_number = 0
             for input_file in self.all_input_files:

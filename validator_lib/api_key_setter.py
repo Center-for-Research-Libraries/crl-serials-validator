@@ -5,6 +5,7 @@ from collections import OrderedDict
 
 
 from crl_lib.api_keys import OclcApiKeys
+from crl_lib.terminal_gui_utilities import print_terminal_page_header
 
 
 class ApiKeySetter:
@@ -18,7 +19,8 @@ class ApiKeySetter:
 
     @staticmethod
     def print_row_to_terminal(number_column, name, api_key, is_default_print, header_row=False):
-        print('{}\t{}\t{}\t{}'.format(colored(str(number_column), 'yellow').ljust(4), name.ljust(12), api_key.ljust(80), is_default_print))
+        print('{}\t{}\t{}\t{}'.format(
+            colored(str(number_column), 'yellow').ljust(4), name.ljust(12), api_key.ljust(80), is_default_print))
         if header_row is True:
             for _ in range(0, 120):
                 print('-', end='')
@@ -29,9 +31,9 @@ class ApiKeySetter:
         
         while True:
             os.system('cls' if os.name == 'nt' else 'clear')
-            cprint('Set API Keys', 'cyan')
-            cprint('~~~~~~~~~~~~', 'cyan')
-            print('')
+
+            print_terminal_page_header('Set API Keys')
+
             self.get_names()
             self.print_row_to_terminal(' ', 'Name', 'API Key', '', header_row=True)
 

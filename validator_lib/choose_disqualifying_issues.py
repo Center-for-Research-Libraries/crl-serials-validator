@@ -10,6 +10,7 @@ import os
 import sys
 
 from validator_lib.validator_config import ValidatorConfig
+from crl_lib.terminal_gui_utilities import print_terminal_page_header
 
 class IssuesChooser:
 
@@ -44,8 +45,8 @@ class IssuesChooser:
 
             column = 0
             issue_no = 0
-            print('Select Disqualifying Issues')
-            cprint('~~~~~~~~~~~~~~~~~~~~~~~~~~~', 'yellow')
+
+            print_terminal_page_header('Select Disqualifying Issues')
 
             for issue in self.validator_config.issue_categories:
                 issue_no += 1
