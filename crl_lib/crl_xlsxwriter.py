@@ -1,7 +1,7 @@
 import xlsxwriter
 import statistics
 import math
-from termcolor import colored
+from termcolor import colored, cprint
 
 
 class CRLXlsxWriter:
