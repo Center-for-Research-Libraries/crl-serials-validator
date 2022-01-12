@@ -11,8 +11,8 @@ from validator_lib.run_spreadsheet_tsv_csv_process import SpreadsheetTsvCsvRunne
 from validator_lib.get_worldcat_data import WorldCatMarcDataExtractor
 from validator_lib.validator_issn_db import ValidatorIssnDb
 from validator_lib.process_input_data import InputDataProcessor
+from validator_lib.terminal_gui_utilities import print_terminal_page_header
 
-from crl_lib.terminal_gui_utilities import print_terminal_page_header
 
 class ChecksRunner:
     def __init__(
@@ -42,7 +42,7 @@ class ChecksRunner:
             line_583_validation_output = None
         self.add_worldcat_data_to_input_file_data_dicts(input_file_data, input_file)
         validator_issn_db.process_title_dicts(input_file_data, input_file)
-        
+
         InputDataProcessor(
             input_file, input_file_data, input_fields, disqualifying_issue_categories, found_issn_db, self.jstor)
 

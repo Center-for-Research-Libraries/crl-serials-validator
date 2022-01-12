@@ -4,8 +4,9 @@ from termcolor import colored, cprint
 from collections import OrderedDict
 
 
+from validator_lib.terminal_gui_utilities import print_terminal_page_header
+
 from crl_lib.api_keys import OclcApiKeys
-from crl_lib.terminal_gui_utilities import print_terminal_page_header
 
 
 class ApiKeySetter:
@@ -28,7 +29,7 @@ class ApiKeySetter:
 
     def make_gui(self):
         self.api_keys = OclcApiKeys(self.data_folder)
-        
+
         while True:
             os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -70,7 +71,6 @@ class ApiKeySetter:
                     else:
                         make_default = False
                     self.add_key(new_name, new_key, make_default)
-                
             elif choice_result.lower() == 'r':
                 to_delete = input('{} number to delete: '.format(colored('Enter', 'yellow')))
                 try:

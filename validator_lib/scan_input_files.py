@@ -17,14 +17,14 @@ from collections import Counter
 import logging
 from termcolor import cprint, colored
 
+from validator_lib.terminal_gui_utilities import print_terminal_page_header
+
 from crl_lib.marc_file_reader import MarcFileReader
 from crl_lib.marc_fields import MarcFields
-from crl_lib.terminal_gui_utilities import print_terminal_page_header
 
 
 class InputFileScanner:
     def __init__(self, input_files):
-        
         self.data = {}
         self.input_dir = os.path.join(os.getcwd(), 'input')
         self.input_files = input_files
@@ -38,7 +38,6 @@ class InputFileScanner:
             if input_file.endswith(".mrk"):
                 logging.debug("Scanning {}".format(input_file))
                 self.marc_scanner(input_file)
-               
             elif input_file.endswith(".xlsx"):
                 logging.info("Skipping {}".format(input_file))
             elif input_file.endswith(".txt") or input_file.endswith(".tsv") or input_file.endswith(".csv"):
@@ -73,7 +72,6 @@ class InputFileScanner:
         if file_data["Total records"] == 0:
             logging.warning('No records found in {}. Blank file?'.format(input_file))
             return
-        
         self.print_file_scan_results(input_file, file_data)
 
     def print_file_scan_results(self, input_file, file_data):

@@ -10,7 +10,8 @@ import os
 import sys
 
 from validator_lib.validator_config import ValidatorConfig
-from crl_lib.terminal_gui_utilities import print_terminal_page_header
+from validator_lib.terminal_gui_utilities import print_terminal_page_header
+
 
 class IssuesChooser:
 
@@ -35,7 +36,6 @@ class IssuesChooser:
         self.make_gui()
 
     def make_gui(self):
-        
         yes_symbol = colored('yes', 'white', 'on_blue')
         no_symbol = colored('no', 'white', 'on_red')
         disabled_symbol = colored('n/a', 'magenta')
@@ -82,7 +82,7 @@ class IssuesChooser:
             print('{}. Visit the Validator issues glossary in a web browser.'.format(colored('g', 'yellow')))
             print('{}. Return to the main menu.'.format(colored('m', 'yellow')))
             print('{}. Quit the Validator.'.format(colored('q', 'yellow')))
-            
+
             user_choice = input(colored('Your choice: ', 'cyan'))
 
             if user_choice.lower().startswith('g'):

@@ -11,7 +11,7 @@ import sys
 from yaml import warnings
 
 from validator_lib.validator_config import ValidatorConfig
-from crl_lib.terminal_gui_utilities import print_terminal_page_header
+from validator_lib.terminal_gui_utilities import print_terminal_page_header
 
 
 class InputFields:
