@@ -16,7 +16,6 @@ class ReviewWorkbookPrinter:
         print_originally_from=False,
         print_issues_worksheets=False,
         print_for_review=False,
-        print_583_output=True,
         print_good_marc_output=True):
 
         self.running_headless = running_headless
@@ -24,7 +23,6 @@ class ReviewWorkbookPrinter:
         self.print_originally_from = print_originally_from
         self.print_issues_worksheets = print_issues_worksheets
         self.print_for_review = print_for_review
-        self.print_583_output = print_583_output
         self.print_good_marc_output = print_good_marc_output
 
         # if we have KeyErrors with dict keys containing "issn_db" we'll know the database isn't installed
@@ -438,8 +436,6 @@ class ReviewWorkbookPrinter:
             CRLXlsxWriter(output_file_location, output_pages)
 
     def make_583_output(self):
-        if self.print_583_output is False:
-            return
         if not self.line_583_validation_output:
             return
         output = defaultdict(list)
