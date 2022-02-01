@@ -9,13 +9,12 @@ from termcolor import colored, cprint
 import os
 import sys
 
+from validator_lib import ERROR_GLOSSARY_URL
 from validator_lib.validator_config import ValidatorConfig
 from validator_lib.terminal_gui_utilities import print_terminal_page_header
 
 
 class IssuesChooser:
-
-    error_glossary_url = 'https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/disqualifying_issues.md'
 
     # Issue categories that should be at the top of sections.
     break_categories = {
@@ -102,7 +101,7 @@ class IssuesChooser:
                 self.validator_config.write_validator_config_file()
 
     def open_glossary_on_wiki(self):
-        webbrowser.open(self.error_glossary_url)
+        webbrowser.open(ERROR_GLOSSARY_URL)
 
     def ok_clicked(self):
         for issue in self.validator_config.config['disqualifying_issues']:

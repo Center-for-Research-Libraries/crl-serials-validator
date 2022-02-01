@@ -6,6 +6,7 @@ import sys
 import gc
 from termcolor import cprint
 
+from validator_lib import DOCS_URL
 from validator_lib.validator_file_locations import ValidatorFileLocations
 from validator_lib.choose_input_file_fields import InputFieldsChooser
 from validator_lib.scan_input_files import InputFileScanner
@@ -26,7 +27,6 @@ class ValidatorController(ValidatorFileLocations):
     """
 
     viable_input_formats = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
-    docs_url = 'https://github.com/Center-for-Research-Libraries/validator/blob/main/README.md'
 
     def __init__(
         self, headless_mode=False, log_level='info', portable_install=False, papr_output=False):
@@ -97,7 +97,7 @@ class ValidatorController(ValidatorFileLocations):
                         self.marc_input_seen = True
 
     def open_project_docs(self):
-        webbrowser.open(self.docs_url)
+        webbrowser.open(DOCS_URL)
 
     def set_api_keys(self):
         self.print_break_line()
