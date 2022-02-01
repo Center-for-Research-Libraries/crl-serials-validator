@@ -20,67 +20,93 @@ from appdirs import AppDirs
 import logging
 
 
+CURRENT_OS = platform.system()
+HOME_FOLDER = os.path.expanduser("~")
+CRL_FOLDER = os.path.join(os.path.expanduser("~"), 'CRL')
+MARC_DB_NAME = 'marc_collection.db'
+ISSN_DB_NAME = 'ISSN_db.db'
+API_KEY_CONFIG_NAME = 'api_keys.ini'
+APPDIRS_DIRECTORY = AppDirs(appname='CRL').user_data_dir
+
+VALIDATOR_INPUT_FOLDER = os.path.join(os.getcwd(), 'input')
+VALIDATOR_OUTPUT_FOLDER = os.path.join(os.getcwd(), 'output')
+VALIDATOR_DATA_FOLDER = os.path.join(os.getcwd(), 'data')
+VALIDATOR_LOGS_FOLDER = os.path.join(os.getcwd(), 'logs')
+
+
+def initialize_validator_folders():
+
+    for my_directory in [VALIDATOR_INPUT_FOLDER, VALIDATOR_OUTPUT_FOLDER, VALIDATOR_DATA_FOLDER, VALIDATOR_LOGS_FOLDER]:
+        if not os.path.isdir(my_directory):
+            logging.info('Creating directory {}'.format(my_directory))
+            os.mkdir(my_directory)
+
+
 class ValidatorFileLocations:
 
-    current_os = platform.system()
-    home_folder = os.path.expanduser("~")
-    crl_folder = os.path.join(os.path.expanduser("~"), 'CRL')
-    marc_db_name = 'marc_collection.db'
-    issn_db_name = 'ISSN_db.db'
-    api_key_config_name = 'api_keys.ini'
-
-    validator_input_folder = os.path.join(os.getcwd(), 'input')
-    validator_output_folder = os.path.join(os.getcwd(), 'output')
-    validator_data_folder = os.path.join(os.getcwd(), 'data')
-    validator_logs_folder = os.path.join(os.getcwd(), 'logs')
-
-    input_files = []
-
-    data_storage_folder = None
-    marc_db_location = None
-    issn_db_location = None
-
     def __init__(self, portable_install=False):
-        self.initialize_folders()
 
         self.portable_install = portable_install
 
+        self.input_files = []
+
         self.issn_db_folder = None
         self.marc_db_folder = None
+        self.data_storage_folder = None
+        self.marc_db_location = None
+        self.issn_db_location = None
 
-        self.get_marc_and_issn_data_locations()
+        self.find_marc_database_location()
+        self.find_issn_database_location()
 
         if not self.data_storage_folder:
             self.data_storage_folder = self.validator_data_folder
 
-        self.check_about_file()
+        self.add_about_file()
         self.get_input_files()
 
-    def get_marc_and_issn_data_locations(self):
+    def find_marc_database_location(self):
         """
         Look for the MARC database (and optional ISSN database) in various standard locations. If not found, set them
         in the default location. For portable installs that will be the data folder of the Validator. For everything else
         this will be the user data directory as defined by the appdirs library.
         """
-        self.look_for_validator_data_folder()
-
-        if self.portable_install:
-            self.marc_db_folder = self.validator_data_folder
+        if self.portable_install is True:
+            self.marc_db_folder = VALIDATOR_DATA_FOLDER
+            self.marc_db_location = os.path.join(VALIDATOR_DATA_FOLDER, MARC_DB_NAME)
+        elif os.path.isdir(APPDIRS_DIRECTORY) and os.path.isfile(os.path.join(APPDIRS_DIRECTORY, MARC_DB_NAME)):
+            self.marc_db_folder = APPDIRS_DIRECTORY
+            self.marc_db_location = (os.path.join(APPDIRS_DIRECTORY, MARC_DB_NAME))
+        elif os.path.isdir(CRL_FOLDER) and os.path.isfile(os.path.join(CRL_FOLDER, MARC_DB_NAME)):
+            self.marc_db_folder = CRL_FOLDER
+            self.marc_db_location = (os.path.join(CRL_FOLDER, MARC_DB_NAME))
         else:
-            self.look_for_crl_marc_machine_folder()
-            self.look_for_crl_folder()
-            self.look_for_user_data_dir()
+            if not os.path.isdir(APPDIRS_DIRECTORY):
+                os.mkdir(APPDIRS_DIRECTORY)
+            self.marc_db_folder = APPDIRS_DIRECTORY
+            self.marc_db_location = (os.path.join(APPDIRS_DIRECTORY, MARC_DB_NAME))
 
-            if not self.marc_db_folder:
-                self.make_user_data_dir()
+        self.data_storage_folder = self.marc_db_folder
+        self.add_about_file()
 
-            if self.marc_db_folder:
-                self.data_storage_folder = self.marc_db_folder
-            elif self.issn_db_folder:
-                self.data_storage_folder = self.issn_db_folder
-                self.marc_db_folder = self.issn_db_folder
+    def find_issn_database_location(self):
+        if os.path.isdir(APPDIRS_DIRECTORY) and os.path.isfile(os.path.join(APPDIRS_DIRECTORY, ISSN_DB_NAME)):
+            self.issn_db_folder = APPDIRS_DIRECTORY
+            self.issn_db_folder = (os.path.join(APPDIRS_DIRECTORY, ISSN_DB_NAME))
+        elif os.path.isdir(CRL_FOLDER) and os.path.isfile(os.path.join(CRL_FOLDER, ISSN_DB_NAME)):
+            self.issn_db_folder = CRL_FOLDER
+            self.issn_db_folder = (os.path.join(CRL_FOLDER, ISSN_DB_NAME))     
 
-            self.marc_db_location = os.path.join(self.marc_db_folder, self.marc_db_name)
+    def add_about_file(self):
+        """
+        Add a basic about file to our data folder.
+        """
+        if not self.portable_install:
+            about_file_location = os.path.join(self.marc_db_folder, 'about.txt')
+            if not os.path.isfile(about_file_location):
+                with open(about_file_location, 'w') as fout:
+                    fout.write('This folder contains data files for utilities from the Center for Research Libraries.')
+                    fout.write('\n')
 
     def log_file_location_results(self):
         logging.info('Data storage folder at {}'.format(self.data_storage_folder))
@@ -93,94 +119,18 @@ class ValidatorFileLocations:
         else:
             logging.info('ISSN database not found.')
 
-    def check_folder(self, dir):
-        if not os.path.isdir(dir):
-            return
-        dir_list = os.listdir(dir)
-        self.check_for_marc_db(dir, dir_list)
-        self.check_for_issn_db(dir, dir_list)
-
-    def check_for_marc_db(self, dir, dir_list):
-        if not self.marc_db_location and self.marc_db_name in dir_list:
-            self.marc_db_folder = dir
-
-    def check_for_issn_db(self, dir, dir_list):
-        if not self.issn_db_location and self.issn_db_name in dir_list:
-            self.issn_db_folder = dir
-            self.issn_db_location = os.path.join(dir, self.issn_db_name)
-
-    def look_for_validator_data_folder(self):
-        self.check_folder(self.validator_data_folder)
-
-    def look_for_crl_marc_machine_folder(self):
-        marc_machine_folder = os.path.join(self.home_folder, 'CRL MARC Machine')
-        self.check_folder(marc_machine_folder)
-
-    def look_for_crl_folder(self):
-        self.check_folder(self.crl_folder)
-
-    def _get_appidirs_user_data_directory(self):
-        if self.current_os == 'Windows':
-            a = AppDirs(appname='CRL')
-        elif self.current_os == 'Linux':
-            a = AppDirs(appname='CRL')
-        elif self.current_os == 'Darwin':
-            # This might be wrong; don't have access to a MacOS computer to test with
-            a = AppDirs(appname='CRL')
-        return a.user_data_dir
-
-    def look_for_user_data_dir(self):
-        """
-        The plan now is to store any new system-wide databases in the user's data directory in a 
-        subdiectory called CRL. On Linux this requires and app name of "CRL". On Windows the top folder level
-        is the app author, and an app name would be a lower level if we added it.
-        """
-        user_data_dir = self._get_appidirs_user_data_directory()
-        self.check_folder(user_data_dir)
-
-    def make_user_data_dir(self):
-        user_data_dir = self._get_appidirs_user_data_directory()
-        try:
-            os.makedirs(user_data_dir, exist_ok=True)
-            self.marc_db_folder = user_data_dir
-        except PermissionError:
-            logging.warning("Don't have permission to create user data directory at {}. Using data folder in main program folder.".format(user_data_dir))
-            self.marc_db_folder = self.validator_data_folder
-
     def get_input_files(self):
-        all_input_files = os.listdir(self.validator_input_folder)
+
+        valid_file_extensions = {'mrk', 'txt', 'tsv', 'csv', 'xlsx'}
+
+        all_input_files = os.listdir(VALIDATOR_INPUT_FOLDER)
         for input_file in all_input_files:
             if input_file.startswith('~'):
                 continue
-            if not input_file.endswith('mrk') and not input_file.endswith('mrc'):
-                if not input_file.endswith('txt') and not input_file.endswith('csv') and not input_file.endswith('tsv'):
-                    if not input_file.endswith('xlsx'):
-                        continue
+            file_extension = input_file.split('.')[-1]
+            if not file_extension.lower() in valid_file_extensions:
+                continue
             self.input_files.append(input_file)
-
-    def initialize_folders(self):
-        if not os.path.isdir(self.validator_input_folder):
-            logging.info('Creating input directory.')
-            os.mkdir(self.validator_input_folder)
-        if not os.path.isdir(self.validator_output_folder):
-            logging.info('Creating output directory.')
-            os.mkdir(self.validator_output_folder)
-        if not os.path.isdir(self.validator_input_folder):
-            logging.info('Creating data directory.')
-            os.mkdir(self.validator_data_folder)
-        if not os.path.isdir(self.validator_logs_folder):
-            logging.info('Creating logs directory.')
-            os.mkdir(self.validator_logs_folder)
-
-    def check_about_file(self):
-        """
-        Add a basic about file to our data folder. If the data folder is in the main application folder then skip this step.
-        """
-        if self.data_storage_folder != self.validator_data_folder:
-            about_file_location = os.path.join(self.data_storage_folder, 'about.txt')
-            if not os.path.isfile(about_file_location):
-                with open(about_file_location, 'w') as fout:
-                    fout.write('This folder contains data files for utilities from the Center for Research Libraries.\n')
 
 
 def print_validator_file_locations():

@@ -7,7 +7,7 @@ import gc
 from termcolor import cprint
 
 from validator_lib import DOCS_URL
-from validator_lib.validator_file_locations import ValidatorFileLocations
+from validator_lib.validator_file_locations import ValidatorFileLocations, VALIDATOR_LOGS_FOLDER, VALIDATOR_DATA_FOLDER, VALIDATOR_OUTPUT_FOLDER
 from validator_lib.choose_input_file_fields import InputFieldsChooser
 from validator_lib.scan_input_files import InputFileScanner
 from validator_lib.run_checks_process import ChecksRunner
@@ -47,9 +47,6 @@ class ValidatorController(ValidatorFileLocations):
 
         self.log_file_location_results()
 
-        # Make sure the relevant folders exist.
-        self.initialize_folders()
-
         self.input_files_seen = False
         self.marc_input_seen = False
 
@@ -71,7 +68,7 @@ class ValidatorController(ValidatorFileLocations):
         }
 
         log_file_name = 'validator_log_{:%Y-%m-%d}.log'.format(datetime.datetime.now())
-        log_file = os.path.join(self.validator_logs_folder, log_file_name)
+        log_file = os.path.join(VALIDATOR_LOGS_FOLDER, log_file_name)
         logging.basicConfig(
             filename=log_file, 
             level=log_levels[self.log_level], 
@@ -147,8 +144,8 @@ class ValidatorController(ValidatorFileLocations):
                 input_fields,
                 disqualifying_issue_categories,
                 self.data_storage_folder,
-                self.validator_data_folder,
-                self.validator_output_folder, 
+                VALIDATOR_DATA_FOLDER,
+                VALIDATOR_OUTPUT_FOLDER, 
                 self.issn_db_location,
                 running_headless=self.headless_mode,
                 papr_output=self.papr_output)
@@ -183,10 +180,10 @@ class ValidatorController(ValidatorFileLocations):
                 else:
                     cprint("I didn't understand that.", 'red')
                     print('')
-        output_files = os.listdir(self.validator_output_folder)
+        output_files = os.listdir(VALIDATOR_OUTPUT_FOLDER)
         for output_file in output_files:
             logging.info('Clearing output folder; deleting {}'.format(output_file))
-            output_file_loc = os.path.join(self.validator_output_folder, output_file)
+            output_file_loc = os.path.join(VALIDATOR_OUTPUT_FOLDER, output_file)
             if not os.path.isfile(output_file_loc):
                 continue
             try:

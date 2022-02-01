@@ -23,7 +23,7 @@ from termcolor import colored, cprint
 from validator_lib.validator_controller import ValidatorController
 from validator_lib.bulk_validator_preferences import run_bulk_config
 from validator_lib.command_line_api_keys import CommandLineApiKeys
-from validator_lib.validator_file_locations import print_validator_file_locations
+from validator_lib.validator_file_locations import initialize_validator_folders, print_validator_file_locations
 
 
 class SimpleValidatorInterface:
@@ -167,6 +167,8 @@ def command_line_app():
 
 if __name__ == "__main__":
     args = parse_command_line_args()        
+
+    initialize_validator_folders()
 
     if args.file_locations is True:
         print_validator_file_locations()
