@@ -7,7 +7,7 @@ import gc
 from termcolor import cprint
 
 from validator_lib import DOCS_URL
-from validator_lib.validator_file_locations import ValidatorFileLocations, VALIDATOR_LOGS_FOLDER, VALIDATOR_DATA_FOLDER, VALIDATOR_OUTPUT_FOLDER
+from validator_lib.validator_file_locations import ValidatorFileLocations
 from validator_lib.choose_input_file_fields import InputFieldsChooser
 from validator_lib.scan_input_files import InputFileScanner
 from validator_lib.run_checks_process import ChecksRunner
