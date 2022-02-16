@@ -9,7 +9,7 @@ from termcolor import colored, cprint
 import os
 import sys
 
-from validator_lib import ERROR_GLOSSARY_URL
+from validator_lib.validator_data import ERROR_GLOSSARY_URL
 from validator_lib.validator_config import ValidatorConfig
 from validator_lib.terminal_gui_utilities import print_terminal_page_header
 
