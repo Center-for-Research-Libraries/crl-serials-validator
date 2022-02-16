@@ -25,6 +25,8 @@ class ReviewWorkbookPrinter:
         self.print_for_review = print_for_review
         self.print_good_marc_output = print_good_marc_output
 
+        self.total_records = {}
+
         # if we have KeyErrors with dict keys containing "issn_db" we'll know the database isn't installed
         self.issn_db_not_seen = False
 
@@ -135,6 +137,7 @@ class ReviewWorkbookPrinter:
         self.count_errors(title_dicts)
         self.count_disqualifying_errors(title_dicts)
         self.checklist_outputs = defaultdict(list)
+        self.error_outputs = defaultdict(list)
         self.get_checklist_data_for_output()
 
         if self.issn_db_not_seen is True:
@@ -276,6 +279,7 @@ class ReviewWorkbookPrinter:
             else:
                 overview_dict[inst]['for_review'] += 1
         for inst in overview_dict:
+            self.total_records[inst] = overview_dict[inst]['total']
             overview_output = [['{} records'.format(inst), ''],
                                ['Supplied by {}'.format(inst), overview_dict[inst]['total']], ['', ''],
                                ['No issues preventing ingestion', overview_dict[inst]['no_issues']], ['', ''],
@@ -375,6 +379,10 @@ class ReviewWorkbookPrinter:
                         logging.error('Category {} not seen in checklist data.'.format(cat))
             if self.print_errors_only is True and not output_list[0]:
                 continue
+
+            if output_list[0]:
+                self.error_outputs[inst].append(output_list)
+
             self.checklist_outputs[inst].append(output_list)
         if self.issn_db_not_seen is True:
             self.remove_issn_db_from_checklist_cats()
@@ -415,13 +423,24 @@ class ReviewWorkbookPrinter:
             output_pages = {}
             output_pages['Notes'] = {'data': self.outputs[inst]['All issues']}
 
-            if self.print_issues_worksheets is True:
-                output_pages['All issues'] = {'data': error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True}, [2])]}
-                output_pages['Disqualifying issues'] = {'data': disqualifying_error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True}, [2])]}
-
             checklist_number_columns = {1, 3, 6, 7}  # has_disqualifying_error, seqnum, local_oclc, wc_oclc
             checklist_number_columns = {1, 3, 6, 7}  # has_disqualifying_error, seqnum, local_oclc, wc_oclc
             output_pages['Checklist'] = {'data': self.checklist_outputs[inst], 'number_columns': checklist_number_columns}
+
+            if self.total_records[inst] >= 50000:
+                error_pages = {}
+
+                error_filename = '{} errors.xlsx'.format(inst)
+                error_file_location = os.path.join(self.output_folder, error_filename)
+                error_file_location = validator_lib.utilities.get_unused_filename(error_file_location)
+                error_pages['Checklist'] = {'data': self.error_outputs[inst], 'number_columns': checklist_number_columns}
+
+                self.error_outputs[inst].insert(0, self.checklist_cats)
+                error_pages['All issues'] = {'data': error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True}, [2])]}
+                error_pages['Disqualifying issues'] = {'data': disqualifying_error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True}, [2])]}
+                error_pages['For review'] = {'data': for_review_list, 'special_formats': for_review_special_formats}
+
+                CRLXlsxWriter(error_file_location, error_pages)
 
             if self.print_for_review is True:
                 output_pages['For review'] = {'data': for_review_list, 'special_formats': for_review_special_formats}
@@ -434,6 +453,8 @@ class ReviewWorkbookPrinter:
                 self.print_headless_checklist(output_pages['Checklist'], output_file_location.replace('.xlsx', '.txt'))
 
             CRLXlsxWriter(output_file_location, output_pages)
+                
+
 
     def make_583_output(self):
         if not self.line_583_validation_output:
