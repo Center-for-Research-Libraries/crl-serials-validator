@@ -47,11 +47,31 @@ class SpreadsheetTsvCsvRunner:
                 delimiter = '\t'
             else:
                 raise Exception('Invalid input file?\n{}'.format(input_file))
-            fin = open(input_file_location, 'r', newline='')
+            my_encoding = self.get_text_file_encoding(input_file, input_file_location)
+            fin = open(input_file_location, 'r', newline='', encoding=my_encoding)
             iterator = csv.reader(fin, delimiter=delimiter)
 
         input_data = self.extract_data_from_spreadsheet_file(iterator, input_file, input_fields)
         return input_data
+
+    def get_text_file_encoding(self, input_file, input_file_location):
+        """
+        Find encoding for text files. Right now only works with UTF8 and cp1252 (Windows standard) as well as plain
+        ASCII files. This will probably fail on any malformed input files, but those would likely fail in the data
+        extraction step anyway.
+        """
+        encodings = ['utf8', 'cp1252', 'ascii']
+        for my_encoding in encodings:
+            try:
+                with open(input_file_location, 'r', encoding=my_encoding) as fin:
+                    for line in fin.readlines():
+                        pass
+                print('Will use encoding {} for file.'.format(colored(my_encoding, 'cyan')))
+                return my_encoding
+            except UnicodeDecodeError:
+                pass
+        cprint("Can't find text encoding of input file. Please convert it to UTF-8 or Windows text format.")
+        sys.exit()
 
     def extract_data_from_spreadsheet_file(self, iterator, input_file, input_fields):
         print('Extracting {}.'.format(colored('local data', 'cyan')))
