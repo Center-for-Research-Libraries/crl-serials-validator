@@ -12,6 +12,7 @@ from crl_lib.crl_utilities import clean_oclc
 from validator_lib.validate_583s import Line583Validator
 from validator_lib.utilities import get_first_last_year_from_regular_holdings
 from validator_lib.supplements_and_indexes_functions import remove_supplements_from_holdings, remove_indexes_from_holdings
+from validator_lib.validator_title_dict import get_immutable_title_dict
 
 
 class MrkProcessRunner:
@@ -80,39 +81,18 @@ class MrkProcessRunner:
     def get_data_from_record(self, record, seqnum):
         self.errors_this_record = []
         mf = MarcFields(record, log_warnings=True, debug_info='from {}'.format(self.input_file))
+        record_dict = get_immutable_title_dict()
 
-        record_dict = {
-            'marc': record,
-            'bad_863_field': '',
-            'bib_id': self.get_field_from_marc('bib_id', record),
-            'dangling_subfield': '',
-            'errors': [],
-            'field_583': '',
-            'field_852a': get_field_subfield(record, '852a'),
-            'field_852b': get_field_subfield(record, '852b'),
-            'filename': self.input_file,
-            'holdings_1': '',
-            'holdings_2': '',
-            'holdings_3': '',
-            'holdings_end': '',
-            'holdings_id': self.get_field_from_marc('holdings_id', record),
-            'holdings_missing': '',
-            'holdings_have_no_years': '',
-            'holdings_start': '',
-            'institution': '',
-            'ldr': '',
-            'line_583_error': '',
-            'local_holdings': '',
-            'local_issn': mf.issn_a,
-            'local_oclc': self.get_oclc_from_marc(mf, record),
-            'local_title': mf.title,
-            'location': '',
-            'marc_validation_error': '',
-            'nonpublic_notes': '',
-            'oclc_field': '',
-            'public_notes': '',
-            'seqnum': seqnum,
-        }
+        record_dict['marc'] = record
+        record_dict['bib_id'] = self.get_field_from_marc('bib_id', record)
+        record_dict['field_852a'] = get_field_subfield(record, '852a')
+        record_dict['field_852b'] = get_field_subfield(record, '852b')
+        record_dict['filename'] = self.input_file
+        record_dict['holdings_id'] = self.get_field_from_marc('holdings_id', record)
+        record_dict['local_issn'] = mf.issn_a
+        record_dict['local_oclc'] = self.get_oclc_from_marc(mf, record)
+        record_dict['local_title'] = mf.title
+        record_dict['seqnum'] = seqnum
 
         if '=LDR  ' in record:
             record_dict['ldr'] = True

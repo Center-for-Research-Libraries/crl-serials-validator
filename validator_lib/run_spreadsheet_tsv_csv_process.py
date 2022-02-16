@@ -9,6 +9,7 @@ from termcolor import cprint, colored
 
 from validator_lib.utilities import get_first_last_year_from_regular_holdings
 from validator_lib.supplements_and_indexes_functions import remove_indexes_from_holdings, remove_supplements_from_holdings
+from validator_lib.validator_title_dict import get_immutable_title_dict
 
 
 class SpreadsheetTsvCsvRunner:
@@ -86,7 +87,8 @@ class SpreadsheetTsvCsvRunner:
             n += 1
             sys.stdout.write('\rReading row {}'.format(colored(str(n), 'yellow')))
             sys.stdout.flush()
-            row_dict = {'filename': input_file}
+            row_dict = get_immutable_title_dict()
+            row_dict['filename'] = input_file
             holdings_list = []
             regular_holdings = []
             for cat in self.input_cats:

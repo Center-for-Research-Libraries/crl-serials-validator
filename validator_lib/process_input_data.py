@@ -83,8 +83,6 @@ class InputDataProcessor:
         This runs after all other input processing. Basically creates an error list for the outputs
         """
         # Without OCLC in original we can't do anything, so immediately fail
-        title_dict['invalid_record'] = ''
-        title_dict['disqualifying_errors'] = []
         if not title_dict['local_oclc']:
             title_dict['errors'] = ['no_oclc_number']
             title_dict['disqualifying_errors'] = ['no_oclc_number']
@@ -222,10 +220,6 @@ class InputDataProcessor:
         title_dict['nonprint_words_in_holdings'] = validator_lib.utilities.check_holdings_data_for_magic_words(
             title_dict['local_holdings'], title_dict['nonpublic_notes'], title_dict['public_notes'], 'nonprint')
 
-        title_dict['start_problem'] = ''
-        title_dict['end_problem'] = ''
-        title_dict['holdings_out_of_range'] = ''
-        title_dict['holdings_in_wc_range'] = ''
         if title_dict['holdings_start']:
             start_between = check_year_between(title_dict['start_including_362'], title_dict['end_including_362'],
                                                title_dict['holdings_start'])
