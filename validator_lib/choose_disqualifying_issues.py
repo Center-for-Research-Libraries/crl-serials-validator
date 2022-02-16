@@ -121,6 +121,46 @@ class IssuesChooser:
         self.validator_config.write_validator_config_file()
         self.__init__(self.issn_db_missing)
 
+    def get_default_disqualifying_issues():
+        disqualifying_issues = OrderedDict({
+            'bib_lvl_not_serial': True,
+            'form_not_print': True,
+            'record_type_not_language_material': True,
+            'serial_type_not_periodical': True,
+            'invalid_carrier_type': True,
+            'invalid_media_type': True,
+            'issn_db_form_not_print': True,
+            'issn_db_serial_type_not_periodical': True,
+            'no_oclc_number': True,
+            'no_worldcat_record': True,
+
+            'binding_words_in_holdings': True,
+            'completeness_words_in_holdings': True,
+            'nonprint_words_in_holdings': True,
+
+            'title_in_jstor': False,
+
+            'duplicate_holdings_id': True,
+            'duplicate_local_oclc': True,
+            'duplicate_wc_oclc': True,
+
+            'holdings_out_of_range': True,
+            'holdings_out_of_issn_db_date_range': True,
+
+            'invalid_local_issn': True,
+            'issn_mismatch': True,
+            'local_issn_does_not_match_wc_issn_a': False,
+            'local_issn_does_not_match_issn_db': False,
+
+            'oclc_mismatch': True,
+            'title_mismatch': True,
+
+            'line_583_error': True,
+            'marc_validation_error': True,
+            'missing_field_852a': True,
+        })
+        return disqualifying_issues
+
 
 if __name__ == "__main__":
     IssuesChooser()
