@@ -72,6 +72,7 @@ def get_immutable_title_dict():
         'holdings_have_no_years': '',
         'holdings_id': '',
         'holdings_id_repeated': '',
+        'holdings_id_unique': '',
         'holdings_in_wc_range': '',
         'holdings_missing': '',
         'holdings_out_of_range': '',
@@ -100,6 +101,7 @@ def get_immutable_title_dict():
         'local_issn_does_not_match_wc_issn_a': '',
         'local_oclc': '',
         'local_oclc_repeated': '',
+        'local_oclc_unique': '',
         'local_title': '',
         'location': '',
         'marc': '',
@@ -136,6 +138,7 @@ def get_immutable_title_dict():
         'wc_line_362': '',
         'wc_oclc': '',
         'wc_oclc_repeated': '',
+        'wc_oclc_unique': '',
         'wc_title': '',
     }
 

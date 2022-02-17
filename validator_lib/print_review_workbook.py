@@ -424,7 +424,6 @@ class ReviewWorkbookPrinter:
             output_pages['Notes'] = {'data': self.outputs[inst]['All issues']}
 
             checklist_number_columns = {1, 3, 6, 7}  # has_disqualifying_error, seqnum, local_oclc, wc_oclc
-            checklist_number_columns = {1, 3, 6, 7}  # has_disqualifying_error, seqnum, local_oclc, wc_oclc
             output_pages['Checklist'] = {'data': self.checklist_outputs[inst], 'number_columns': checklist_number_columns}
 
             if self.total_records[inst] >= 50000:

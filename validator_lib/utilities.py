@@ -74,7 +74,7 @@ def check_holdings_data_for_magic_words(holdings, holdings_nonpublic_notes, hold
 
 
 def get_valid_serial_types():
-    return {"m", "p", "\\", " ", "-", '|'}
+    return {"m", "p", "\\", " ", "-", '|', 'g', 'j'}
 
 
 def get_valid_forms():
