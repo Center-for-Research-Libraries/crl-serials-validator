@@ -6,14 +6,14 @@ A set of utilities mainly to support checking and validation of bib records.
 import re
 
 
-def check_marc_for_hc_serial(marc):
+def check_marc_for_print_serial(marc):
     """
     Is a MARC record for a hard copy serial?
 
     Requires broadly valid MARC to work.
     """
 
-    if not check_marc_for_hc(marc):
+    if not check_marc_for_print(marc):
         return False
 
     m = re.search(r"=LDR\s\s.......(.)", marc)
@@ -38,7 +38,7 @@ def check_marc_for_hc_serial(marc):
 # ------------------------------------------------------------------------------
 
 
-def check_marc_for_hc(marc, check_form=True, pipe_ok=False):
+def check_marc_for_print(marc, check_form=True, pipe_ok=False):
     """
     Is this MARC hard copy? Returns True for hard copy.
 
@@ -47,7 +47,7 @@ def check_marc_for_hc(marc, check_form=True, pipe_ok=False):
     """
     m = re.search(r"=008\s\s.{23}(.)", marc)
     try:
-        if not check_hc_form(m.group(1), pipe_ok):
+        if not check_print_form(m.group(1), pipe_ok):
             # print(f'{m.group(1)}  {pipe_ok}')
             return False
     except AttributeError:
@@ -56,13 +56,13 @@ def check_marc_for_hc(marc, check_form=True, pipe_ok=False):
     # RDA fields
     media_fields = re.findall(r"=33[78]\s\s..\$a([^$]+)", marc)
     for media_field in media_fields:
-        if not check_for_hc_media_type(media_field):
+        if not check_for_print_media_type(media_field):
             return False
 
     # title fields
     m = re.search(r"=245\s\s[^\r\n]*\$h(^[^$]+)", marc)
     try:
-        if not check_for_hc_media_type(m.group(1)):
+        if not check_for_print_media_type(m.group(1)):
             return False
     except AttributeError:
         pass
@@ -70,7 +70,7 @@ def check_marc_for_hc(marc, check_form=True, pipe_ok=False):
     return True
 
 
-def check_for_hc_title_h(title_h_field):
+def check_for_print_title_h(title_h_field):
     """
     Look at the 245 $h for a non-hard copy record.
 
@@ -82,7 +82,7 @@ def check_for_hc_title_h(title_h_field):
     return True
 
 
-def check_for_hc_carrier_type(carrier_type):
+def check_for_print_carrier_type(carrier_type):
     """
     Is the given carrier type compatible with a hard copy record?
     """
@@ -95,7 +95,7 @@ def check_for_hc_carrier_type(carrier_type):
     return True
 
 
-def check_for_hc_media_type(media_type):
+def check_for_print_media_type(media_type):
     """
     is the given media type compatible with a hard copy record?
     """
@@ -108,7 +108,7 @@ def check_for_hc_media_type(media_type):
     return True
 
 
-def check_hc_form(form, pipe_ok=False):
+def check_print_form(form, pipe_ok=False):
     """
     Check if form is hard copy.
     """
@@ -127,17 +127,17 @@ def check_hc_form(form, pipe_ok=False):
     return False
 
 
-def check_hc(form, media_type=None, marc=None, pipe_ok=False):
+def check_print(form, media_type=None, marc=None, pipe_ok=False):
     """
     Checks form, and MARC if available, for hard copy.
     """
 
     # empty form must be blank space, not empty str
-    if not check_hc_form(form, pipe_ok):
+    if not check_print_form(form, pipe_ok):
         return False
-    if media_type and not check_for_hc_media_type(media_type):
+    if media_type and not check_for_print_media_type(media_type):
         return False
-    if marc and not check_marc_for_hc(marc, pipe_ok):
+    if marc and not check_marc_for_print(marc, pipe_ok):
         return False
     return True
 

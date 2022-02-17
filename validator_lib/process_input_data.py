@@ -18,7 +18,7 @@ with warnings.catch_warnings():
 
 from crl_lib.crl_utilities import check_for_valid_issn
 from crl_lib.date_utilities import check_year_between
-from crl_lib.validation_utilities import check_for_hc_carrier_type, check_for_hc_media_type
+from crl_lib.validation_utilities import check_for_print_carrier_type, check_for_print_media_type
 import validator_lib.utilities
 
 
@@ -282,7 +282,7 @@ class InputDataProcessor:
     def check_carrier_type(title_dict):
         if not title_dict['carrier_type']:
             title_dict['invalid_carrier_type'] = ''
-        elif check_for_hc_carrier_type(title_dict['carrier_type']):
+        elif check_for_print_carrier_type(title_dict['carrier_type']):
             title_dict['invalid_carrier_type'] = ''
         else:
             title_dict['invalid_carrier_type'] = '1'
@@ -291,7 +291,7 @@ class InputDataProcessor:
     def check_media_type(title_dict):
         if not title_dict['media_type']:
             title_dict['invalid_media_type'] = ''
-        elif check_for_hc_media_type(title_dict['media_type']):
+        elif check_for_print_media_type(title_dict['media_type']):
             title_dict['invalid_media_type'] = ''
         else:
             title_dict['invalid_media_type'] = ''
