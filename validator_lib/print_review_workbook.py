@@ -101,7 +101,7 @@ class ReviewWorkbookPrinter:
             'numbering_peculiarities',
             'title_in_jstor',
             'issn_db_issn',
-            'local_issn_does_not_match_issn_db_issn',
+            'local_issn_does_not_match_issn_db',
             'wc_issn_does_not_match_issn_db_issn',
             'issn_db_title',
             'issn_db_format',

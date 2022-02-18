@@ -59,7 +59,7 @@ class ValidatorIssnDb:
     def process_dict_without_issn_db_access(title_dict):
         cats = ['issn_db_issn', 'issn_db_title', 'issn_db_format', 'issn_db_form_not_print', 'issn_db_serial_type',
                 'issn_db_serial_type_not_periodical', 'issn_db_year_1', 'issn_db_year_2', 'holdings_out_of_issn_db_date_range',
-                'local_issn_does_not_match_issn_db_issn', 'wc_issn_does_not_match_issn_db_issn']
+                'local_issn_does_not_match_issn_db', 'wc_issn_does_not_match_issn_db_issn']
         for cat in cats:
             title_dict[cat] = ''
 
