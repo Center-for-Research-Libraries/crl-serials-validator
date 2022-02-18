@@ -16,8 +16,11 @@ and store data in the Linux directory structure.
 
 import os
 import logging
+import shutil
+from termcolor import cprint, colored
 
 from validator_lib.validator_data import *
+import colorama
 
 
 def initialize_validator_folders():
@@ -60,26 +63,27 @@ class ValidatorFileLocations:
         if self.portable_install is True:
             self.marc_db_folder = VALIDATOR_DATA_FOLDER
             self.marc_db_location = os.path.join(VALIDATOR_DATA_FOLDER, MARC_DB_NAME)
-        elif os.path.isdir(APPDIRS_DIRECTORY) and os.path.isfile(os.path.join(APPDIRS_DIRECTORY, MARC_DB_NAME)):
-            self.marc_db_folder = APPDIRS_DIRECTORY
-            self.marc_db_location = (os.path.join(APPDIRS_DIRECTORY, MARC_DB_NAME))
         elif os.path.isdir(CRL_FOLDER) and os.path.isfile(os.path.join(CRL_FOLDER, MARC_DB_NAME)):
             self.marc_db_folder = CRL_FOLDER
             self.marc_db_location = (os.path.join(CRL_FOLDER, MARC_DB_NAME))
         else:
-            if not os.path.isdir(APPDIRS_DIRECTORY):
-                os.mkdir(APPDIRS_DIRECTORY)
-            self.marc_db_folder = APPDIRS_DIRECTORY
-            self.marc_db_location = (os.path.join(APPDIRS_DIRECTORY, MARC_DB_NAME))
+            if not os.path.isdir(CRL_FOLDER):
+                os.mkdir(CRL_FOLDER)
+            self.marc_db_folder = CRL_FOLDER
+            self.marc_db_location = (os.path.join(CRL_FOLDER, MARC_DB_NAME))
 
         self.data_storage_folder = self.marc_db_folder
         self.add_about_file()
 
     def find_issn_database_location(self):
+<<<<<<< HEAD
         if os.path.isdir(APPDIRS_DIRECTORY) and os.path.isfile(os.path.join(APPDIRS_DIRECTORY, ISSN_DB_NAME)):
             self.issn_db_folder = APPDIRS_DIRECTORY
             self.issn_db_location = (os.path.join(APPDIRS_DIRECTORY, ISSN_DB_NAME))
         elif os.path.isdir(CRL_FOLDER) and os.path.isfile(os.path.join(CRL_FOLDER, ISSN_DB_NAME)):
+=======
+        if os.path.isdir(CRL_FOLDER) and os.path.isfile(os.path.join(CRL_FOLDER, ISSN_DB_NAME)):
+>>>>>>> default_location
             self.issn_db_folder = CRL_FOLDER
             self.issn_db_location = (os.path.join(CRL_FOLDER, ISSN_DB_NAME))     
 
@@ -120,8 +124,6 @@ class ValidatorFileLocations:
 
 
 def print_validator_file_locations():
-    from termcolor import colored, cprint
-    import colorama
     
     file_locations = ValidatorFileLocations()
 
@@ -150,3 +152,34 @@ def print_validator_file_locations():
         cprint(file_locations.issn_db_location, location_color)
     else:
         print('The {} is {}.'.format(issn_database, not_installed))
+
+
+def migrate_from_appdirs_directory():
+    """
+    Older installations will have the databases and related files placed in the folder chosen by the appdirs library.
+    Search for these and migrate them to a "CRL" folder in the user's home directory.
+
+    This functions was finalized 2022-02-18. At some point there should be no more installations using the appdirs
+    folder, at which point it can be removed.
+    """
+    from appdirs import AppDirs
+
+    appdirs_directory = AppDirs(appname='CRL').user_data_dir
+    print(appdirs_directory)
+    if not os.path.isdir(appdirs_directory):
+        return
+    
+    cprint('Performing one-time migration of files.', 'yellow')
+    print('Source:      {}'.format(colored(appdirs_directory, 'cyan')))
+    print('Destination: {}'.format(colored(CRL_FOLDER, 'cyan')))
+    if not os.path.isdir(CRL_FOLDER):
+        # No CRL folder, so we can cleanly move the whole appdirs folder
+        shutil.move(appdirs_directory, CRL_FOLDER)
+    else:
+        # CRL folder exists. Copy file-by-file.
+        appdirs_contents = os.listdir(appdirs_directory)
+        for my_file in appdirs_contents:
+            source = os.path.join(appdirs_directory, my_file)
+            destination = os.path.join(CRL_FOLDER, my_file)
+            shutil.move(source, destination)
+        os.rmdir(appdirs_directory)
