@@ -48,10 +48,8 @@ class ValidatorIssnDb:
             title_dict['issn_db_year_1'] = db_data_local['issn_db_year_1']
             title_dict['issn_db_year_2'] = db_data_local['issn_db_year_2']
             title_dict['holdings_out_of_issn_db_date_range'] = db_data_local['holdings_out_of_issn_db_date_range']
-            title_dict['local_issn_mismatches_issn_db_issn'] = db_data_local['issn_mismatch']
-            title_dict['wc_issn_mismatches_issn_db_issn'] = db_data_wc['issn_mismatch']
-
-            title_dict['invalid_issn'] = ''
+            title_dict['local_issn_does_not_match_issn_db'] = db_data_local['issn_mismatch']
+            title_dict['wc_issn_does_not_match_issn_db_issn'] = db_data_wc['issn_mismatch']
             if title_dict['local_issn']:
                 if check_for_valid_issn(title_dict['local_issn']) is False:
                     title_dict['invalid_issn'] = '1'
@@ -61,7 +59,7 @@ class ValidatorIssnDb:
     def process_dict_without_issn_db_access(title_dict):
         cats = ['issn_db_issn', 'issn_db_title', 'issn_db_format', 'issn_db_form_not_print', 'issn_db_serial_type',
                 'issn_db_serial_type_not_periodical', 'issn_db_year_1', 'issn_db_year_2', 'holdings_out_of_issn_db_date_range',
-                'local_issn_mismatches_issn_db_issn', 'wc_issn_mismatches_issn_db_issn']
+                'local_issn_does_not_match_issn_db_issn', 'wc_issn_does_not_match_issn_db_issn']
         for cat in cats:
             title_dict[cat] = ''
 
