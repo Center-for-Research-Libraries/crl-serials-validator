@@ -76,14 +76,7 @@ class ValidatorFileLocations:
         self.add_about_file()
 
     def find_issn_database_location(self):
-<<<<<<< HEAD
-        if os.path.isdir(APPDIRS_DIRECTORY) and os.path.isfile(os.path.join(APPDIRS_DIRECTORY, ISSN_DB_NAME)):
-            self.issn_db_folder = APPDIRS_DIRECTORY
-            self.issn_db_location = (os.path.join(APPDIRS_DIRECTORY, ISSN_DB_NAME))
-        elif os.path.isdir(CRL_FOLDER) and os.path.isfile(os.path.join(CRL_FOLDER, ISSN_DB_NAME)):
-=======
         if os.path.isdir(CRL_FOLDER) and os.path.isfile(os.path.join(CRL_FOLDER, ISSN_DB_NAME)):
->>>>>>> default_location
             self.issn_db_folder = CRL_FOLDER
             self.issn_db_location = (os.path.join(CRL_FOLDER, ISSN_DB_NAME))     
 
