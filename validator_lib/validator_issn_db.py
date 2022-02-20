@@ -31,14 +31,13 @@ class ValidatorIssnDb:
         for title_dict in title_dicts:
             n += 1
             if self.issn_db.conn is None:
-                self.process_dict_without_issn_db_access(title_dict)
                 continue
             pct_done = colored(str('{0:.1%}'.format(n/len(title_dicts))), 'yellow')
             sys.stdout.write('\rISSN db work at {}'.format(pct_done))
             db_data_local = self.get_issn_db_data(title_dict['local_issn'], title_dict['holdings_start'],
-                                                  title_dict['holdings_end'])
+                                                  title_dict['holdings_end'], issn_source='local')
             db_data_wc = self.get_issn_db_data(title_dict['wc_issn_a'], title_dict['008_year_1'],
-                                               title_dict['008_year_2'])
+                                               title_dict['008_year_2'], issn_source='worldcat')
             title_dict['issn_db_issn'] = db_data_local['issn_db_issn']
             title_dict['issn_db_title'] = db_data_local['issn_db_title']
             title_dict['issn_db_format'] = db_data_local['issn_db_format']
@@ -49,21 +48,12 @@ class ValidatorIssnDb:
             title_dict['issn_db_year_2'] = db_data_local['issn_db_year_2']
             title_dict['holdings_out_of_issn_db_date_range'] = db_data_local['holdings_out_of_issn_db_date_range']
             title_dict['local_issn_does_not_match_issn_db'] = db_data_local['issn_mismatch']
-            title_dict['wc_issn_does_not_match_issn_db_issn'] = db_data_wc['issn_mismatch']
-            if title_dict['local_issn']:
-                if check_for_valid_issn(title_dict['local_issn']) is False:
-                    title_dict['invalid_local_issn'] = '1'
+            title_dict['wc_issn_does_not_match_issn_db'] = db_data_wc['issn_mismatch']
+            if title_dict['local_issn_does_not_match_issn_db'] and title_dict['wc_issn_does_not_match_issn_db']:
+                title_dict['no_issn_matches_issn_db'] = '1'
         print()
 
-    @staticmethod
-    def process_dict_without_issn_db_access(title_dict):
-        cats = ['issn_db_issn', 'issn_db_title', 'issn_db_format', 'issn_db_form_not_print', 'issn_db_serial_type',
-                'issn_db_serial_type_not_periodical', 'issn_db_year_1', 'issn_db_year_2', 'holdings_out_of_issn_db_date_range',
-                'local_issn_does_not_match_issn_db', 'wc_issn_does_not_match_issn_db_issn']
-        for cat in cats:
-            title_dict[cat] = ''
-
-    def get_issn_db_data(self, issn, year_1, year_2):
+    def get_issn_db_data(self, issn, year_1, year_2, issn_source='local'):
         db_data = {
             'issn_db_issn': '',
             'issn_mismatch': '',
@@ -80,14 +70,19 @@ class ValidatorIssnDb:
             return db_data
         issn_data = self.choose_best_issn(issn, year_1, year_2)
         if not issn_data:
-            db_data['issn_mismatch'] = '1'
+            if issn_source == 'local':
+                db_data['local_issn_does_not_match_issn_db'] = '1'
+            elif issn_source == 'worldcat':
+                db_data['wc_issn_does_not_match_issn_db'] = '1'
             return db_data
 
         db_data['issn_db_issn'] = issn_data.issn
 
-        db_data['issn_mismatch'] = ''
         if issn != db_data['issn_db_issn']:
-            db_data['issn_mismatch'] = '1'
+            if issn_source == 'local':
+                db_data['local_issn_does_not_match_issn_db'] = '1'
+            elif issn_source == 'worldcat':
+                db_data['wc_issn_does_not_match_issn_db'] = '1'
 
         db_data['issn_db_title'] = issn_data.title_a
 

@@ -221,9 +221,10 @@ class ValidatorConfig:
             'holdings_out_of_issn_db_date_range': True,
 
             'invalid_local_issn': True,
-            'issn_mismatch': True,
             'local_issn_does_not_match_wc_issn_a': False,
             'local_issn_does_not_match_issn_db': False,
+            'wc_issn_does_not_match_issn_db': False,
+            'no_issn_matches_issn_db': True,
 
             'oclc_mismatch': True,
             'title_mismatch': True,

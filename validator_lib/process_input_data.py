@@ -188,13 +188,12 @@ class InputDataProcessor:
             if check_for_valid_issn(title_dict['local_issn']) is False:
                 title_dict['invalid_local_issn'] = '1'
 
-        if self.found_issn_db is True:
-            if title_dict['local_issn'] != title_dict['issn_db_issn']:
-                title_dict['local_issn_does_not_match_issn_db'] = '1'
-            if title_dict['wc_issn_a'] != title_dict['issn_db_issn']:
-                title_dict['wc_issn_does_not_match_issn_db_issn'] = '1'
-            if title_dict['local_issn_does_not_match_issn_db'] and title_dict['wc_issn_does_not_match_issn_db_issn']:
-                title_dict['issn_mismatch'] = '1'
+        if title_dict['wc_issn_a']:
+            if check_for_valid_issn(title_dict['wc_issn_a']) is False:
+                title_dict['invalid_wc_issn_a'] = '1'
+
+        if title_dict['local_issn'] != title_dict['wc_issn_a']:
+            title_dict['local_issn_does_not_match_wc_issn_a'] = '1'
 
     def check_if_title_in_jstor(self, title_dict):
         title_dict['title_in_jstor'] = ''
