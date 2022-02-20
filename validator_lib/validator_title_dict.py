@@ -82,7 +82,7 @@ def get_immutable_title_dict():
         'ignored_errors': [],
         'institution': '',
         'invalid_carrier_type': '',
-        'invalid_issn': '',
+        'invalid_local_issn': '',
         'invalid_local_issn': '',
         'invalid_media_type': '',
         'invalid_record': '',

@@ -52,7 +52,7 @@ class ValidatorIssnDb:
             title_dict['wc_issn_does_not_match_issn_db_issn'] = db_data_wc['issn_mismatch']
             if title_dict['local_issn']:
                 if check_for_valid_issn(title_dict['local_issn']) is False:
-                    title_dict['invalid_issn'] = '1'
+                    title_dict['invalid_local_issn'] = '1'
         print()
 
     @staticmethod

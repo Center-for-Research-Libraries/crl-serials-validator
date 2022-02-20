@@ -187,7 +187,7 @@ class ReviewWorkbookPrinter:
             'invalid_media_type': 'Media type of title is not hard copy',
             'issn_db_form_not_print': 'ISSN database record has does not have hard copy form',
             'issn_db_serial_type_not_periodical': 'ISSN database record does not have periodical serial type',
-            'issn_mismatch': 'ISSN mismatch with WorldCat and ISSN database',
+            'issn_mismatch': 'ISSN mismatch between WorldCat and ISSN database',
             'local_issn_does_not_match_wc_issn_a': 'Local ISSN mismatch with WorldCat ISSN',
             'local_issn_does_not_match_issn_db': 'Local ISSN mismatch with ISSN database',
             'line_583_error': 'One of more errors in 583 line(s)',
