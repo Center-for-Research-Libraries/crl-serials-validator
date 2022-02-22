@@ -213,10 +213,10 @@ class ValidatorConfig:
 
             'title_in_jstor': False,
 
-            'duplicate_bib_id': True,
-            'duplicate_holdings_id': True,
-            'duplicate_local_oclc': True,
-            'duplicate_wc_oclc': True,
+            'bib_id_repeated': True,
+            'holdings_id_repeated': True,
+            'local_oclc_repeated': True,
+            'wc_oclc_repeated': True,
 
             'holdings_out_of_range': True,
             'holdings_out_of_issn_db_date_range': True,

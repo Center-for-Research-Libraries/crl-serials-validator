@@ -18,7 +18,7 @@ class IssuesChooser:
 
     # Issue categories that should be at the top of sections.
     break_categories = {
-        'binding_words_in_holdings', 'duplicate_holdings_id', 'holdings_out_of_range', 'title_in_jstor', 
+        'binding_words_in_holdings', 'holdings_id_repeated', 'holdings_out_of_range', 'title_in_jstor', 
         'invalid_local_issn', 'oclc_mismatch', 'line_583_error' }
 
     title_text = 'Select Disqualifying Issues'
@@ -140,9 +140,9 @@ class IssuesChooser:
 
             'title_in_jstor': False,
 
-            'duplicate_holdings_id': True,
-            'duplicate_local_oclc': True,
-            'duplicate_wc_oclc': True,
+            'holdings_id_repeated': True,
+            'local_oclc_repeated': True,
+            'wc_oclc_repeated': True,
 
             'holdings_out_of_range': True,
             'holdings_out_of_issn_db_date_range': True,

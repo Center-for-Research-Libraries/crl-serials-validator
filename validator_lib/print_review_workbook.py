@@ -25,6 +25,7 @@ class ReviewWorkbookPrinter:
         self.print_for_review = print_for_review
         self.print_good_marc_output = print_good_marc_output
 
+        self.error_rows = defaultdict(list)
         self.total_records = {}
 
         # if we have KeyErrors with dict keys containing "issn_db" we'll know the database isn't installed
@@ -179,10 +180,10 @@ class ReviewWorkbookPrinter:
             'bib_lvl_not_serial': 'Bib level of title is not serial',
             'binding_words_in_holdings': 'Binding statements in holdings or notes',
             'completeness_words_in_holdings': 'Completeness or reprint statement in holdings or notes',
-            'duplicate_bib_id': 'Duplicate bib ID',
-            'duplicate_holdings_id': 'Duplicate holdings ID',
-            'duplicate_local_oclc': 'Duplicate local OCLC #',
-            'duplicate_wc_oclc': 'Duplicate WorldCat OCLC #',
+            'bib_id_repeated': 'Duplicate bib ID',
+            'holdings_id_repeated': 'Duplicate holdings ID',
+            'local_oclc_repeated': 'Duplicate local OCLC #',
+            'wc_oclc_repeated': 'Duplicate WorldCat OCLC #',
             'form_not_print': 'Form of title is not hard copy',
             'holdings_out_of_issn_db_date_range': 'Holdings are outside the ISSN database expected publication dates',
             'holdings_out_of_range': 'Holdings are outside the expected publication dates',
@@ -360,8 +361,10 @@ class ReviewWorkbookPrinter:
 
     def get_checklist_data_for_output(self):
         insts = set()
+        row_counts = Counter()
         for title_dict in self.title_dicts:
             inst = title_dict['institution']
+            row_counts[inst] += 1
             insts.add(inst)
             output_list = []
             for cat in self.checklist_cats:
@@ -376,10 +379,9 @@ class ReviewWorkbookPrinter:
                         logging.error('Category {} not seen in checklist data.'.format(cat))
             if self.print_errors_only is True and not output_list[0]:
                 continue
-
+            self.error_rows[inst].append(row_counts[inst])
             if output_list[0]:
                 self.error_outputs[inst].append(output_list)
-
             self.checklist_outputs[inst].append(output_list)
         if self.issn_db_not_seen is True:
             self.remove_issn_db_from_checklist_cats()
@@ -420,7 +422,7 @@ class ReviewWorkbookPrinter:
             output_pages = {}
             output_pages['Notes'] = {'data': self.outputs[inst]['All issues']}
 
-            checklist_number_columns = {1, 3, 6, 7}  # has_disqualifying_error, seqnum, local_oclc, wc_oclc
+            checklist_number_columns = {1, 3, 5, 7, 10, 11, 12, 16}  # has_disqualifying_error, seqnum, local_oclc, wc_oclc
             output_pages['Checklist'] = {'data': self.checklist_outputs[inst], 'number_columns': checklist_number_columns}
 
             if self.total_records[inst] >= 50000:

@@ -152,8 +152,8 @@ class InputDataProcessor:
             if not title_dict[cat]:
                 continue
             if self.duplication_check[institution][location][cat][title_dict[cat]] > 1:
-                title_dict['duplicate_{}'.format(cat)] = '1'
-                title_dict['errors'].append('duplicate_{}'.format(cat))
+                title_dict['{}_repeated'.format(cat)] = '1'
+                title_dict['errors'].append('{}_repeated'.format(cat))
 
     def check_for_missing_fields(self, title_dict):
         title_dict['missing_fields'] = ''
