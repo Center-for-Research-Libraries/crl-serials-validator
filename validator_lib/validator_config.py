@@ -213,6 +213,7 @@ class ValidatorConfig:
 
             'title_in_jstor': False,
 
+            'duplicate_bib_id': True,
             'duplicate_holdings_id': True,
             'duplicate_local_oclc': True,
             'duplicate_wc_oclc': True,

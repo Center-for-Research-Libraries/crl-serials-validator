@@ -4,8 +4,6 @@ import logging
 import datetime
 from pprint import pprint
 
-from attr import field
-
 from crl_lib.marc_utilities import get_field_subfield, get_fields_subfields
 from crl_lib.line_85x86x import Convert85x86x
 from crl_lib.marc_fields import MarcFields
