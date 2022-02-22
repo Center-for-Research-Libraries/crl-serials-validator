@@ -43,10 +43,12 @@ class ReviewWorkbookPrinter:
         self.checklist_cats = [
             'disqualifying_error_category',
             'has_disqualifying_error',
-            'ignored_error_category',
+            'warning_category',
             'seqnum',
             'bib_id',
+            'bib_id_repeated',
             'holdings_id',
+            'holdings_id_repeated',
             'local_oclc',
             'wc_oclc',
             'oclc_mismatch',
@@ -177,6 +179,7 @@ class ReviewWorkbookPrinter:
             'bib_lvl_not_serial': 'Bib level of title is not serial',
             'binding_words_in_holdings': 'Binding statements in holdings or notes',
             'completeness_words_in_holdings': 'Completeness or reprint statement in holdings or notes',
+            'duplicate_bib_id': 'Duplicate bib ID',
             'duplicate_holdings_id': 'Duplicate holdings ID',
             'duplicate_local_oclc': 'Duplicate local OCLC #',
             'duplicate_wc_oclc': 'Duplicate WorldCat OCLC #',
@@ -209,7 +212,7 @@ class ReviewWorkbookPrinter:
     def count_errors(self, title_dicts):
         """Tally the issues in the input files."""
         for title_dict in title_dicts:
-            inst = self.get_inst_from_dict(title_dict)
+            inst = title_dict['institution']
             if not title_dict['error_category']:
                 self.error_counter[inst]['No errors'] += 1
             else:
@@ -218,7 +221,7 @@ class ReviewWorkbookPrinter:
     def count_disqualifying_errors(self, title_dicts):
         """Tally the issues in the input files."""
         for title_dict in title_dicts:
-            inst = self.get_inst_from_dict(title_dict)
+            inst = title_dict['institution']
             try:
                 marc = title_dict['marc']
             except KeyError:
@@ -233,7 +236,7 @@ class ReviewWorkbookPrinter:
                     self.bad_marc[inst].append(marc)
 
     def organize_by_errors(self, title_dict):
-        inst = self.get_inst_from_dict(title_dict)
+        inst = title_dict['institution']
         if 'for_review' not in self.outputs[inst]:
             self.outputs[inst]['for_review'] = defaultdict(list)
         if not title_dict['errors']:
@@ -263,17 +266,10 @@ class ReviewWorkbookPrinter:
             ]
             self.outputs[inst]['for_review'][error_cat].append(output_row)
 
-    @staticmethod
-    def get_inst_from_dict(title_dict):
-        if title_dict['institution']:
-            return title_dict['institution']
-        abbrev = validator_lib.utilities.get_abbrev_from_input_filename(title_dict['filename'])
-        return abbrev
-
     def make_notes_worksheet(self):
         overview_dict = defaultdict(Counter)
         for title_dict in self.title_dicts:
-            inst = self.get_inst_from_dict(title_dict)
+            inst = title_dict['institution']
             overview_dict[inst]['total'] += 1
             if not title_dict['invalid_record'] == '1':
                 overview_dict[inst]['no_issues'] += 1
@@ -328,7 +324,7 @@ class ReviewWorkbookPrinter:
         turned on via the print_originally_from variable.
         """
         for title_dict in self.title_dicts:
-            inst = self.get_inst_from_dict(title_dict)
+            inst = title_dict['institution']
 
             if 'field_852a' not in title_dict:
                 title_dict['field_852a'] = title_dict['oclc_symbol']
@@ -356,7 +352,7 @@ class ReviewWorkbookPrinter:
     def check_for_583s_in_files(self):
         seen_insts = set()
         for title_dict in self.title_dicts:
-            inst = self.get_inst_from_dict(title_dict)
+            inst = title_dict['institution']
             if inst in seen_insts:
                 continue
             if '583_in_file' in title_dict and title_dict['583_in_file']:
@@ -365,7 +361,7 @@ class ReviewWorkbookPrinter:
     def get_checklist_data_for_output(self):
         insts = set()
         for title_dict in self.title_dicts:
-            inst = self.get_inst_from_dict(title_dict)
+            inst = title_dict['institution']
             insts.add(inst)
             output_list = []
             for cat in self.checklist_cats:
@@ -486,7 +482,7 @@ class ReviewWorkbookPrinter:
             'ArchivingInstitution_583$5'
         ]
         for record_dict in self.title_dicts:
-            inst = self.get_inst_from_dict(record_dict)
+            inst = record_dict['institution']
             if record_dict['has_disqualifying_error']:
                 continue
             for line_583_data in record_dict['lines_583_data']:

@@ -43,9 +43,7 @@ class ChecksRunner:
         self.add_worldcat_data_to_input_file_data_dicts(input_file_data, input_file)
         validator_issn_db.process_title_dicts(input_file_data, input_file)
 
-
-        InputDataProcessor(
-            input_file, input_file_data, input_fields, disqualifying_issue_categories, found_issn_db, self.jstor)
+        InputDataProcessor(input_file_data, input_fields, disqualifying_issue_categories, found_issn_db, self.jstor)
 
         ReviewWorkbookPrinter(input_file_data, line_583_validation_output, self.running_headless, self.papr_output)
 

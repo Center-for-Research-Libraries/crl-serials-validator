@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, Counter
 from unidecode import unidecode
 from pprint import pprint
 import logging
@@ -26,8 +26,7 @@ class InputDataProcessor:
 
     marc_issues_to_check = ['line_583_error', 'marc_validation_error', 'missing_field_852a']
 
-    def __init__(self, input_file, title_dicts, input_fields, disqualifying_issue_categories, found_issn_db, jstor_titles):
-        self.input_file = input_file
+    def __init__(self, title_dicts, input_fields, disqualifying_issue_categories, found_issn_db, jstor_titles):
         self.found_issn_db = found_issn_db
         self.jstor_titles = jstor_titles
         self.title_dicts = title_dicts
@@ -36,12 +35,11 @@ class InputDataProcessor:
         self.errors = []
         self.issues_to_check = self.get_issues_to_check()
 
-        self.unique_cats = ['local_oclc', 'wc_oclc', 'holdings_id']
-
         self.valid_forms = validator_lib.utilities.get_valid_forms()
         self.valid_serial_types = validator_lib.utilities.get_valid_serial_types()
 
-        self.duplicated = {'local_oclc': defaultdict(set), 'wc_oclc': defaultdict(set), 'holdings_id': defaultdict(set)}
+        self.duplication_check = {}
+        self.unique_fields = ['local_oclc', 'wc_oclc', 'holdings_id', 'bib_id']
         self.check_for_duplicated_fields()
 
         for title_dict in self.title_dicts:
@@ -61,6 +59,13 @@ class InputDataProcessor:
             self.check_media_type(title_dict)
             self.check_if_title_in_jstor(title_dict)
             self.assemble_errors_in_dict(title_dict)
+
+    def get_institution(self, title_dict):
+        if not title_dict['institution']:
+            if title_dict['field_852a']:
+                title_dict['institution'] = title_dict['field_852a']
+            else:
+                title_dict['institution'] = validator_lib.utilities.get_abbrev_from_input_filename(title_dict['filename'])
 
     def get_issues_to_check(self):
         issues_to_check = [
@@ -106,13 +111,13 @@ class InputDataProcessor:
                 title_dict['invalid_record'] = '1'
                 title_dict['disqualifying_errors'].append(marc_issue)
         title_dict['error_category'] = '; '.join(title_dict['errors'])
-        title_dict['ignored_errors'] = title_dict['errors'].copy()
+        title_dict['warnings'] = title_dict['errors'].copy()
         for disqualifying_error in title_dict['disqualifying_errors']:
             try:
-                title_dict['ignored_errors'].remove(disqualifying_error)
+                title_dict['warnings'].remove(disqualifying_error)
             except ValueError:
                 pass
-        title_dict['ignored_error_category'] = '; '.join(title_dict['ignored_errors'])
+        title_dict['warning_category'] = '; '.join(title_dict['warnings'])
         title_dict['disqualifying_error_category'] = '; '.join(title_dict['disqualifying_errors'])
         title_dict['has_disqualifying_error'] = ''
         if title_dict['disqualifying_error_category']:
@@ -128,27 +133,27 @@ class InputDataProcessor:
                     title_dict[cat] = ''
 
     def check_for_duplicated_fields(self):
-        seen = {'local_oclc': defaultdict(set), 'wc_oclc': defaultdict(set), 'holdings_id': defaultdict(set)}
-        for data_dict in self.title_dicts:
-            for cat in self.unique_cats:
-                cat_data = data_dict[cat]
-                location = data_dict['location']
-                if cat_data and cat_data in seen[cat][location]:
-                    self.duplicated[cat][location].add(cat_data)
-                seen[cat][location].add(cat_data)
+        for title_dict in self.title_dicts:
+            self.get_institution(title_dict)
+            for cat in self.unique_fields:
+                if not title_dict[cat]:
+                    continue
+                institution = title_dict['institution']
+                location = title_dict['location']
+                self.duplication_check.setdefault(institution, {})
+                self.duplication_check[institution].setdefault(location, {})
+                self.duplication_check[institution][location].setdefault(cat, Counter())
+                self.duplication_check[institution][location][cat][title_dict[cat]] += 1
 
     def run_unique_checks_on_title(self, title_dict):
-        for cat in self.unique_cats:
-            if title_dict[cat]:
-                location = title_dict['location']
-                if title_dict[cat] in self.duplicated[cat][location]:
-                    title_dict['{}_repeated'.format(cat)] = '1'
-                    self.errors.append('duplicate_{}'.format(cat))
-                else:
-                    title_dict['{}_repeated'.format(cat)] = ''
-            else:
-                title_dict['{}_unique'.format(cat)] = ''
-                title_dict['{}_repeated'.format(cat)] = ''
+        institution = title_dict['institution']
+        location = title_dict['location']
+        for cat in self.unique_fields:
+            if not title_dict[cat]:
+                continue
+            if self.duplication_check[institution][location][cat][title_dict[cat]] > 1:
+                title_dict['duplicate_{}'.format(cat)] = '1'
+                title_dict['errors'].append('duplicate_{}'.format(cat))
 
     def check_for_missing_fields(self, title_dict):
         title_dict['missing_fields'] = ''
