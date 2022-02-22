@@ -154,7 +154,9 @@ def headless_app():
 
 
 def headless_api_keys():
-    CommandLineApiKeys()
+    os.system('cls' if os.name == 'nt' else 'clear')
+    controller = ValidatorController(headless_mode=False)
+    controller.set_api_keys()
 
 
 def bulk_preferences():
