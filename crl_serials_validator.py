@@ -80,7 +80,7 @@ class SimpleValidatorInterface:
         Print out the question list and get a response.
         """
         while True:
-            cprint('Welcome to the CRL Serials Validator', 'yellow', 'on_blue')
+            cprint('Welcome to the CRL Serials Validator', 'white', 'on_blue')
             print('')
             cprint('What would you like to do?', 'cyan')
             for i in range(1, len(question_map)):
