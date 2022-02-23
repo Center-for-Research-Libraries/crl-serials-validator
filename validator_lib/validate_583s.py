@@ -3,11 +3,12 @@ from crl_lib.marc_utilities import get_field_subfield, get_fields_subfields
 import logging
 
 
-class Line583Validator:
-
-    legal_subfields = {
+LEGAL_583_SUBFIELDS = {
         'a', 'b', 'c', 'd', 'e', 'f', 'h', 'i', 'j', 'k', 'l', 'n', 'o', 'u', 'x', 'z', '2', '3', '5', '6', '8'}
-    unsearched_legal_subfields = ['b', 'e', 'k', '6', '8']
+UNSEARCHED_LEGAL_583_SUBFIELDS = ['b', 'e', 'k', '6', '8']
+
+
+class Line583Validator:
 
     def __init__(self):
 
@@ -52,7 +53,7 @@ class Line583Validator:
 
     def validate_583_line(self, line, record_dict):
         errors = []
-        self.check_for_illegal_subfields(line, record_dict, errors)
+        self.check_for_ilLEGAL_583_SUBFIELDS(line, record_dict, errors)
         delimiter_1 = line[6]
         delimiter_2 = line[7]
         self.validate_delimiters(delimiter_1, delimiter_2, errors)
@@ -86,7 +87,7 @@ class Line583Validator:
         record_dict['lines_583_data'].append(line_583_data)
 
         other_subfield_data = []
-        for unsearched_subfield in self.unsearched_legal_subfields:
+        for unsearched_subfield in UNSEARCHED_LEGAL_583_SUBFIELDS:
             subfields_data = get_fields_subfields(line, '583', unsearched_subfield)
             if subfields_data:
                 for subfield_data in subfields_data:
@@ -140,13 +141,13 @@ class Line583Validator:
         except IndexError:
             output_row.append('')
 
-    def check_for_illegal_subfields(self, line, record_dict, errors):
+    def check_for_ilLEGAL_583_SUBFIELDS(self, line, record_dict, errors):
         seen_subfields = set()
         split_line = line.split('$')
         split_line.pop(0)
         for segment in split_line:
             subfield = segment[0]
-            if subfield not in self.legal_subfields:
+            if subfield not in LEGAL_583_SUBFIELDS:
                 subfield = subfield.strip()
                 if subfield:
                     errors.append('illegal_583_subfield_{}'.format(subfield))
