@@ -8,7 +8,7 @@ import re
 
 def check_marc_for_print_serial(marc):
     """
-    Is a MARC record for a hard copy serial?
+    Is a MARC record for a print serial?
 
     Requires broadly valid MARC to work.
     """
@@ -34,16 +34,16 @@ def check_marc_for_print_serial(marc):
 
 
 # ------------------------------------------------------------------------------
-# Hard copy checks
+# print checks
 # ------------------------------------------------------------------------------
 
 
 def check_marc_for_print(marc, check_form=True, pipe_ok=False):
     """
-    Is this MARC hard copy? Returns True for hard copy.
+    Is this MARC print? Returns True for print.
 
     This checks by form, media type fields, and 245 $h. A failure in any one 
-    means the title is considered non-hard copy.
+    means the title is considered non-print.
     """
     m = re.search(r"=008\s\s.{23}(.)", marc)
     try:
@@ -72,9 +72,9 @@ def check_marc_for_print(marc, check_form=True, pipe_ok=False):
 
 def check_for_print_title_h(title_h_field):
     """
-    Look at the 245 $h for a non-hard copy record.
+    Look at the 245 $h for a non-print record.
 
-    Returns False (is not hard copy) on suspicious words, True without them or
+    Returns False (is not print) on suspicious words, True without them or
     with no $h at all.
     """
     if title_h_field and re.search("(?:elec|micro|mf)", title_h_field, flags=re.I):
@@ -84,7 +84,7 @@ def check_for_print_title_h(title_h_field):
 
 def check_for_print_carrier_type(carrier_type):
     """
-    Is the given carrier type compatible with a hard copy record?
+    Is the given carrier type compatible with a print record?
     """
     if not carrier_type:
         return True
@@ -97,7 +97,7 @@ def check_for_print_carrier_type(carrier_type):
 
 def check_for_print_media_type(media_type):
     """
-    is the given media type compatible with a hard copy record?
+    is the given media type compatible with a print record?
     """
     if not media_type:
         return True
@@ -110,13 +110,13 @@ def check_for_print_media_type(media_type):
 
 def check_print_form(form, pipe_ok=False):
     """
-    Check if form is hard copy.
+    Check if form is print.
     """
     # Assume blank form must be empty pace, not a blank string like ""
     if not form:
         return False
     # "/" is a common error for "\".
-    # "r" is reprint, but a common error for hard copy form
+    # "r" is reprint, but a common error for print form
     elif form == " " or form == "\\" or form == "/" or form == "r":
         return True
     elif form == "f":
@@ -129,7 +129,7 @@ def check_print_form(form, pipe_ok=False):
 
 def check_print(form, media_type=None, marc=None, pipe_ok=False):
     """
-    Checks form, and MARC if available, for hard copy.
+    Checks form, and MARC if available, for print.
     """
 
     # empty form must be blank space, not empty str
@@ -200,7 +200,7 @@ def check_valid_serial_form(form):
 
 def loose_form_match(form_1, form_2):
     """
-    Allows all electronic to match, and 'r' to match regular hard copy.
+    Allows all electronic to match, and 'r' to match regular print.
     """
     forms = [form_1, form_2]
     for i in range(2):
@@ -208,7 +208,7 @@ def loose_form_match(form_1, form_2):
         # allow matching of all electronic -- 'o', 'q', 's'
         forms[i] = forms[i].replace("o", "s")
         forms[i] = forms[i].replace("q", "s")
-        # treat all unknowns as hard copy; use blank fro hard copy
+        # treat all unknowns as print; use blank fro print
         forms[i] = forms[i].replace("#", "")
         forms[i] = forms[i].replace("|", "")
         forms[i] = forms[i].replace("\\", "")
