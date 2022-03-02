@@ -379,8 +379,8 @@ class ReviewWorkbookPrinter:
                         logging.error('Category {} not seen in checklist data.'.format(cat))
             if self.print_errors_only is True and not output_list[0]:
                 continue
-            self.error_rows[inst].append(row_counts[inst])
             if output_list[0]:
+                self.error_rows[inst].append(row_counts[inst])
                 self.error_outputs[inst].append(output_list)
             self.checklist_outputs[inst].append(output_list)
         if self.issn_db_not_seen is True:
@@ -414,6 +414,10 @@ class ReviewWorkbookPrinter:
             error_count_output = self.make_error_counts_output(inst)
             disqualifying_error_count_output = self.make_disqualifying_error_counts_output(inst)
 
+            checklist_special_formats = [
+                # ({'bold': True, 'font_color': '#FF0000', 'text_wrap': True}, self.error_rows[inst]),
+            ]
+
             for_review_special_formats = [
                 ({'bold': True, 'bg_color': '#D8D8D8', 'text_wrap': True}, [0]),
                 ({'bold': True, 'bg_color': '#FBE5D6', 'font_size': '14'}, for_review_special_rows)
@@ -423,7 +427,10 @@ class ReviewWorkbookPrinter:
             output_pages['Notes'] = {'data': self.outputs[inst]['All issues']}
 
             checklist_number_columns = {1, 3, 5, 7, 10, 11, 12, 16}  # has_disqualifying_error, seqnum, local_oclc, wc_oclc
-            output_pages['Checklist'] = {'data': self.checklist_outputs[inst], 'number_columns': checklist_number_columns}
+            output_pages['Checklist'] = {
+                'data': self.checklist_outputs[inst], 
+                'number_columns': checklist_number_columns,
+                'special_formats': checklist_special_formats}
 
             if self.total_records[inst] >= 50000:
                 error_pages = {}
