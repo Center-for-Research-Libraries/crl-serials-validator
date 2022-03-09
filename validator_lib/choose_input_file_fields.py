@@ -229,8 +229,7 @@ class InputFieldsChooser:
             input(colored('Type Enter to continue.', 'red'))
             return ''
         else:
-            print('YAWP')
-            return field_data  
+            return field_data
 
     @staticmethod
     def print_marc_invalid_field_warning(field_data):
