@@ -14,7 +14,7 @@ The record_type in the WorldCat MARC LDR is not `a`.
 
 ***serial_type_not_periodical***
 
-The serial_type in the WorldCat MARC 008 is not a blank space, a backslash, `m`, `p`, `-`, or `|`.
+The serial_type in the WorldCat MARC 008 is not a blank space, a backslash, `g`, `j`, `m`, `p`, `-`, or `|`.
 
 ***invalid_carrier_type***
 
@@ -30,7 +30,7 @@ The form in the ISSN database MARC 008 is not a blank space, a backslash, `r`, o
 
 ***issn_db_serial_type_not_periodical***
 
-The serial_type in the ISSN database MARC 008 is not a blank space, a backslash, `m`, `p`, `-`, or `|`.
+The serial_type in the ISSN database MARC 008 is not a blank space, a backslash, `g`, `j`, `m`, `p`, `-`, or `|`.
 
 ***no_oclc_number***
 
