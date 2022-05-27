@@ -1,6 +1,6 @@
 import os
 import sys
-from termcolor import colored, cprint
+from termcolor import colored
 from collections import OrderedDict
 
 
