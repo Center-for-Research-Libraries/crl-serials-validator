@@ -6,7 +6,9 @@ import sys
 import gc
 from termcolor import cprint
 
-from validator_lib.validator_data import *
+from validator_lib.validator_data import (
+    VALIDATOR_LOGS_FOLDER, DOCS_URL, VALIDATOR_DATA_FOLDER, 
+    VALIDATOR_OUTPUT_FOLDER)
 from validator_lib.validator_file_locations import ValidatorFileLocations
 from validator_lib.choose_input_file_fields import InputFieldsChooser
 from validator_lib.scan_input_files import InputFileScanner
@@ -23,7 +25,8 @@ DEBUG_MODE = False
 
 class ValidatorController(ValidatorFileLocations):
     """
-    Controller for the validation process, meant to be agnositc about a front end.
+    Controller for the validation process, meant to be agnostic about the front 
+    end.
     """
 
     viable_input_formats = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
@@ -72,7 +75,8 @@ class ValidatorController(ValidatorFileLocations):
         logging.basicConfig(
             filename=log_file, 
             level=log_levels[self.log_level], 
-            filemode='a', format='%(asctime)s\t%(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+            filemode='a', 
+            format='%(asctime)s\t%(message)s', datefmt="%Y-%m-%d %H:%M:%S")
 
     def print_break_line(self, line_before=False, line_length=120):
         if line_before is True:
