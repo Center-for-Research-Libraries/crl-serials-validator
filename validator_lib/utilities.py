@@ -1,12 +1,10 @@
-import sys
 import re
 import os
-import logging
 from termcolor import cprint, colored
 
 from crl_lib.year_utilities import find_years_first_last
-from validator_lib.validator_config import ValidatorConfig
-from validator_lib.bulk_validator_preferences import BulkConfig
+
+from validator_lib.validator_data import VALIDATOR_DATA_FOLDER
 
 
 def get_unused_filename(file_location):
@@ -97,8 +95,8 @@ def double_check_slash_start_year(bib_year, bib_string, holdings_year, holdings_
 
 def double_check_slash_end_year(bib_year, bib_string, holdings_year, holdings_string):
     """
-    Double check holdings ends, in an attempt to be sure that 2000/2001 isn't listed as too late for a bib start date
-    of 2000.
+    Double check holdings ends, in an attempt to be sure that 2000/2001 isn't 
+    listed as too late for a bib start date of 2000.
 
     Returns True on a good date.
     """
@@ -113,7 +111,8 @@ def get_earlier_of_slash_year(year, data_segment):
     """For the year checks functions."""
     year_regex = r'(?:1[6789]\d\d|20[01]\d|2020)'
     short_year = str(year)[2:]
-    m = re.search(r'({}) *[-/] *(?:{}|{})'.format(year_regex, year, short_year), data_segment)
+    m = re.search(r'({}) *[-/] *(?:{}|{})'.format(
+        year_regex, year, short_year), data_segment)
     if m:
         found_year = m.group(1)
         if int(found_year) < int(year):
@@ -134,15 +133,15 @@ def get_later_of_slash_year(year, data_segment):
     return year
 
 
-def get_jstor_issns(validator_data_folder):
+def get_jstor_issns():
     jstor = set()
-    data_files = os.listdir(validator_data_folder)
+    data_files = os.listdir(VALIDATOR_DATA_FOLDER)
     for data_file in data_files:
         if not data_file.lower().startswith('jstor'):
             continue
         if data_file.lower().endswith('xlsx'):
             continue
-        jstor_file = os.path.join(validator_data_folder, data_file)
+        jstor_file = os.path.join(VALIDATOR_DATA_FOLDER, data_file)
         try:
             with open(jstor_file, 'r', encoding='utf8') as fin:
                 raw_issns = [line.rstrip() for line in fin]

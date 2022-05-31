@@ -8,21 +8,24 @@ import logging
 from termcolor import cprint, colored
 
 from validator_lib.utilities import get_first_last_year_from_regular_holdings
-from validator_lib.supplements_and_indexes_functions import remove_indexes_from_holdings, remove_supplements_from_holdings
+from validator_lib.supplements_and_indexes_functions import (
+    remove_indexes_from_holdings, remove_supplements_from_holdings)
 from validator_lib.validator_title_dict import get_immutable_title_dict
 
 
 class SpreadsheetTsvCsvRunner:
 
     string_only_cats = {
-            'title', 'issn', 'institution', 'oclc_symbol', 'location', 'holdings_0', 'holdings_1', 'holdings_2', 
-            'holdings_3'
+            'title', 'issn', 'institution', 'oclc_symbol', 'location', 
+            'holdings_0', 'holdings_1', 'holdings_2',  'holdings_3'
             }
 
     def __init__(self):
 
-        self.input_cats = ['holdings_id', 'bib_id', 'oclc', 'issn', 'title', 'institution', 'oclc_symbol', 'location', 
-                           'holdings_0', 'holdings_1', 'holdings_2', 'holdings_3']
+        self.input_cats = [
+            'holdings_id', 'bib_id', 'oclc', 'issn', 'title', 'institution', 
+            'oclc_symbol', 'location', 'holdings_0', 'holdings_1', 'holdings_2', 
+            'holdings_3']
 
         self.input_folder = os.path.join(os.getcwd(), 'input')
 
@@ -48,17 +51,21 @@ class SpreadsheetTsvCsvRunner:
                 delimiter = '\t'
             else:
                 raise Exception('Invalid input file?\n{}'.format(input_file))
-            my_encoding = self.get_text_file_encoding(input_file, input_file_location)
-            fin = open(input_file_location, 'r', newline='', encoding=my_encoding)
+            my_encoding = self.get_text_file_encoding(
+                input_file, input_file_location)
+            fin = open(
+                input_file_location, 'r', newline='', encoding=my_encoding)
             iterator = csv.reader(fin, delimiter=delimiter)
 
-        input_data = self.extract_data_from_spreadsheet_file(iterator, input_file, input_fields)
+        input_data = self.extract_data_from_spreadsheet_file(
+            iterator, input_file, input_fields)
         return input_data
 
     def get_text_file_encoding(self, input_file, input_file_location):
         """
-        Find encoding for text files. Right now only works with UTF8 and cp1252 (Windows standard) as well as plain
-        ASCII files. This will probably fail on any malformed input files, but those would likely fail in the data
+        Find encoding for text files. Right now only works with UTF8 and cp1252 
+        (Windows standard) as well as plain ASCII files. This will probably fail 
+        on any malformed input files, but those would likely fail in the data 
         extraction step anyway.
         """
         encodings = ['utf8', 'cp1252', 'ascii']
@@ -67,7 +74,8 @@ class SpreadsheetTsvCsvRunner:
                 with open(input_file_location, 'r', encoding=my_encoding) as fin:
                     for line in fin.readlines():
                         pass
-                print('Will use encoding {} for file.'.format(colored(my_encoding, 'cyan')))
+                print('Will use encoding {} for file.'.format(
+                    colored(my_encoding, 'cyan')))
                 return my_encoding
             except UnicodeDecodeError:
                 pass
@@ -85,7 +93,8 @@ class SpreadsheetTsvCsvRunner:
                 row_locations['header_to_skip'] = False
                 continue
             n += 1
-            sys.stdout.write('\rReading row {}'.format(colored(str(n), 'yellow')))
+            sys.stdout.write('\rReading row {}'.format(
+                colored(str(n), 'yellow')))
             sys.stdout.flush()
             row_dict = get_immutable_title_dict()
             row_dict['filename'] = input_file

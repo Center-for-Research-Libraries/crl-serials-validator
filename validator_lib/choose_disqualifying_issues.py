@@ -4,29 +4,33 @@ fail checks.
 """
 
 import webbrowser
+from collections import OrderedDict
 from pprint import pprint
 from termcolor import colored, cprint
 import os
 import sys
 
-from validator_lib.validator_data import ERROR_GLOSSARY_URL
+from validator_lib.validator_data import ERROR_GLOSSARY_URL, ISSN_DB_LOCATION
 from validator_lib.validator_config import ValidatorConfig
 from validator_lib.terminal_gui_utilities import print_terminal_page_header
 
 
 class IssuesChooser:
+    """
+    Class for selecting which potential issues will be considered errors by the 
+    Validator.
+    """
 
     # Issue categories that should be at the top of sections.
     break_categories = {
-        'binding_words_in_holdings', 'holdings_id_repeated', 'holdings_out_of_range', 'title_in_jstor', 
-        'invalid_local_issn', 'oclc_mismatch', 'line_583_error' }
+        'binding_words_in_holdings', 'holdings_id_repeated', 
+        'holdings_out_of_range', 'title_in_jstor', 'invalid_local_issn', 
+        'oclc_mismatch', 'line_583_error' }
 
     title_text = 'Select Disqualifying Issues'
 
-    def __init__(self, issn_db_missing=False):
-        super().__init__()
+    def __init__(self):
 
-        self.issn_db_missing = issn_db_missing
         self.validator_config = ValidatorConfig()
 
         self.warnings = []
@@ -60,7 +64,7 @@ class IssuesChooser:
                 column += 1
 
                 number_color = 'yellow'
-                if 'issn_db' in issue and self.issn_db_missing is True:
+                if 'issn_db' in issue and not ISSN_DB_LOCATION:
                     print_symbol = disabled_symbol
                     number_color = 'red'
                     # self.int_vars[issue].set(0)
@@ -117,9 +121,10 @@ class IssuesChooser:
     def reset_fields(self):
         disqualifying_issues = self.validator_config.get_default_disqualifying_issues()
         # YAML can't write OrderedDict, so convert to regular dict
-        self.validator_config.config['disqualifying_issues'] = dict(disqualifying_issues)
+        self.validator_config.config['disqualifying_issues'] = dict(
+            disqualifying_issues)
         self.validator_config.write_validator_config_file()
-        self.__init__(self.issn_db_missing)
+        self.__init__()
 
     def get_default_disqualifying_issues():
         disqualifying_issues = OrderedDict({

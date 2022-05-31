@@ -4,7 +4,8 @@ import logging
 
 
 LEGAL_583_SUBFIELDS = {
-        'a', 'b', 'c', 'd', 'e', 'f', 'h', 'i', 'j', 'k', 'l', 'n', 'o', 'u', 'x', 'z', '2', '3', '5', '6', '8'}
+        'a', 'b', 'c', 'd', 'e', 'f', 'h', 'i', 'j', 'k', 'l', 'n', 'o', 'u', 
+        'x', 'z', '2', '3', '5', '6', '8'}
 UNSEARCHED_LEGAL_583_SUBFIELDS = ['b', 'e', 'k', '6', '8']
 
 

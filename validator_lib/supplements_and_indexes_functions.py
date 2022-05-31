@@ -1,5 +1,6 @@
 """
-Functions taken from the Normalizer for separating index & supplement from regular holdings.
+Functions taken from the Normalizer for separating index & supplement from
+regular holdings.
 """
 
 import re
@@ -13,21 +14,26 @@ def remove_supplements_from_holdings(holdings):
     Remove supplement string from holdings.
     """
     working_holdings = re.sub("supp?ressed", "", holdings, flags=re.I)
-    # semicolons in parens will break some supplement regexs
-    working_holdings = re.sub(r"(\([^)]*);([^)]*\))", "\\1,\\2", working_holdings)
+    # semicolons in parens will break some supplement regexes
+    working_holdings = re.sub(
+        r"(\([^)]*);([^)]*\))", "\\1,\\2", working_holdings)
 
-    # "hors-série" or "hors series" means "special issue" and in practice is always a supplement
-    working_holdings = re.sub(r"hors[-\s]*series?", "supp", working_holdings, flags=re.I)
+    # "hors-série" or "hors series" means "special issue" and in practice is 
+    # always a supplement
+    working_holdings = re.sub(
+        r"hors[-\s]*series?", "supp", working_holdings, flags=re.I)
 
     if "supp" in working_holdings.lower():
-        start_terms = ["supp", "special suppl", "*supp", "stastical supp", "[suppl"]
+        start_terms = [
+            "supp", "special suppl", "*supp", "statistical supp", "[suppl"]
         for start_term in start_terms:
             if working_holdings.lower().startswith(start_term):
                 # entire statement is supplements
                 return "", holdings, True
     # else:
     #     supps = []
-    #     m = re.findall("( *(?:&|and) *(suppl(?:ement)?s?\.?[^\(,;]*))", holdings)
+    #     m = re.findall(
+    #       "( *(?:&|and) *(suppl(?:ement)?s?\.?[^\(,;]*))", holdings)
     #     for segment in m:
     #         supps.append(segment[1])
     #         holdings = holdings.replace(segment[0], "")
@@ -35,10 +41,11 @@ def remove_supplements_from_holdings(holdings):
     #     return holdings, supps.join("; "), False
 
     # deal with something like "2015  no. 4-6 + suppl. (no. 298-300)"
-    # normally we expect a year for the overall volume in the ending parens ("v.14 + suppl. 8 (2011)"), so this is a
-    # special case we're looking for
-    m = re.search(r"(:? *(?:\+|&|and) *(?:annual *|cum(?:ulative)?\.? *|special *)?suppl?s?\.?[^()]*\([^)]+\))", 
-                  working_holdings, flags=re.I)
+    # normally we expect a year for the overall volume in the ending parens 
+    # ("v.14 + suppl. 8 (2011)"), so this is a special case
+    m = re.search(
+        r"(:? *(?:\+|&|and) *(?:annual *|cum(?:ulative)?\.? *|special *)?suppl?s?\.?[^()]*\([^)]+\))", 
+        working_holdings, flags=re.I)
     if m:
         capture_text = m.group(1)
         if not re.search(r"\([^)]*(?:19\d\d|20[0-2]\d)", capture_text):
@@ -46,8 +53,9 @@ def remove_supplements_from_holdings(holdings):
             capture_text = re.sub(r"^[:;]* *(?:&|\+|and) *", "", capture_text)
             return working_holdings, capture_text, True
 
-    # regexs by category -- to remove, show the entire string is a supplement, or to extract the supplement segment(s)
-    suppl_regexs = OrderedDict({
+    # regexes by category -- to remove, show the entire string is a supplement, 
+    # or to extract the supplement segment(s)
+    suppl_regexes = OrderedDict({
         # "v. 1, no. 1-4 (Apr/May-Nov/Dec 1988) includes suppl. to Sept/Oct 1988"
         "incl[^;]*supp[;]*": "capture",
         # "v. 1 & suppl."
@@ -83,17 +91,17 @@ def remove_supplements_from_holdings(holdings):
         # 1959/60-1975/76; 1975/76, suppl.
         "; *([^;]*supp[^;]*)": "capture",
     })
-    for r in suppl_regexs:
+    for r in suppl_regexes:
         m = re.findall(r, working_holdings, flags=re.I)
         if not m:
             continue
-        if suppl_regexs[r] == "entire":
+        if suppl_regexes[r] == "entire":
             return "", holdings, True
         for i in range(0, len(m)):
             working_holdings = working_holdings.replace(m[i], "")
-            if suppl_regexs[r] == "capture":
+            if suppl_regexes[r] == "capture":
                 m[i] = re.sub(r"^[:;]* *(?:&|\+|and) *", "", m[i])
-        if suppl_regexs[r] == "capture":
+        if suppl_regexes[r] == "capture":
             suppls = "; ".join(m)
             return working_holdings, suppls, True
         else:
@@ -231,8 +239,10 @@ def volume_transform(holdings_segment):
 
     # capital to capital that might be mistaken later for a roman numeral
     non_roman = "[ABDEFGHJKNOPQRSTUVWYZ]"
-    holdings_segment = re.sub(r"(\b)[A-Z] *- *{}(\b)".format(non_roman), "\\1 \\2", holdings_segment)
-    holdings_segment = re.sub(r"(\b){} *- *[A-Z](\b)".format(non_roman), "\\1 \\2", holdings_segment)
+    holdings_segment = re.sub(
+        r"(\b)[A-Z] *- *{}(\b)".format(non_roman), "\\1 \\2", holdings_segment)
+    holdings_segment = re.sub(
+        r"(\b){} *- *[A-Z](\b)".format(non_roman), "\\1 \\2", holdings_segment)
 
     # "nol." appears as typo for both "vol." and "no."
     if 'nol.' in holdings_segment:
@@ -241,46 +251,61 @@ def volume_transform(holdings_segment):
         elif 'v.' in holdings_segment:
             holdings_segment = holdings_segment.replace("nol.", "no.")
     # "(año 1988)" should be "(1988)", not "(v.1988)"
-    holdings_segment = re.sub(r"(\([^(]*)ann?o ({})".format(years_regex), "\\1 \\2", holdings_segment, flags=re.I)
+    holdings_segment = re.sub(
+        r"(\([^(]*)ann?o ({})".format(years_regex),
+        r"\1 \2", holdings_segment, flags=re.I)
     # vyps.
     if re.search(r"\bTomo|\bTom|\btom|\bt\.|\bT\.", original_string):
         holdings_segment = re.sub(r"[Vv]yp\.?\s*", "no.", holdings_segment)
     else:
         holdings_segment = re.sub(r"[Vv]yp\.?\s*", "v.", holdings_segment)
 
-    holdings_segment = re.sub(r"(\d+)\.? *jaarg(?:ang)?", "v.\\1", holdings_segment)
+    holdings_segment = re.sub(
+        r"(\d+)\.? *jaarg(?:ang)?", "v.\\1", holdings_segment)
 
     # "ann. 6" of "81.-84. ann.)"
-    holdings_segment = re.sub(r"(\b)ann(\b)", "\\1v.\\2", holdings_segment, flags=re.I)
+    holdings_segment = re.sub(
+        r"(\b)ann(\b)", "\\1v.\\2", holdings_segment, flags=re.I)
 
     # "21st:v.2 (1986)"
-    holdings_segment = re.sub(r"(\b)(\d+){}:? *v\. *(\d\d?\d?)(\b)".format(ordinals_regex), "\\1v.\\2 no.\\3\\4",
-                              holdings_segment, flags=re.I)
+    holdings_segment = re.sub(
+        r"(\b)(\d+){}:? *v\. *(\d\d?\d?)(\b)".format(ordinals_regex),
+        r"\1v.\2 no.\3\4",
+        holdings_segment, flags=re.I)
 
     # "jahrg" can turn other indicators from vol to num
     if "jahrg" in holdings_segment.lower():
         # eliminate "jahrg" when it's only referring to a year
         if re.search(r"jahrg\.? *(?:1[6-9]\d\d|20[01]\d)", holdings_segment, flags=re.I):
-            holdings_segment = re.sub(r"jahrg\.? *", "", holdings_segment, flags=re.I)
+            holdings_segment = re.sub(
+                r"jahrg\.? *", "", holdings_segment, flags=re.I)
         else:
             if re.search(r"\b(?:t|bd)\.? *\d", holdings_segment, flags=re.I):
-
-                holdings_segment = re.sub(r"(\b)(?:t|bd)\.? *(\d)", "\\1no.\\2", holdings_segment, flags=re.I)
+                holdings_segment = re.sub(
+                    r"(\b)(?:t|bd)\.? *(\d)", "\\1no.\\2", 
+                    holdings_segment, flags=re.I)
             # 3. Jahrg., 1. T. (1925)
-            holdings_segment = re.sub(r", (\d\d?\d?)\.? (?:t|bd)\.?", ", no.\\1", holdings_segment, flags=re.I)
+            holdings_segment = re.sub(
+                r", (\d\d?\d?)\.? (?:t|bd)\.?",
+                r", no.\1", holdings_segment, flags=re.I)
 
     # TODO: "Teil/Teilband"/"T" can indicate a series, volume, or number.
     # "v. 10 Teil 1-3" -- teil as "no."
-    holdings_segment = re.sub(r"(\b)v\. *(\d\d?\d?)[,:\s]*t(?:eil)?\.? *(\d\d?\d?(?: *[/-] *\d\d?\d?)?)",
-                              "\\1v.\\2:no.\\3", holdings_segment, flags=re.I)
+    holdings_segment = re.sub(
+        r"(\b)v\. *(\d\d?\d?)[,:\s]*t(?:eil)?\.? *(\d\d?\d?(?: *[/-] *\d\d?\d?)?)",
+        r"\1v.\2:no.\3", holdings_segment, flags=re.I)
 
     # "Vol. 2 (1946)-t. 33 (1991)"
     if re.search(r"\b(?:v\.|vol)", holdings_segment, flags=re.I):
-        holdings_segment = re.sub(r"- *(?:t\.|teil)", "-v.", holdings_segment, flags=re.I)
+        holdings_segment = re.sub(
+            r"- *(?:t\.|teil)", "-v.", holdings_segment, flags=re.I)
 
-    # "v. 39, pt. 2, T. 2 (2009)" -- remove "t." and number when it comes after a volume
-    holdings_segment = re.sub(r"(\bv(?:ol)?\. *\d.*\b)t(?:ome|eil|eilband)?\.? *\d+,?", "\\1 ", holdings_segment,
-                              flags=re.I)
+    # "v. 39, pt. 2, T. 2 (2009)" -- remove "t." and number when it comes after 
+    # a volume
+    holdings_segment = re.sub(
+        r"(\bv(?:ol)?\. *\d.*\b)t(?:ome|eil|eilband)?\.? *\d+,?", 
+        r"\1 ", holdings_segment,
+        flags=re.I)
 
     # "t.131:livr.1548-1553" -> "livre" to indicate number
     holdings_segment = re.sub("teil", "T.", holdings_segment, flags=re.I)

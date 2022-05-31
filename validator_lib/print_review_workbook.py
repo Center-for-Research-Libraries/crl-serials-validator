@@ -6,30 +6,29 @@ import csv
 import re
 
 from crl_lib.crl_xlsxwriter import CRLXlsxWriter
+
 import validator_lib.utilities
+from validator_lib.validator_data import ISSN_DB_LOCATION
 
 
 class ReviewWorkbookPrinter:
     def __init__(
-        self, title_dicts, line_583_validation_output, running_headless, papr_output,
+        self, 
+        title_dicts, line_583_validation_output, running_headless, papr_output,
         print_errors_only=False, 
-        print_originally_from=False,
-        print_issues_worksheets=False,
         print_for_review=False,
         print_good_marc_output=True):
 
+        if not ISSN_DB_LOCATION:
+            logging.info('Skipping output of ISSN db related categories.')
+
         self.running_headless = running_headless
         self.papr_output = papr_output
-        self.print_originally_from = print_originally_from
-        self.print_issues_worksheets = print_issues_worksheets
         self.print_for_review = print_for_review
         self.print_good_marc_output = print_good_marc_output
 
         self.error_rows = defaultdict(list)
         self.total_records = {}
-
-        # if we have KeyErrors with dict keys containing "issn_db" we'll know the database isn't installed
-        self.issn_db_not_seen = False
 
         self.good_marc = defaultdict(list)
         self.bad_marc = defaultdict(list)
@@ -133,9 +132,6 @@ class ReviewWorkbookPrinter:
                                   'WorldCat MARC 362'
                                   ]
 
-        self.originally_from_header = ['Load Status', 'Reasons for Review', 'HoldingID', 'OCLC Number', 'Print ISSN',
-                                       'Title', 'OCLC Symbol', 'OCLC HLC', 'Summary Holdings/Materials Specified']
-
         self.error_counter = defaultdict(Counter)
         self.disqualifying_error_counter = defaultdict(Counter)
         self.count_errors(title_dicts)
@@ -144,7 +140,7 @@ class ReviewWorkbookPrinter:
         self.error_outputs = defaultdict(list)
         self.get_checklist_data_for_output()
 
-        if self.issn_db_not_seen is True:
+        if not ISSN_DB_LOCATION:
             self.remove_issn_db_from_checklist_cats()
 
         self.output_folder = os.path.join(os.getcwd(), 'output')
@@ -156,8 +152,6 @@ class ReviewWorkbookPrinter:
 
         for title_dict in self.title_dicts:
             self.organize_by_errors(title_dict)
-        if self.print_originally_from is True:
-            self.make_originally_from_outputs()
 
         self.make_workbooks()
         
@@ -196,7 +190,7 @@ class ReviewWorkbookPrinter:
             'local_issn_does_not_match_wc_issn_a': 'Local ISSN mismatch with WorldCat ISSN',
             'local_issn_does_not_match_issn_db': 'Local ISSN mismatch with ISSN database',
             'line_583_error': 'One of more errors in 583 line(s)',
-            'no_issn_matches_issn_db': 'Neith local nor WorldCat ISSN matches ISSN database',
+            'no_issn_matches_issn_db': 'Neither local nor WorldCat ISSN matches ISSN database',
             'marc_validation_error': 'MARC record does not validate successfully',
             'missing_field_852a': 'No field 852 $a in MARC input',
             'nonprint_words_in_holdings': 'Nonprint statement in holdings',
@@ -232,7 +226,8 @@ class ReviewWorkbookPrinter:
                 if marc:
                     self.good_marc[inst].append(marc)
             else:
-                self.disqualifying_error_counter[inst][title_dict['disqualifying_error_category']] += 1
+                cat = title_dict['disqualifying_error_category']
+                self.disqualifying_error_counter[inst][cat] += 1
                 if marc:
                     self.bad_marc[inst].append(marc)
 
@@ -246,7 +241,9 @@ class ReviewWorkbookPrinter:
             try:
                 error_str = self.error_category_map[error_cat]
             except:
-                raise Exception('Unknown error Validator error category seen. Category is {}'.format(error_cat))
+                exception_msg = 'Unknown error Validator error category seen. '
+                exception_msg += 'Category is {}'.format(error_cat)
+                raise Exception(exception_msg)
             output_row = [
                 title_dict['record_id'],
                 error_str,
@@ -279,12 +276,11 @@ class ReviewWorkbookPrinter:
         for inst in overview_dict:
             self.total_records[inst] = overview_dict[inst]['total']
             overview_output = [['{} records'.format(inst), ''],
-                               ['Supplied by {}'.format(inst), overview_dict[inst]['total']], ['', ''],
+                               ['Supplied by {}'.format(
+                                   inst), overview_dict[inst]['total']], ['', ''],
                                ['No issues preventing ingestion', overview_dict[inst]['no_issues']], ['', ''],
                                ['For review', overview_dict[inst]['for_review']]]
             self.outputs[inst] = {'All issues': overview_output}
-            if self.print_originally_from is True:
-                self.outputs[inst]['originally_from'] = [self.originally_from_header]
 
     def make_error_worksheet(self, inst_data):
         output_list = [self.for_review_header]
@@ -319,37 +315,6 @@ class ReviewWorkbookPrinter:
             output.append(list(disqualifying_error_tuple))
         return output
 
-    def make_originally_from_outputs(self):
-        """
-        Make workbook listing everything in the original file. By default this is not made or printed, and must be 
-        turned on via the print_originally_from variable.
-        """
-        for title_dict in self.title_dicts:
-            inst = title_dict['institution']
-
-            if 'field_852a' not in title_dict:
-                title_dict['field_852a'] = title_dict['oclc_symbol']
-
-            load_status = 'review'
-            if not title_dict['invalid_record'] == '1' and not title_dict['disqualifying_errors']:
-                load_status = 'validated'
-            if title_dict['local_title']:
-                title = title_dict['local_title']
-            else:
-                title = title_dict['wc_title']
-            output_row = [
-                load_status,
-                title_dict['error_category'],
-                title_dict['holdings_id'],
-                title_dict['local_oclc'],
-                title_dict['local_issn'],
-                title,
-                title_dict['field_852a'],
-                title_dict['location'],
-                title_dict['local_holdings']
-            ]
-            self.outputs[inst]['originally_from'].append(output_row)
-
     def check_for_583s_in_files(self):
         seen_insts = set()
         for title_dict in self.title_dicts:
@@ -368,22 +333,22 @@ class ReviewWorkbookPrinter:
             insts.add(inst)
             output_list = []
             for cat in self.checklist_cats:
-                try:
-                    output_list.append(title_dict[cat])
-                except KeyError:
-                    if 'issn_db' in cat:
-                        if self.issn_db_not_seen is False:
-                            self.issn_db_not_seen = True
-                            logging.info('Skipping output of ISSN db related categories.')
-                    else:
-                        logging.error('Category {} not seen in checklist data.'.format(cat))
+                if 'issn_db' in cat and not ISSN_DB_LOCATION:
+                    continue
+                else:
+                    try:
+                        output_list.append(title_dict[cat])
+                    except KeyError:
+                        logging.error(
+                            'Category {} not seen in checklist data.'.format(
+                                cat))
             if self.print_errors_only is True and not output_list[0]:
                 continue
             if output_list[0]:
                 self.error_rows[inst].append(row_counts[inst])
                 self.error_outputs[inst].append(output_list)
             self.checklist_outputs[inst].append(output_list)
-        if self.issn_db_not_seen is True:
+        if not ISSN_DB_LOCATION:
             self.remove_issn_db_from_checklist_cats()
         for inst in insts:
             self.checklist_outputs[inst].insert(0, self.checklist_cats)
@@ -393,8 +358,10 @@ class ReviewWorkbookPrinter:
             return
         for inst in self.good_marc:
             output_filename = '{} {} records.mrk'.format(inst, good_or_bad)
-            output_file_location = os.path.join(self.output_folder, output_filename)
-            output_file_location = validator_lib.utilities.get_unused_filename(output_file_location)
+            output_file_location = os.path.join(
+                self.output_folder, output_filename)
+            output_file_location = validator_lib.utilities.get_unused_filename(
+                output_file_location)
 
             with open(output_file_location, 'w', encoding='utf8') as fout:
                 if good_or_bad == 'good':
@@ -408,7 +375,8 @@ class ReviewWorkbookPrinter:
         for inst in self.outputs:
             output_filename = '{} for review.xlsx'.format(inst)
             output_file_location = os.path.join(self.output_folder, output_filename)
-            output_file_location = validator_lib.utilities.get_unused_filename(output_file_location)
+            output_file_location = validator_lib.utilities.get_unused_filename(
+                output_file_location)
 
             for_review_list, for_review_special_rows = self.make_error_worksheet(self.outputs[inst]['for_review'])
             error_count_output = self.make_error_counts_output(inst)
@@ -426,36 +394,84 @@ class ReviewWorkbookPrinter:
             output_pages = {}
             output_pages['Notes'] = {'data': self.outputs[inst]['All issues']}
 
-            checklist_number_columns = {1, 3, 5, 7, 10, 11, 12, 16}  # has_disqualifying_error, seqnum, local_oclc, wc_oclc
+            checklist_number_columns = {
+                1,   # has_disqualifying_error
+                3,   # seqnum
+                5,   # bib_id_repeated
+                7,   # holdings_id_repeated
+                10,  # oclc_mismatch
+                11,  # local_oclc_repeated
+                12,  # wc_oclc_repeated
+                16,  # local_issn_does_not_match_wc_issn_a
+                20,  # title_mismatch
+                43,  # start_problem
+                44,  # end_problem
+                45,  # holdings_out_of_range
+                46,  # holdings_have_no_years
+                50,  # completeness_words_in_holdings
+                51,  # binding_words_in_holdings
+                52,  # nonprint_words_in_holdings
+                60,  # title_in_jstor
+                }
+
+            if ISSN_DB_LOCATION:
+                checklist_number_columns.add(62)  # local_issn_does_not_match_issn_db
+                checklist_number_columns.add(63)  # wc_issn_does_not_match_issn_db
+                checklist_number_columns.add(64)  # no_issn_matches_issn_db
+                checklist_number_columns.add(70)  # holdings_out_of_issn_db_date_range
+
             output_pages['Checklist'] = {
                 'data': self.checklist_outputs[inst], 
                 'number_columns': checklist_number_columns,
-                'special_formats': checklist_special_formats}
+                'special_formats': checklist_special_formats
+                }
 
             if self.total_records[inst] >= 50000:
                 error_pages = {}
 
                 error_filename = '{} errors.xlsx'.format(inst)
-                error_file_location = os.path.join(self.output_folder, error_filename)
+                error_file_location = os.path.join(
+                    self.output_folder, error_filename)
                 error_file_location = validator_lib.utilities.get_unused_filename(error_file_location)
-                error_pages['Checklist'] = {'data': self.error_outputs[inst], 'number_columns': checklist_number_columns}
+                error_pages['Checklist'] = {
+                    'data': self.error_outputs[inst], 
+                    'number_columns': checklist_number_columns
+                    }
 
                 self.error_outputs[inst].insert(0, self.checklist_cats)
-                error_pages['All issues'] = {'data': error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True}, [2])]}
-                error_pages['Disqualifying issues'] = {'data': disqualifying_error_count_output, 'special_formats': [({'bold': True, 'text_wrap': True}, [2])]}
-                error_pages['For review'] = {'data': for_review_list, 'special_formats': for_review_special_formats}
+                error_pages['All issues'] = {
+                    'data': error_count_output, 
+                    'special_formats': [
+                        ({'bold': True, 'text_wrap': True}, [2])]
+                    }
+                error_pages['Disqualifying issues'] = {
+                    'data': disqualifying_error_count_output, 
+                    'special_formats': [
+                        ({'bold': True, 'text_wrap': True}, [2])]
+                    }
+                error_pages['For review'] = {
+                    'data': for_review_list, 
+                    'special_formats': for_review_special_formats
+                    }
 
                 CRLXlsxWriter(error_file_location, error_pages)
 
             if self.print_for_review is True:
-                output_pages['For review'] = {'data': for_review_list, 'special_formats': for_review_special_formats}
+                output_pages['For review'] = {
+                    'data': for_review_list, 
+                    'special_formats': for_review_special_formats
+                    }
             
             if inst in self.print_line_583_output:
                 if self.line_583_validation_output and self.print_errors_only is False:
-                    output_pages['Line 583 validation'] = {'data': self.line_583_validation_output}
+                    output_pages['Line 583 validation'] = {
+                        'data': self.line_583_validation_output
+                        }
 
             if self.running_headless is True:
-                self.print_headless_checklist(output_pages['Checklist'], output_file_location.replace('.xlsx', '.txt'))
+                self.print_headless_checklist(
+                    output_pages['Checklist'], 
+                    output_file_location.replace('.xlsx', '.txt'))
 
             CRLXlsxWriter(output_file_location, output_pages)
                 
@@ -481,7 +497,7 @@ class ReviewWorkbookPrinter:
             'ActionNote_583$a',
             'ActionDate_583$c',
             'ExpirationDate_583$d',
-            'MethodofAction_583$i',
+            'MethodOfAction_583$i',
             'Status_583$l',
             'PublicNote_583$z',
             'ProgramName_583$f',

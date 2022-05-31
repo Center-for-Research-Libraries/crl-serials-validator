@@ -1,125 +1,37 @@
 """
-Find the directories containing the ISSN dataase (if installed), the local MARC database, and the configuration
-file containing API keys.
-
-In most installations of the Validator these will all be in the data folder of the Validator's main directory.
-They will only appear in other places if the user also uses other CRL applications (most notably the CRL MARC Machine) or if the user installed the Validator prior to September 13, 2021.
-
-The ISSN database can also appear in a specific internal location if the Validator is used inside CRL's network.
-
-To force the Validator to only use the data folder in the main validator directory, pass True as an argument
-called portable_install to ValidatorFileLocations.
-
-Right now this treats systems running on Windows Subsystem for Linux (WSL) as Linux machines, and will look for 
-and store data in the Linux directory structure.
+A few functions relating to the locations of files and folders the Validator 
+uses.
 """
 
 import os
 import logging
 import shutil
 from termcolor import cprint, colored
-
-from validator_lib.validator_data import *
 import colorama
+
+from validator_lib.validator_data import (
+    VALIDATOR_INPUT_FOLDER, VALIDATOR_OUTPUT_FOLDER, VALIDATOR_DATA_FOLDER, 
+    VALIDATOR_LOGS_FOLDER, CRL_FOLDER, MARC_DB_LOCATION, ISSN_DB_LOCATION)
 
 
 def initialize_validator_folders():
-
+    """
+    Look for folders the Validator requires, and create them if necessary.
+    """
     for my_directory in [VALIDATOR_INPUT_FOLDER, VALIDATOR_OUTPUT_FOLDER, VALIDATOR_DATA_FOLDER, VALIDATOR_LOGS_FOLDER]:
         if not os.path.isdir(my_directory):
             logging.info('Creating directory {}'.format(my_directory))
             os.mkdir(my_directory)
 
 
-class ValidatorFileLocations:
-
-    def __init__(self, portable_install=False):
-
-        self.portable_install = portable_install
-
-        self.input_files = []
-
-        self.issn_db_folder = None
-        self.marc_db_folder = None
-        self.data_storage_folder = None
-        self.marc_db_location = None
-        self.issn_db_location = None
-
-        self.find_marc_database_location()
-        self.find_issn_database_location()
-
-        if not self.data_storage_folder:
-            self.data_storage_folder = self.validator_data_folder
-
-        self.add_about_file()
-        self.get_input_files()
-
-    def find_marc_database_location(self):
-        """
-        Look for the MARC database (and optional ISSN database) in various standard locations. If not found, set them
-        in the default location. For portable installs that will be the data folder of the Validator. For everything else
-        this will be the user data directory as defined by the appdirs library.
-        """
-        if self.portable_install is True:
-            self.marc_db_folder = VALIDATOR_DATA_FOLDER
-            self.marc_db_location = os.path.join(VALIDATOR_DATA_FOLDER, MARC_DB_NAME)
-        elif os.path.isdir(CRL_FOLDER) and os.path.isfile(os.path.join(CRL_FOLDER, MARC_DB_NAME)):
-            self.marc_db_folder = CRL_FOLDER
-            self.marc_db_location = (os.path.join(CRL_FOLDER, MARC_DB_NAME))
-        else:
-            if not os.path.isdir(CRL_FOLDER):
-                os.mkdir(CRL_FOLDER)
-            self.marc_db_folder = CRL_FOLDER
-            self.marc_db_location = (os.path.join(CRL_FOLDER, MARC_DB_NAME))
-
-        self.data_storage_folder = self.marc_db_folder
-        self.add_about_file()
-
-    def find_issn_database_location(self):
-        if os.path.isdir(CRL_FOLDER) and os.path.isfile(os.path.join(CRL_FOLDER, ISSN_DB_NAME)):
-            self.issn_db_folder = CRL_FOLDER
-            self.issn_db_location = (os.path.join(CRL_FOLDER, ISSN_DB_NAME))     
-
-    def add_about_file(self):
-        """
-        Add a basic about file to our data folder.
-        """
-        if not self.portable_install:
-            about_file_location = os.path.join(self.marc_db_folder, 'about.txt')
-            if not os.path.isfile(about_file_location):
-                with open(about_file_location, 'w') as fout:
-                    fout.write('This folder contains data files for utilities from the Center for Research Libraries.')
-                    fout.write('\n')
-
-    def log_file_location_results(self):
-        logging.info('Data storage folder at {}'.format(self.data_storage_folder))
-        if self.marc_db_location:
-            logging.info('Found MARC database at {}'.format(self.marc_db_location))
-        else:
-            logging.info('MARC database not found.')
-        if self.issn_db_location:
-            logging.info('Found ISSN database at {}'.format(self.issn_db_location))
-        else:
-            logging.info('ISSN database not found.')
-
-    def get_input_files(self):
-
-        valid_file_extensions = {'mrk', 'txt', 'tsv', 'csv', 'xlsx'}
-
-        all_input_files = os.listdir(VALIDATOR_INPUT_FOLDER)
-        for input_file in all_input_files:
-            if input_file.startswith('~'):
-                continue
-            file_extension = input_file.split('.')[-1]
-            if not file_extension.lower() in valid_file_extensions:
-                continue
-            self.input_files.append(input_file)
-
-
 def print_validator_file_locations():
-    
-    file_locations = ValidatorFileLocations()
+    """
+    Print the location of the MARC and ISSN databases to the command line.
 
+    This function is triggered by running the Validator with a -f flag, like so:
+        python crl_serials_validator.py -f
+    """
+    
     colorama.init()
 
     name_color = 'cyan'
@@ -137,25 +49,39 @@ def print_validator_file_locations():
     not_installed = colored('not installed', not_installed_color, 'on_white')
 
     print('The {} is located at: '.format(main_data_folder), end='')
-    cprint(file_locations.data_storage_folder, location_color)
-    print('The {} is located at: '.format(local_marc_database), end='')
-    cprint(file_locations.marc_db_location, location_color)
-    if file_locations.issn_db_location:
+    cprint(CRL_FOLDER, location_color)
+    if os.path.isfile(MARC_DB_LOCATION):
+        print('The {} is located at: '.format(local_marc_database), end='')
+        cprint(MARC_DB_LOCATION, location_color)
+    else:
+        print('The {} has not been created.'.format(local_marc_database))
+    if ISSN_DB_LOCATION:
         print('The {} is located at: '.format(issn_database), end='')
-        cprint(file_locations.issn_db_location, location_color)
+        cprint(ISSN_DB_LOCATION, location_color)
     else:
         print('The {} is {}.'.format(issn_database, not_installed))
 
 
+
 def migrate_from_appdirs_directory():
     """
-    Older installations will have the databases and related files placed in the folder chosen by the appdirs library.
-    Search for these and migrate them to a "CRL" folder in the user's home directory.
+    Older installations will have the databases and related files placed in the 
+    folder chosen by the appdirs library. Search for these and migrate them to a 
+    "CRL" folder in the user's home directory.
 
-    This functions was finalized 2022-02-18. At some point there should be no more installations using the appdirs
-    folder, at which point it can be removed.
+    This functions was finalized 2022-02-18. Soon there should be no more 
+    installations using the appdirs folder, at which point it can be removed.
+
+    I've removed appdirs from the requirements for the project, on the 
+    assumption that a Python installation without appdirs already installed 
+    won't have Validator folders in the locations specified by appdirs. If 
+    appdirs isn't found, this function should abort and return to the main
+    process.
     """
-    from appdirs import AppDirs
+    try:
+        from appdirs import AppDirs
+    except ImportError:
+        return
 
     appdirs_directory = AppDirs(appname='CRL').user_data_dir
     print(appdirs_directory)

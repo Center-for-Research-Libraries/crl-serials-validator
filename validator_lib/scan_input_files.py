@@ -15,7 +15,7 @@ import os
 import csv
 from collections import Counter
 import logging
-from termcolor import cprint, colored
+from termcolor import colored
 
 from validator_lib.terminal_gui_utilities import print_terminal_page_header
 
@@ -29,8 +29,8 @@ class InputFileScanner:
         self.input_dir = os.path.join(os.getcwd(), 'input')
         self.input_files = input_files
         self.cats = [
-            "Total records", "Have 001 field", "Have 004 field", "Have 035", "OCLC in 035", "Have 583", 
-            "Have 863/864/865", "Have 866/867/868"]
+            "Total records", "Have 001 field", "Have 004 field", "Have 035", 
+            "OCLC in 035", "Have 583", "Have 863/864/865", "Have 866/867/868"]
 
     def scan_input_files(self):
         logging.debug("Scanning input files.")

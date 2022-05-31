@@ -11,12 +11,14 @@ from crl_lib.date_utilities import check_year_between
 from crl_lib.marc_fields import MarcFields
 
 from validator_lib.utilities import get_valid_forms, get_valid_serial_types
+from validator_lib.validator_data import ISSN_DB_LOCATION
 
 
 class ValidatorIssnDb:
-    def __init__(self, issn_db_location):
+    def __init__(self):
 
-        self.issn_db = IssnDb(issn_db_location=issn_db_location, ignore_missing_db=True)
+        self.issn_db = IssnDb(
+            issn_db_location=ISSN_DB_LOCATION, ignore_missing_db=True)
         self.issn_type_order = ['issn_l', 'issn_z', 'issn_y', 'issn_m']
 
         self.valid_forms = get_valid_forms()

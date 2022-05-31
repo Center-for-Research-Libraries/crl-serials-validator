@@ -1,4 +1,4 @@
-from collections import defaultdict, Counter
+from collections import Counter
 from unidecode import unidecode
 from pprint import pprint
 import logging
@@ -7,10 +7,11 @@ import warnings
 
 with warnings.catch_warnings():
     """
-    thefuzz on import will throw the following warning:
-    "Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning"
-    On Windows installing this requires installing the Visual C++ 2019 redistributable, and so isn't realistic for this
-    project. Instead we'll just suppress the warning.
+    thefuzz on import will often throw the following warning: "Using slow pure-
+    python SequenceMatcher. Install python-Levenshtein to remove this warning"
+
+    On Windows installing this requires installing Visual C++ 2019 and so isn't 
+    realistic for this project. Instead we'll just suppress the warning.
     """
     warnings.simplefilter("ignore")
     from thefuzz import fuzz
@@ -19,15 +20,21 @@ with warnings.catch_warnings():
 from crl_lib.crl_utilities import check_for_valid_issn
 from crl_lib.date_utilities import check_year_between
 from crl_lib.validation_utilities import check_for_print_carrier_type, check_for_print_media_type
+
 import validator_lib.utilities
+from validator_lib.validator_data import ISSN_DB_LOCATION
 
 
 class InputDataProcessor:
 
-    marc_issues_to_check = ['line_583_error', 'marc_validation_error', 'missing_field_852a']
+    marc_issues_to_check = [
+        'line_583_error', 'marc_validation_error', 'missing_field_852a']
 
-    def __init__(self, title_dicts, input_fields, disqualifying_issue_categories, found_issn_db, jstor_titles):
-        self.found_issn_db = found_issn_db
+    def __init__(
+        self, title_dicts, input_fields, disqualifying_issue_categories, 
+        jstor_titles
+        ):
+
         self.jstor_titles = jstor_titles
         self.title_dicts = title_dicts
         self.input_fields = input_fields
@@ -75,24 +82,26 @@ class InputDataProcessor:
             'nonprint_words_in_holdings', 'oclc_mismatch', 'record_type_not_language_material', 
             'serial_type_not_periodical', 'title_mismatch', 'title_in_jstor' ]
 
-        if self.found_issn_db:
+        if ISSN_DB_LOCATION:
             issn_db_issues = [
                 'holdings_out_of_issn_db_date_range',
-                'issn_db_form_not_print', 'issn_db_serial_type_not_periodical', 'local_issn_does_not_match_issn_db', 
+                'issn_db_form_not_print', 'issn_db_serial_type_not_periodical', 
+                'local_issn_does_not_match_issn_db', 
                 'local_issn_does_not_match_wc_issn_a']
             issues_to_check.extend(issn_db_issues)
         return issues_to_check
 
     def assemble_errors_in_dict(self, title_dict):
         """
-        This runs after all other input processing. Basically creates an error list for the outputs
+        This runs after all other input processing. Basically creates an error 
+        list for the outputs
         """
         # Without OCLC in original we can't do anything, so immediately fail
         if not title_dict['local_oclc']:
             title_dict['errors'] = ['no_oclc_number']
             title_dict['disqualifying_errors'] = ['no_oclc_number']
             title_dict['invalid_record'] = '1'
-        # Without OCLC a WorldCat record we can't do anything, so immediately fail
+        # Without OCLC a WorldCat record can't do anything, so immediately fail
         elif not title_dict['wc_oclc']:
             title_dict['errors'] = ['no_worldcat_record']
             title_dict['disqualifying_errors'] = ['no_worldcat_record']
@@ -103,7 +112,8 @@ class InputDataProcessor:
                     title_dict['errors'].append(issue_to_check)
                     if issue_to_check in self.disqualifying_issue_categories:
                         title_dict['invalid_record'] = '1'
-                        title_dict['disqualifying_errors'].append(issue_to_check)
+                        title_dict['disqualifying_errors'].append(
+                            issue_to_check)
 
         # MARC-only errors
         for marc_issue in self.marc_issues_to_check:
@@ -124,7 +134,10 @@ class InputDataProcessor:
             title_dict['has_disqualifying_error'] = '1'
 
     def remove_none_strings_from_title_dict(self, title_dict):
-        """Validator outputs 'None' if there's a blank field. Remove these everywhere, except in titles."""
+        """
+        Validator outputs 'None' if there's a blank field. Remove these 
+        everywhere, except in titles.
+        """
         for cat in title_dict:
             if cat == 'local_title':
                 continue
@@ -186,8 +199,8 @@ class InputDataProcessor:
         """
         Check for local ISSN that fits he ISSN algorithm.
 
-        issn_mismatch will be considered as false if the local ISSN matches the WorldCat ISSN *or* the ISSN
-        database ISSN.
+        issn_mismatch will be considered as false if the local ISSN matches the 
+        WorldCat ISSN *or* the ISSN database ISSN.
         """
         if title_dict['local_issn']:
             if check_for_valid_issn(title_dict['local_issn']) is False:
@@ -298,7 +311,8 @@ class InputDataProcessor:
     @staticmethod
     def match_titles(title_dict):
         """
-        ATM we're doing simple Levenshtein distances with thefuzz. The numbers probably need to be massaged a lot.
+        At the moment we're doing simple Levenshtein distances with thefuzz. The 
+        numbers probably need to be massaged a lot.
         """
         if not title_dict['local_title'] or not title_dict['wc_title']:
             title_dict['title_mismatch'] = ''

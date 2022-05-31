@@ -3,32 +3,36 @@ import sys
 from termcolor import colored
 from collections import OrderedDict
 
-
 from validator_lib.terminal_gui_utilities import print_terminal_page_header
+from validator_lib.validator_data import CRL_FOLDER
 
 from crl_lib.api_keys import OclcApiKeys
 
 
 class ApiKeySetter:
-    def __init__(self, data_folder):
-        """
-        data_folder should be the location (or desired location) of the API keys config file.
-        """
-        super().__init__()
-        self.data_folder = data_folder
+    """
+    Class to read and write API keys from/to the config file. This is mainly a
+    GUI front end for the OclcApiKeys library.
+    """
+    def __init__(self):
         self.make_gui()
 
     @staticmethod
-    def print_row_to_terminal(number_column, name, api_key, is_default_print, header_row=False):
+    def print_row_to_terminal(
+        number_column, name, api_key, is_default_print, header_row=False):
         print('{}\t{}\t{}\t{}'.format(
-            colored(str(number_column), 'yellow').ljust(4), name.ljust(12), api_key.ljust(80), is_default_print))
+            colored(str(number_column), 
+            'yellow').ljust(4), 
+            name.ljust(12), 
+            api_key.ljust(80), 
+            is_default_print))
         if header_row is True:
             for _ in range(0, 120):
                 print('-', end='')
             print('')
 
     def make_gui(self):
-        self.api_keys = OclcApiKeys(self.data_folder)
+        self.api_keys = OclcApiKeys(CRL_FOLDER)
 
         while True:
             os.system('cls' if os.name == 'nt' else 'clear')
@@ -36,7 +40,8 @@ class ApiKeySetter:
             print_terminal_page_header('Set API Keys')
 
             self.get_names()
-            self.print_row_to_terminal(' ', 'Name', 'API Key', '', header_row=True)
+            self.print_row_to_terminal(
+                ' ', 'Name', 'API Key', '', header_row=True)
 
             i = 0
             for name in self.names_and_keys:
@@ -46,7 +51,9 @@ class ApiKeySetter:
                 is_default_print = ''
                 if name == self.default_key:
                     is_default_print = colored('default', 'white', 'on_blue')
-                self.print_row_to_terminal(i, name, self.names_and_keys[name]['api_key'], is_default_print)
+                self.print_row_to_terminal(
+                    i, name, self.names_and_keys[name]['api_key'],
+                    is_default_print)
 
             print('')
             print('{}. Add a new key.'.format(colored('a', 'yellow')))
@@ -58,9 +65,13 @@ class ApiKeySetter:
             choice_result = input('Your choice? ')
 
             if choice_result.lower() == 'a':
-                new_name = input('{} name for key: '.format(colored('Enter', 'yellow')))
-                new_key = input('{} API key: '.format(colored('Enter', 'yellow')))
-                new_is_default = input('Make default key? ({}/{}) '.format(colored('y', 'yellow'), colored('n', 'yellow')))
+                new_name = input('{} name for key: '.format(
+                    colored('Enter', 'yellow')))
+                new_key = input('{} API key: '.format(
+                    colored('Enter', 'yellow')))
+                new_is_default = input(
+                    'Make default key? ({}/{}) '.format(
+                        colored('y', 'yellow'), colored('n', 'yellow')))
                 if not new_name:
                     print('No name given; key not added.')
                 elif not new_key:
@@ -72,7 +83,8 @@ class ApiKeySetter:
                         make_default = False
                     self.add_key(new_name, new_key, make_default)
             elif choice_result.lower() == 'r':
-                to_delete = input('{} number to delete: '.format(colored('Enter', 'yellow')))
+                to_delete = input('{} number to delete: '.format(
+                    colored('Enter', 'yellow')))
                 try:
                     int(to_delete)
                     self.delete_key(to_delete)
@@ -80,7 +92,8 @@ class ApiKeySetter:
                     print('Must enter a number to delete.')
                     input('Press Enter to continue.')
             elif choice_result.lower() == 'd':
-                new_default = input('{} number to set as default: '.format(colored('Enter', 'yellow')))
+                new_default = input('{} number to set as default: '.format(
+                    colored('Enter', 'yellow')))
                 try:
                     int(new_default)
                     self.set_default_key(int(new_default))

@@ -9,17 +9,24 @@ from crl_lib.line_85x86x import Convert85x86x
 from crl_lib.marc_fields import MarcFields
 from crl_lib.marc_file_reader import MarcFileReader
 from crl_lib.crl_utilities import clean_oclc
+
 from validator_lib.validate_583s import Line583Validator
 from validator_lib.utilities import get_first_last_year_from_regular_holdings
 from validator_lib.supplements_and_indexes_functions import remove_supplements_from_holdings, remove_indexes_from_holdings
 from validator_lib.validator_title_dict import get_immutable_title_dict
+from validator_lib.validator_data import VALIDATOR_INPUT_FOLDER
 
 
 class MrkProcessRunner:
+    """
+    Get and check data from an input MARC record. These can be LHRs or regular
+    MARC files with holdings data included.
+    """
     def __init__(self, input_file, input_fields):
         
         self.input_file = input_file
-        self.input_file_location = os.path.join(os.getcwd(), 'input', self.input_file)
+        self.input_file_location = os.path.join(
+            VALIDATOR_INPUT_FOLDER, self.input_file)
 
         self.input_fields = input_fields
 
@@ -41,15 +48,21 @@ class MrkProcessRunner:
         self.other_holdings_fields = []
         if self.input_fields:
             if 'holdings_1' in self.input_fields:
-                self.other_holdings_fields.append(self.input_fields['holdings_1'])
+                self.other_holdings_fields.append(
+                    self.input_fields['holdings_1'])
             if 'holdings_2' in self.input_fields:
-                self.other_holdings_fields.append(self.input_fields['holdings_2'])
+                self.other_holdings_fields.append(
+                    self.input_fields['holdings_2'])
 
     def open_error_log_file(self, log_type):
-        error_log_file_name = '{}_{}_errors_{:%Y-%m-%d}.log'.format(self.input_file, log_type, datetime.datetime.now())
-        error_log_file_location = os.path.join(os.getcwd(), 'logs', error_log_file_name)
-        self.error_log_fout[log_type] = open(error_log_file_location, 'a', encoding='utf8')
-        self.error_log_fout[log_type].write('\t'.join(self.error_log_header_list) + '\n')
+        error_log_file_name = '{}_{}_errors_{:%Y-%m-%d}.log'.format(
+            self.input_file, log_type, datetime.datetime.now())
+        error_log_file_location = os.path.join(
+            os.getcwd(), 'logs', error_log_file_name)
+        self.error_log_fout[log_type] = open(
+            error_log_file_location, 'a', encoding='utf8')
+        self.error_log_fout[log_type].write(
+            '\t'.join(self.error_log_header_list) + '\n')
 
     def get_data_from_marc(self):
         seqnum = 0
@@ -58,11 +71,13 @@ class MrkProcessRunner:
         for record in mfr:
             seqnum += 1
             if seqnum % 5000 == 0:
-                logging.info('   ...reached record {} in {}'.format(seqnum, self.input_file))
+                logging.info('   ...reached record {} in {}'.format(
+                    seqnum, self.input_file))
             record_dict = self.get_data_from_record(record, seqnum)
             if '583' in self.input_fields and self.input_fields['583']:
                 record_dict['583_in_file'] = True
-                self.line_583_validator.validate_583_lines_in_record(record, record_dict)
+                self.line_583_validator.validate_583_lines_in_record(
+                    record, record_dict)
                 if record_dict['line_583_error']:
                     record_dict['errors'].append('line_583_error')
                     self.log_583_errors(seqnum, record_dict)
@@ -80,7 +95,8 @@ class MrkProcessRunner:
 
     def get_data_from_record(self, record, seqnum):
         self.errors_this_record = []
-        mf = MarcFields(record, log_warnings=True, debug_info='from {}'.format(self.input_file))
+        mf = MarcFields(record, log_warnings=True, debug_info='from {}'.format(
+            self.input_file))
         record_dict = get_immutable_title_dict()
 
         record_dict['marc'] = record
@@ -88,7 +104,8 @@ class MrkProcessRunner:
         record_dict['field_852a'] = get_field_subfield(record, '852a')
         record_dict['field_852b'] = get_field_subfield(record, '852b')
         record_dict['filename'] = self.input_file
-        record_dict['holdings_id'] = self.get_field_from_marc('holdings_id', record)
+        record_dict['holdings_id'] = self.get_field_from_marc(
+            'holdings_id', record)
         record_dict['local_issn'] = mf.issn_a
         record_dict['local_oclc'] = self.get_oclc_from_marc(mf, record)
         record_dict['local_title'] = mf.title
@@ -109,15 +126,28 @@ class MrkProcessRunner:
         return record_dict
 
     def validate_line(self, marc_line, record_dict):
+        """
+        Look for very basic issues in a MARC line.
+
+        At the moment, this only looks for "dangling subfields", were a subfield
+        starts with a blank space. This can indicate all sorts of issues with 
+        the line (like a dollar sign that isn't meant to serve as an 
+        indicator of a subfield), but could also be a simple typo.
+        """
         # line_no = marc_line[1:4]
         line_list = marc_line.split('$')
         # line_list[0] should be line number & delimiters
         for i in range(1, len(line_list)):
             if not re.search(r"^\w", line_list[i]):
-                self.errors_this_record.append("Incomplete, Dangling, or Illegal Subfield: {}".format(marc_line))
+                msg = "Incomplete, Dangling, or Illegal Subfield: {}".format(
+                    marc_line)
+                self.errors_this_record.append(msg)
                 record_dict['dangling_subfield'] = True
 
     def get_oclc_from_marc(self, mf, record):
+        """
+        OCLC from MARC, based on user's indication of its location.
+        """
         oclc = ''
         if 'oclc' in self.input_fields and self.input_fields['oclc']:
             if self.input_fields['oclc'] == '035':

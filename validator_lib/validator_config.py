@@ -5,10 +5,11 @@ from collections import OrderedDict
 from pprint import pprint
 import logging
 
+from validator_lib.validator_data import VALIDATOR_DATA_FOLDER
 
 class ValidatorConfig:
 
-    config_file = os.path.join(os.getcwd(), 'data', 'config.yaml')
+    config_file = os.path.join(VALIDATOR_DATA_FOLDER, 'config.yaml')
 
     def __init__(self):
         self.config = {}
@@ -24,7 +25,8 @@ class ValidatorConfig:
         """
         Read the YAML config file. 
         
-        First check if it exists and if it is valid YAML. If either of these is false, write a blank file and load that.
+        First check if it exists and if it is valid YAML. If either of these is 
+        false, write a blank file and load that.
         """
         config_changed_in_first_reading = False
         try:
@@ -38,8 +40,9 @@ class ValidatorConfig:
             self.config = {}
         except yaml.io.UnsupportedOperation:
             # means the file there is not a YAML file
-            # TODO: this will erase the config file entirely. We should make a failure option, in case
-            # the user has (badly) edited the YAML file by hand.
+            # TODO: this will erase the config file entirely. We should make a 
+            # failure option, in case the user has (badly) edited the YAML file 
+            # by hand.
             self.config = {}
             config_changed_in_first_reading = True
 
@@ -50,7 +53,8 @@ class ValidatorConfig:
             self.config['disqualifying_issues'] = dict(disqualifying_issues)
             config_changed_in_first_reading = True
 
-        # in case we've added or removed any disqualifying issues since the last time the user has changed them, we'll compare against the defaults.
+        # in case we've added or removed any disqualifying issues since the last 
+        # time the user has changed them, we'll compare against the defaults.
         for disqualifying_issue in default_disqualifying_issues:
             if disqualifying_issue not in self.config['disqualifying_issues']:
                 self.config['disqualifying_issues'][disqualifying_issue] = default_disqualifying_issues[disqualifying_issue]
@@ -130,8 +134,9 @@ class ValidatorConfig:
 
     def get_disqualifying_issues(self, input_file=None):
         """
-        Look for appropriate issues from the bulk config when presented with an individual file. Otherwise, return the
-        regular disqualifying issues. If none have been set then these will be the defaults.
+        Look for appropriate issues from the bulk config when presented with an 
+        individual file. Otherwise, return the regular disqualifying issues. If 
+        none have been set then these will be the defaults.
         """
         if input_file:
             inst_name = self._get_short_input_filename(input_file)
@@ -143,7 +148,8 @@ class ValidatorConfig:
             try:
                 disqualifying_issues = self.config['programs'][program_name]['disqualifying_issues']
                 if program_name == inst_name:
-                    logging.info('Using disqualifying issues set for {}'.format(program_name))
+                    logging.info('Using disqualifying issues set for {}'.format(
+                        program_name))
                 else:
                     logging.info('Using disqualifying issues set for {} in program {}'.format(inst_name, program_name))
                 return disqualifying_issues
@@ -155,9 +161,9 @@ class ValidatorConfig:
     def get_disqualifying_issue_categories(self, input_file=None):
         disqualifying_issue_categories = set()
         disqualifying_issues = self.get_disqualifying_issues(input_file)
-        for disquaifying_issue in disqualifying_issues:
-            if disqualifying_issues[disquaifying_issue] is True:
-                disqualifying_issue_categories.add(disquaifying_issue)
+        for disqualifying_issue in disqualifying_issues:
+            if disqualifying_issues[disqualifying_issue] is True:
+                disqualifying_issue_categories.add(disqualifying_issue)
         return disqualifying_issue_categories
 
     def check_that_all_issues_are_in_config(self):

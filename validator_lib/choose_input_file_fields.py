@@ -1,6 +1,9 @@
 """
-Class to create a screen listing every file in the input folder with potential fields as fill in boxes or checkboxes.
-Records the user's choices to the config file as defined in the ValidatorData class.
+Class to create a screen listing every file in the input folder with potential 
+fields as fill in boxes or checkboxes.
+
+Records the user's choices to the config file as defined in the ValidatorData 
+class.
 """
 
 from termcolor import cprint, colored
@@ -8,17 +11,18 @@ import re
 import os
 import sys
 
-from yaml import warnings
-
 from validator_lib.validator_config import ValidatorConfig
 from validator_lib.terminal_gui_utilities import print_terminal_page_header
 
 
 class InputFields:
-    marc_cats = ["oclc", "583", "bib_id", "holdings_id", "863", "866", "holdings_1", "holdings_2"]
+    marc_cats = [
+        "oclc", "583", "bib_id", "holdings_id", "863", "866", "holdings_1", 
+        "holdings_2"]
     spreadsheet_cats = [
-        "header", "oclc", "bib_id", "holdings_id", "institution", "oclc_symbol", "location", "issn", "title", 
-        "holdings_0", "holdings_1", "holdings_2", "holdings_3"]
+        "header", "oclc", "bib_id", "holdings_id", "institution", "oclc_symbol", 
+        "location", "issn", "title", "holdings_0", "holdings_1", "holdings_2", 
+        "holdings_3"]
     cat_labels = {
             "header": "Has header row",
             "oclc": "OCLC",
@@ -101,7 +105,8 @@ class InputFieldsChooser:
     @staticmethod
     def get_input_file_header(input_file):
         header_list = []
-        header_list.append('Selecting fields for {}'.format(colored(input_file, 'cyan')))
+        header_list.append('Selecting fields for {}'.format(
+            colored(input_file, 'cyan')))
         bar = '~~~~~~~~~~~~~~~~~~~~~'
         for _ in range(0, len(input_file)):
             bar += '~'
@@ -125,7 +130,8 @@ class InputFieldsChooser:
                 print_number = '{}. '.format(colored(str(cat_number), 'yellow'))
                 if cat_number < 10:
                     print_number += ' '
-                cat_body_list.append('{}{} {}'.format(print_number, self.cat_labels[cat].ljust(30), cat_data))
+                cat_body_list.append('{}{} {}'.format(
+                    print_number, self.cat_labels[cat].ljust(30), cat_data))
 
             cat_body_list.append('')
             print('\n'.join(cat_body_list))
@@ -153,12 +159,13 @@ class InputFieldsChooser:
                     else:
                         self.validator_config.config[input_file][cat_to_change] = '1'
                 else:
-                    self.get_freetext_field_data(cat_to_change, input_file, cat_body_list)
+                    self.get_free_text_field_data(cat_to_change, input_file, cat_body_list)
     
-    def get_freetext_field_data(self, cat_to_change, input_file, cat_body_list):
+    def get_free_text_field_data(self, cat_to_change, input_file, cat_body_list):
         os.system('cls' if os.name == 'nt' else 'clear')
         print('\n'.join(cat_body_list))
-        print('Altering field {}.'.format(colored(self.cat_labels[cat_to_change]), 'cyan'))
+        print('Altering field {}.'.format(
+            colored(self.cat_labels[cat_to_change]), 'cyan'))
         bar = '~~~~~~~~~~~~~~~~'
         for _ in range(0, len(cat_to_change)):
             bar += '~'
@@ -166,7 +173,8 @@ class InputFieldsChooser:
         cprint('What would you like to do?', 'cyan')
         print('{}. Enter a new value.'.format(colored('n', 'yellow')))
         print('{}. Clear the field\'s value.'.format(colored('c', 'yellow')))
-        print('Press {} to cancel and not make any changes.'.format(colored('Enter', 'yellow')))
+        print('Press {} to cancel and not make any changes.'.format(
+            colored('Enter', 'yellow')))
         user_choice = input(colored('Your choice: ', 'cyan'))
         if user_choice.lower().startswith('n'):
             if input_file.lower().endswith('mrk') or input_file.lower().endswith('mrc'):
@@ -185,7 +193,9 @@ class InputFieldsChooser:
         self.validator_config.write_validator_config_file()
 
     def get_category_data(self, cat, input_file):
-        """See if the input is in our config list, and insert preset values if so."""
+        """
+        See if the input is in our config list, and insert preset values if so.
+        """
         blank_return = colored('---', 'cyan')
         yes_return = colored('yes', 'white', 'on_blue')
         no_return = colored('no', 'white', 'on_red')
@@ -199,7 +209,8 @@ class InputFieldsChooser:
         elif not self.validator_config.config[input_file][cat]:
             return blank_return
         else:
-            return colored(self.validator_config.config[input_file][cat], 'cyan')
+            return colored(
+                self.validator_config.config[input_file][cat], 'cyan')
 
     def basic_field_validation(self, input_file, field_name, field_data):
         field_data = field_data.strip()
