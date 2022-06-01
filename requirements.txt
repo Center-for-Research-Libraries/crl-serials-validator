@@ -6,4 +6,3 @@ requests
 pyyaml
 termcolor
 colorama
-appdirs
