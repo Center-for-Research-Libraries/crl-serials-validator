@@ -11,7 +11,7 @@ Generally, the CRL Serials Validator attempts to answer these questions:
 
 * Can the title be found in WorldCat?
 * Is the title a serial?
-* Is it attached to a hard copy bibliographic record?
+* Is it attached to a print bibliographic record?
 * Do the holdings fit within the title's publication range?
 
 Specific criteria can be set by the user, to make checking more or less strict as required.
