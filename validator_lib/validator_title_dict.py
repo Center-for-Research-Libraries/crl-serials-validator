@@ -1,7 +1,7 @@
 import collections
 
 
-class FixedDict(collections.MutableMapping):
+class FixedDict(collections.abc.MutableMapping):
     """
     Immutable dict, taken from an answer here:
     https://stackoverflow.com/questions/14816341/define-a-python-dictionary-with-immutable-keys-but-mutable-values
