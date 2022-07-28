@@ -16,7 +16,7 @@ Generally, the CRL Serials Validator attempts to answer these questions:
 
 Specific criteria can be set by the user, to make checking more or less strict as required.
 
-The program can provess input data in a variety of formats: MARC, tab-separated and comma-separated text files, and Excel (xlsx) spreadsheets. It produces an output spreadsheet with information about every title in the input set, any relevant errors found, and a list of titles that passed all of the selected checks.
+The program can process input data in a variety of formats: MARC, tab-separated and comma-separated text files, and Excel (xlsx) spreadsheets. It produces an output spreadsheet with information about every title in the input set, any relevant errors found, and a list of titles that passed all of the selected checks.
 
 If the user has a subscription to data downloads from the ISSN Centre, the user can additionally validate their data against this ISSN data.
 
