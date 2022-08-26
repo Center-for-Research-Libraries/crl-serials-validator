@@ -93,21 +93,21 @@ class OclcApiKeys:
 
     def add_api_key(self, name: str, api_key: str, api_secret: str, is_search: str, is_metadata: str,
                     is_default: str) -> None:
-        self.add_api_key(name, api_key, api_secret, is_search, is_metadata, is_default, True)
+        self.alter_api_key(name, api_key, api_secret, is_search, is_metadata, is_default, True)
 
     def update_api_key(self, name: str, api_key: str, api_secret: str, is_search: str, is_metadata: str,
                        is_default: str) -> None:
-        self.add_api_key(name, api_key, api_secret, is_search, is_metadata, is_default, False)
+        self.alter_api_key(name, api_key, api_secret, is_search, is_metadata, is_default, False)
 
     def alter_api_key(self, name: str, api_key: str, api_secret: str, is_search: str, is_metadata: str, is_default: str,
-                      new_key: bool) -> None:
+                      is_new_key: bool) -> None:
         if not name:
             raise OclcApiKeyError('Need name for API key.')
         if not api_key:
             raise OclcApiKeyError(f'No key value provided for name {name}')
-        if new_key is True and name in self.api_keys:
+        if is_new_key is True and name in self.api_keys:
             raise OclcApiKeyError(f'Key with name {name} already in API keys preference file.')
-        elif new_key is False and name not in self.api_keys:
+        elif is_new_key is False and name not in self.api_keys:
             raise OclcApiKeyError(f'Key with name {name} not found in API keys preference file.')
 
         # standardize boolean entries on '1' or blank
@@ -115,7 +115,7 @@ class OclcApiKeys:
         is_metadata = '1' if is_metadata else ''
         is_default = '1' if is_default else ''
 
-        self.api_keys['NAME'] = {
+        self.api_keys[name] = {
             'KEY': api_key,
             'SECRET': api_secret,
             'DEFAULT': is_default,
@@ -177,6 +177,10 @@ class OclcApiKeys:
             pass
 
     def write_preferences_to_file(self) -> None:
+        for name in self.api_keys:
+            for cat in self.api_keys[name]:
+                if self.api_keys[name][cat] is None:
+                    self.api_keys[name][cat] = ''
         try:
             with open(self.api_key_config_file_location, "w", encoding="utf8") as fout:
                 yaml.dump(self.api_keys, fout)

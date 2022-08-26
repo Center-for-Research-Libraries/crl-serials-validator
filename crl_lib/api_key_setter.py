@@ -1,9 +1,13 @@
 import os
 import sys
 from termcolor import colored, cprint
-from collections import OrderedDict
 
 from crl_lib.api_keys import OclcApiKeys
+
+
+IS_SEARCH_API_VALUE = colored('Se', 'green')
+IS_METADATA_API_VALUE = colored('Md', 'cyan')
+IS_DEFAULT_VALUE = colored('D', 'white', 'on_blue')
 
 
 def print_terminal_page_header(header_str, header_color='green'):
@@ -27,18 +31,35 @@ class ApiKeySetter:
 
     @staticmethod
     def print_row_to_terminal(
-            number_column, name, api_key, api_secret, is_default_print, header_row=False):
-        print('{}\t{}\t{}\t{}'.format(
-            colored(str(number_column),
-                    'yellow').ljust(4),
+            number_column, name, api_key, api_secret, for_which_apis_print, is_default_print, header_row=False):
+        first_col = f'{colored(str(number_column), "yellow").ljust(2)}  {is_default_print.ljust(2)}'
+        print('{}\t{}\t{}\t{}\t{}'.format(
+            first_col,
             name.ljust(12),
             api_key.ljust(80),
-            api_secret.ljust(20),
-            is_default_print))
+            api_secret.ljust(25),
+            for_which_apis_print,
+            ))
         if header_row is True:
-            for _ in range(0, 150):
+            for _ in range(0, 160):
                 print('-', end='')
             print('')
+
+    def make_which_apis_print_string(self, name: str) -> str:
+        if name not in self.api_keys.api_keys:
+            return ''
+        return_string_list = []
+        try:
+            if self.api_keys.api_keys[name]['SEARCH'] == '1':
+                return_string_list.append(IS_SEARCH_API_VALUE)
+        except KeyError:
+            self.api_keys.api_keys[name]['SEARCH'] = ''
+        try:
+            if self.api_keys.api_keys[name]['METADATA'] == '1':
+                return_string_list.append(IS_METADATA_API_VALUE)
+        except KeyError:
+            self.api_keys.api_keys[name]['METADATA'] = ''
+        return ', '.join(return_string_list)
 
     def make_gui(self):
 
@@ -52,23 +73,26 @@ class ApiKeySetter:
             self.names = list(self.api_keys.api_keys.keys())
             self.names.insert(0, '')
 
-            self.print_row_to_terminal(
-                ' ', 'Name', 'API Key', 'API Secret', '', header_row=True)
+            self.print_row_to_terminal(' ', 'Name', 'API Key', 'API Secret', 'APIs', '', header_row=True)
 
-            for i in range(1, len(names)):
+            for i in range(1, len(self.names)):
                 name = self.names[i]
                 if not name:
                     continue
-                is_default_print = ''
                 api_key = self.api_keys.api_keys[name]['KEY']
                 api_secret = self.api_keys.api_keys[name]['SECRET']
+
                 if self.api_keys.api_keys[name]['DEFAULT'] == '1':
-                    is_default_print = colored('default', 'white', 'on_blue')
-                self.print_row_to_terminal(i, name, api_key, api_secret, is_default_print)
+                    is_default_print = IS_DEFAULT_VALUE
+                else:
+                    is_default_print = ''
+
+                which_apis_print = self.make_which_apis_print_string(name)
+
+                self.print_row_to_terminal(i, name, api_key, api_secret, which_apis_print, is_default_print)
 
             print('')
             print('{}. Add a new key.'.format(colored('a', 'yellow')))
-            print('{}. Edit a key.'.format(colored('e', 'yellow')))
             print('{}. Remove a key.'.format(colored('r', 'yellow')))
             print('{}. Set a new default key.'.format(colored('d', 'yellow')))
             print('{}. Back to the main menu.'.format(colored('m', 'yellow')))
@@ -98,22 +122,20 @@ class ApiKeySetter:
         new_key = input('{} API key: '.format(colored('Enter', 'yellow')))
         new_secret = input('{} API secret (if applicable): '.format(colored('Enter', 'yellow')))
         new_is_default = input('Make default key? ({}/{}) '.format(colored('y', 'yellow'), colored('n', 'yellow')))
+        new_is_search = input('Key works with Search API? ({}/{}) '.format(colored('y', 'yellow'), colored('n', 'yellow')))
+        new_is_metadata = input('Key works with Metadata API? ({}/{}) '.format(colored('y', 'yellow'), colored('n', 'yellow')))
         if not new_name:
             print('No name given; key not added.')
         elif not new_key:
             print('No key input; nothing added.')
-        else:
-            if new_is_default.lower().startswith('y'):
-                make_default = '1'
-            else:
-                make_default = ''
+        elif new_is_metadata and not new_secret:
+            print('Metadata key must have API key secret; key not added.')
 
-            self.api_keys.api_keys[new_name] = {
-                'KEY': new_key,
-                'SECRET': new_secret,
-                'DEFAULT': make_default
-            }
-            self.api_keys.write_preferences_to_file()
+            new_is_default = '1' if new_is_default.lower().startswith('y') else ''
+            new_is_search = '1' if new_is_search.lower().startswith('y') else ''
+            new_is_metadata = '1' if new_is_metadata.lower().startswith('y') else ''
+
+            self.api_keys.add_api_key(new_name, new_key, new_secret, new_is_search, new_is_metadata, new_is_default)
 
     def delete_key(self):
         to_delete = input('{} number to delete: '.format(colored('Enter', 'yellow')))
@@ -142,4 +164,4 @@ class ApiKeySetter:
 
 
 if __name__ == "__main__":
-    a = ApiKeySetter('')
+    a = ApiKeySetter()
