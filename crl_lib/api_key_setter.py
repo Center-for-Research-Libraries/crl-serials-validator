@@ -10,7 +10,7 @@ IS_METADATA_API_VALUE = colored('Md', 'cyan')
 IS_DEFAULT_VALUE = colored('D', 'white', 'on_blue')
 
 
-def print_terminal_page_header(header_str, header_color='green'):
+def print_terminal_page_header(header_str: str, header_color: str = 'green') -> None:
     header_bar = ''.join(['~' for _ in header_str])
     cprint(header_bar, header_color)
     cprint(header_str, header_color)
@@ -24,15 +24,22 @@ class ApiKeySetter:
     GUI front end for the OclcApiKeys library.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.api_keys = None
         self.names = []
         self.make_gui()
 
     @staticmethod
     def print_row_to_terminal(
-            number_column, name, api_key, api_secret, for_which_apis_print, is_default_print, header_row=False):
-        first_col = f'{colored(str(number_column), "yellow").ljust(2)}  {is_default_print.ljust(2)}'
+            number_column: str, 
+            name: str, 
+            api_key: str, 
+            api_secret: str, 
+            for_which_apis_print: str, 
+            is_default_print: str, 
+            header_row: bool = False
+        ) -> None:
+        first_col = f'{colored(number_column, "yellow").ljust(2)}  {is_default_print.ljust(2)}'
         print('{}\t{}\t{}\t{}\t{}'.format(
             first_col,
             name.ljust(12),
@@ -61,7 +68,7 @@ class ApiKeySetter:
             self.api_keys.api_keys[name]['METADATA'] = ''
         return ', '.join(return_string_list)
 
-    def make_gui(self):
+    def make_gui(self) -> None:
 
         while True:
             self.api_keys = OclcApiKeys()
@@ -89,7 +96,7 @@ class ApiKeySetter:
 
                 which_apis_print = self.make_which_apis_print_string(name)
 
-                self.print_row_to_terminal(i, name, api_key, api_secret, which_apis_print, is_default_print)
+                self.print_row_to_terminal(str(i), name, api_key, api_secret, which_apis_print, is_default_print)
 
             print('')
             print('{}. Add a new key.'.format(colored('a', 'yellow')))
@@ -117,7 +124,7 @@ class ApiKeySetter:
                 print("I didn't understand that.")
             print('')
 
-    def add_key(self):
+    def add_key(self) -> None:
         new_name = input('{} name for key: '.format(colored('Enter', 'yellow')))
         new_key = input('{} API key: '.format(colored('Enter', 'yellow')))
         new_secret = input('{} API secret (if applicable): '.format(colored('Enter', 'yellow')))
@@ -137,7 +144,7 @@ class ApiKeySetter:
 
             self.api_keys.add_api_key(new_name, new_key, new_secret, new_is_search, new_is_metadata, new_is_default)
 
-    def delete_key(self):
+    def delete_key(self) -> None:
         to_delete = input('{} number to delete: '.format(colored('Enter', 'yellow')))
         try:
             name_to_delete = self.names[int(to_delete.strip())]
@@ -150,7 +157,7 @@ class ApiKeySetter:
             print('Must enter a valid number to delete.')
             input('Press Enter to continue.')
 
-    def set_default_key(self):
+    def set_default_key(self) -> None:
         new_default = input('{} number to set as default: '.format(colored('Enter', 'yellow')))
         try:
             default_name = self.names[int(new_default)]

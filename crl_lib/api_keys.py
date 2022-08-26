@@ -91,16 +91,38 @@ class OclcApiKeys:
         with open(self.api_key_config_file_location, 'r', encoding='utf8') as fin:
             self.api_keys = yaml.full_load(fin)
 
-    def add_api_key(self, name: str, api_key: str, api_secret: str, is_search: str, is_metadata: str,
-                    is_default: str) -> None:
+    def add_api_key(
+        self, 
+        name: str, 
+        api_key: str, 
+        api_secret: str, 
+        is_search: str, 
+        is_metadata: str,
+        is_default: str
+    ) -> None:
         self.alter_api_key(name, api_key, api_secret, is_search, is_metadata, is_default, True)
 
-    def update_api_key(self, name: str, api_key: str, api_secret: str, is_search: str, is_metadata: str,
-                       is_default: str) -> None:
+    def update_api_key(
+        self, 
+        name: str, 
+        api_key: str, 
+        api_secret: str, 
+        is_search: str, 
+        is_metadata: str,
+        is_default: str
+    ) -> None:
         self.alter_api_key(name, api_key, api_secret, is_search, is_metadata, is_default, False)
 
-    def alter_api_key(self, name: str, api_key: str, api_secret: str, is_search: str, is_metadata: str, is_default: str,
-                      is_new_key: bool) -> None:
+    def alter_api_key(
+        self, 
+        name: str, 
+        api_key: str, 
+        api_secret: str, 
+        is_search: str, 
+        is_metadata: str, 
+        is_default: str,
+        is_new_key: bool
+    ) -> None:
         if not name:
             raise OclcApiKeyError('Need name for API key.')
         if not api_key:
