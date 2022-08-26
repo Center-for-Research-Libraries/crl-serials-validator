@@ -7,8 +7,16 @@ import sys
 from crl_lib.crl_file_locations import get_api_key_file_location
 
 
-class OclcApiKeys:
+class OclcApiKeyError(Exception):
+    """
+    Generic error class for API key errors.
+    """
 
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+
+
+class OclcApiKeys:
     """
     Class for getting WorldCat Search API keys from a preferences file.
 
@@ -83,6 +91,39 @@ class OclcApiKeys:
         with open(self.api_key_config_file_location, 'r', encoding='utf8') as fin:
             self.api_keys = yaml.full_load(fin)
 
+    def add_api_key(self, name: str, api_key: str, api_secret: str, is_search: str, is_metadata: str,
+                    is_default: str) -> None:
+        self.add_api_key(name, api_key, api_secret, is_search, is_metadata, is_default, True)
+
+    def update_api_key(self, name: str, api_key: str, api_secret: str, is_search: str, is_metadata: str,
+                       is_default: str) -> None:
+        self.add_api_key(name, api_key, api_secret, is_search, is_metadata, is_default, False)
+
+    def alter_api_key(self, name: str, api_key: str, api_secret: str, is_search: str, is_metadata: str, is_default: str,
+                      new_key: bool) -> None:
+        if not name:
+            raise OclcApiKeyError('Need name for API key.')
+        if not api_key:
+            raise OclcApiKeyError(f'No key value provided for name {name}')
+        if new_key is True and name in self.api_keys:
+            raise OclcApiKeyError(f'Key with name {name} already in API keys preference file.')
+        elif new_key is False and name not in self.api_keys:
+            raise OclcApiKeyError(f'Key with name {name} not found in API keys preference file.')
+
+        # standardize boolean entries on '1' or blank
+        is_search = '1' if is_search else ''
+        is_metadata = '1' if is_metadata else ''
+        is_default = '1' if is_default else ''
+
+        self.api_keys['NAME'] = {
+            'KEY': api_key,
+            'SECRET': api_secret,
+            'DEFAULT': is_default,
+            'SEARCH': is_search,
+            'METADATA': is_metadata,
+        }
+        self.write_preferences_to_file()
+
     @property
     def api_key(self) -> str:
         try:
@@ -97,7 +138,7 @@ class OclcApiKeys:
 
     def get_api_key_name(self) -> str:
         return self.api_key_name
-                
+
     def set_preferred_api_key_name(self, name: str) -> None:
         """
         Set the preferred API key name in the preferences. To make this permanent,
@@ -107,8 +148,7 @@ class OclcApiKeys:
         try:
             self.api_keys[name]['DEFAULT'] = '1'
         except KeyError:
-            raise KeyError(
-                f"Can't use name {name} as preferred API key; not in list of keys.")
+            raise KeyError(f"Can't use name {name} as preferred API key; not in list of keys.")
 
     def set_api_key_name(self, name_for_key: str = '') -> None:
         # No API keys read. The user will have to add some, or the base script will have to deal with the issue
@@ -158,6 +198,8 @@ class OclcApiKeys:
                 'KEY': config['API KEYS'][name],
                 'SECRET': '',
                 'DEFAULT': '',
+                'METADATA': '',
+                'SEARCH': '1'
             }
         try:
             for name in config['Preferred API Key']:
