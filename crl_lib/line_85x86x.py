@@ -632,7 +632,6 @@ class Convert85x86x(Read85x86x):
                 chronology_str = re.sub(r"(\b){}(\b)".format(digits), r"\1{}\2".format(chron_data), chronology_str)
             except re.error:
                 print(f"CHRON TYPE: {chronology_type}\tDIGITS: {digits}\tCHRON DATA: {chron_data}\tCHRON STRING: {chronology_str}")
-
         return chronology_str
 
     def convert_season_number_to_text(self, season_number):

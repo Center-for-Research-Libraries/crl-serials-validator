@@ -205,11 +205,15 @@ class MarcFields:
                 # Similar issue if last OCLC code ends with a dollar sign.
                 if line.endswith('$'):
                     line = line[:-1] + r'{dollar}'
-            if line[8] == '$':
-                field_list = line[9:].split('$')
-            else:
-                field_list = line[8:].split('$')
-                self.warnings_list.append('No subfield indicator at start of MARC line {}'.format(line))
+            try:
+                if line[8] == '$':
+                    field_list = line[9:].split('$')
+                else:
+                    field_list = line[8:].split('$')
+                    self.warnings_list.append('No subfield indicator at start of MARC line {}'.format(line))
+            except IndexError:
+                print(f'ERROR FIELD {field}')
+                print(self.marc)
             for subfield_data in field_list:
                 try:
                     subfield = subfield_data[0]

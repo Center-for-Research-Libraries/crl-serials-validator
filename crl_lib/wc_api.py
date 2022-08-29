@@ -1,45 +1,7 @@
 """
-wc_api.py
-====================================
-Get records from the WorldCat Search API.
-
-At present works with OCLC numbers, ISSNs, LCCNs, and SNs.
-
-OCLC number searches by default first search the local database of
-collected MARC records. This can be turned off with the flag skip_db=True,
-or set to only use records collected within the last six months with the
-flag recent_only=True.
-
-ISSN searches can be set to search for records only at a specific institution
-with the flag institution=library_symbol. By default ISSN searches are not
-frbrized; this can be changed with the flag frbrize=True.
-
-By default, the class returns MARC as a Unicode text string. It can
-instead return MARCXML if the user sets the flag return_marcxml=True.
-
-If the user has set a default API key, the class will use that. If a key
-has not been set, one can be set with the flag user_name=name. The name
-string should be lower case, and should be the same as a name in the
-config.ini file in the user's preferences folder.
-
-Sample usage:
-
-    from crl_lib.wc_api import WcApi
-
-    fetcher = WcApi()
-
-    # single record from an OCLC
-    marc_record = fetcher.fetch_marc_from_api(oclc_number)
-    # single record from OCLC, skipping the local database
-    marc_record = fetcher.fetch_marc_from_api(oclc_number, skip_db=True)
-    # list of records from an LCCN, with a specific API key
-    marc_list = fetcher.fetch_marc_from_api(lccn, user_name="nate")
-    # change the default API key
-    fetcher.name = "andy"
-    # list of records from an ISSN, only in the CRL
-    marc_list = fetcher.fetch_marc_from_api(issn, institution="crl")
-    # a frbrized list of records from an ISSN
-    marc_list = fetcher.fetch_marc_from_api(issn, frbrize=True)
+Frontend for interacting with the WorldCat Search and Metadata APIs as well as 
+the local database of MARC record, mainly for the retrieval of MARC records 
+given OCLC numbers.
     
 """
 
@@ -52,6 +14,7 @@ import sys
 import logging
 
 from crl_lib.api_keys import OclcApiKeys
+from crl_lib.search_api import SearchApi
 import crl_lib.marcxml
 from crl_lib.crl_utilities import fix_issn, fix_lccn
 import crl_lib.local_marc_db
@@ -73,7 +36,14 @@ class WcApi:
 
     """
 
-    def __init__(self, user_name=None, data_folder=None):
+    def __init__(
+        self, 
+        user_name: str = '', 
+        data_folder: str = '', 
+        api_key: str = '', 
+        api_secret: str = '', 
+        default_api: str = 'search'
+    ) -> None:
         self._name = user_name
         self.crl_marcxml = crl_lib.marcxml.CrlMarcXML()
         self.api_keys = OclcApiKeys(api_key_config_file_location=data_folder, name_for_key=user_name)
