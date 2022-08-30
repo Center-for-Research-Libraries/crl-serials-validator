@@ -6,3 +6,4 @@ requests
 pyyaml
 termcolor
 colorama
+oauthlib
