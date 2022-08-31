@@ -1,6 +1,6 @@
 import logging
 
-from crl_lib.wc_api import WcApi
+from crl_lib.search_api import SearchApi
 from crl_lib.marc_fields import MarcFields, WorldCatMarcFields
 
 from validator_lib.validator_data import CRL_FOLDER
@@ -29,7 +29,7 @@ class WorldCatMarcDataExtractor:
     """
     def __init__(self):
         logging.info('Getting WorldCat data.')
-        self.wc_api = WcApi(data_folder=CRL_FOLDER)
+        self.search_api = SearchApi(data_folder=CRL_FOLDER)
         self.no_worldcat_data_found = []
         self.no_oclc_in_input = 0
 
@@ -55,7 +55,7 @@ class WorldCatMarcDataExtractor:
             self.no_oclc_in_input += 1
             return None
 
-        marc = self.wc_api.fetch_marc_from_api(oclc, recent_only=True)
+        marc = self.search_api.fetch_marc_from_api(oclc, recent_only=True)
 
         if not marc:
             self.no_worldcat_data_found.append(oclc)

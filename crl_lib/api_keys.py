@@ -46,6 +46,7 @@ class OclcApiKeys:
         self.config = ''
 
         self.read_config_file()
+        self.set_api_key_name(self.name_for_key)
 
     def __del__(self) -> None:
         pass
@@ -149,13 +150,25 @@ class OclcApiKeys:
     @property
     def api_key(self) -> str:
         try:
-            return self.api_keys['KEYS'][self.api_key_name]
+            return self.api_keys[self.api_key_name]['KEY']
         except AttributeError:
             # no key set, probably because none in api_keys.yaml
             return ''
 
     @api_key.setter
     def api_key(self, name_for_key: str = '') -> None:
+        self.set_api_key_name(name_for_key)
+
+    @property
+    def api_key_secret(self) -> str:
+        try:
+            return self.api_keys[self.api_key_name]['SECRET']
+        except AttributeError:
+            # no key set, probably because none in api_keys.yaml
+            return ''
+
+    @api_key_secret.setter
+    def api_key_secret(self, name_for_key: str = '') -> None:
         self.set_api_key_name(name_for_key)
 
     def get_api_key_name(self) -> str:

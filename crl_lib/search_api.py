@@ -49,7 +49,6 @@ class WorldCatSearchApiFailureError(Exception):
 class SearchApi:
     """
     Class for fetching MARC records from the WorldCat Search API.
-
     """
 
     def __init__(self, api_key: str):
