@@ -23,8 +23,6 @@ Sample usage:
     
 """
 
-from pprint import pprint
-import xml.etree.ElementTree as ET
 import urllib3
 from collections import Counter
 import time
@@ -32,7 +30,6 @@ import sys
 import logging
 
 import crl_lib.marcxml
-from crl_lib.crl_utilities import fix_issn, fix_lccn
 import crl_lib.local_marc_db
 
 
@@ -113,7 +110,7 @@ class SearchApi:
     def fetch_marc_from_api(self, search_term: str, return_marcxml: bool = False) -> str:
         """The main function for getting MARC from the API."""
 
-        search_url = self.base_search_strings["oclc"].format(search_term, self.api_key)
+        search_url = self.base_search_string.format(search_term, self.api_key)
 
         marcxml = self._fetch_from_api(search_url)
         

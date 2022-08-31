@@ -36,6 +36,13 @@ class MetadataApi(OclcClientCredentialsGrant):
         super().__init__(api_key, api_secret, SCOPE)
         self.marcxml_converter = CrlMarcXML()
     
+    def fetch_marc_from_api(self, oclc_number: str) -> str:
+        """
+        Convenience function to match the name in the old Search API object
+        """
+        marc_record = self.get_marc_record_from_oclc(oclc_number)
+        return marc_record
+
     def get_marc_record_from_oclc(self, oclc_number: str) -> str:
         marcxml = self.get_marcxml_from_oclc(oclc_number)
         marc_list = self.marcxml_converter.marcxml_to_marc(marcxml)

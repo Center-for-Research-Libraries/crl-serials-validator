@@ -6,22 +6,16 @@ given OCLC numbers.
 """
 
 from pprint import pprint
-import xml.etree.ElementTree as ET
-import urllib3
 from collections import Counter
-import time
-import sys
 import logging
 
+from crl_lib.crl_file_locations import CrlFileLocations
 from crl_lib.api_keys import OclcApiKeys
 from crl_lib.search_api import SearchApi
 from crl_lib.metadata_api import MetadataApi
 import crl_lib.marcxml
 from crl_lib.crl_utilities import fix_issn, fix_lccn
 import crl_lib.local_marc_db
-
-
-TEST_OCLC_NUMBER = '84078'  # The Center for Research Libraries catalogue : monographs 
 
 
 class WorldCatApiFailureError(Exception):
@@ -46,21 +40,28 @@ class WcApi:
         data_folder: str = '', 
         api_key: str = '', 
         api_secret: str = '', 
-        default_api: str = 'any',  # 'search', 'metadata', or 'any'
-        preferred_api: str = '',  # 'search', 'metadata', or 'any'
+        preferred_api: str = 'any',  # 'search', 'metadata', or 'any'
     ) -> None:
 
-        self.default_api = default_api
+        self.wc_api = None
+
         self.preferred_api = preferred_api
         self._name = user_name
 
+        self._api_key = api_key
+        self._api_secret = api_secret
+
         self.api_keys = OclcApiKeys(api_key_config_file_location=data_folder, name_for_key=user_name)
 
+        if not data_folder:
+            data_folder = CrlFileLocations().find_data_folder()
+
         self.local_marc_db = crl_lib.local_marc_db.LocalMarcDb(data_folder=data_folder)
-        self.http = urllib3.PoolManager()
         self.counter = Counter()
 
         self.logger = logging.getLogger()
+
+        self.set_api()
 
     @property
     def name(self):
@@ -85,34 +86,30 @@ class WcApi:
             self.crl_marcxml = None
 
     def set_api(self):
-        if not self.preferred_api:
-            pass
-        elif self.preferred_api == 'search':
-            pass
-        elif self.preferred_api == 'metadata':
-            pass
+        if self.preferred_api == 'metadata':
+            self.try_metadata_api()
 
-    def open_search_api(self):
-        self.search_api = SearchApi(self.api_keys.api_key)
+        if not self.wc_api:
+            self.wc_api = SearchApi(self.api_keys.api_key)
 
-    def open_metadata_api(self):
-        self.metadata_api = MetadataApi(self.api_keys.api_key, self.api_keys.api_key_secret)
-
-    def test_search_api(self) -> bool:
-        test_marc = self.search_api.fetch_marc_from_api(TEST_OCLC_NUMBER)
-        if test_marc:
-            return True
-        return False
-
-    def test_metadata_api(self):
-        test_marc = self.metadata_api.get_marc_record_from_oclc(TEST_OCLC_NUMBER)
-        if test_marc:
-            return True
-        return False
+    def try_metadata_api(self) -> None:
+        if self.api_keys.api_key and self.api_keys.api_key_secret:
+            self.wc_api = MetadataApi(self.api_keys.api_key, self.api_keys.api_key_secret)
+            self.wc_api.fetch_token()
+            try:
+                self.wc_api._token
+            except AttributeError:
+                self.wc_api = None
 
     def fetch_marc_from_api(
         self, search_term: str, search_type: str = "oclc", frbrize: bool = False, institution: str = '',
         skip_db: bool = False, recent_only: bool = False, return_marcxml: bool = False
     ) -> str:
         """The main function for getting MARC from the API."""
-        pass
+        if not skip_db:
+            marc_record = self.local_marc_db.get_marc_from_db(search_term, recent_only)
+            if marc_record:
+                return marc_record
+
+        marc_record = self.wc_api.fetch_marc_from_api(search_term)
+        return marc_record

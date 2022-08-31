@@ -32,12 +32,12 @@ class OclcApiKeys:
     api_keys = {}
     api_key_config_file_location = None
 
-    def __init__(self, name: str = '', api_key_config_file_location: str = '') -> None:
+    def __init__(self, name_for_key: str = '', api_key_config_file_location: str = '') -> None:
 
         if api_key_config_file_location and not api_key_config_file_location.endswith('yaml'):
             api_key_config_file_location = os.path.join(api_key_config_file_location, 'api_keys.yaml')
 
-        self.name_for_key = name
+        self.name_for_key = name_for_key
         self.find_config_file(api_key_config_file_location)
         self.check_api_key_config_file_location()
         self.api_keys = {}
