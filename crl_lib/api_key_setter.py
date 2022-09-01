@@ -1,5 +1,6 @@
 import os
 import sys
+from tkinter import HORIZONTAL
 from unicodedata import name
 from termcolor import colored, cprint
 
@@ -7,13 +8,16 @@ from crl_lib.api_keys import OclcApiKeys
 from crl_lib.wc_api_utilities import test_search_api, test_metadata_api
 
 
-IS_SEARCH_API_KEY_VALUE = colored('Se', 'green')
-IS_METADATA_API_KEY_VALUE = colored('Md', 'cyan')
-IS_DEFAULT_VALUE = colored('D', 'white', 'on_blue')
+IS_SEARCH_API_KEY_VALUE = colored('Search', 'green')
+IS_METADATA_API_KEY_VALUE = colored('Metadata', 'cyan')
+IS_DEFAULT_KEY_VALUE = '  ' + colored('default', 'white', 'on_blue') + '  '
+IS_NOT_DEFAULT_KEY_VALUE = '           '
 
 SUCCESS_LINE = 'Key ' + colored('works', 'yellow') + ' with {} API.'
 FAILURE_LINE = 'Key ' + colored('does not work', 'red') + ' with {} API.'
 NOT_SET_LINE = FAILURE_LINE + ' ' + colored('{} not set.', 'red')
+
+HORIZONTAL_LINE = ''.join(['-' for i in range(0, 109)])
 
 
 def print_terminal_page_header(header_str: str, header_color: str = 'green') -> None:
@@ -46,18 +50,18 @@ class ApiKeySetter:
             is_default_print: str, 
             header_row: bool = False
         ) -> None:
-        first_col = f'{colored(number_column, "yellow").ljust(2)}  {is_default_print.ljust(2)}'
-        print('{}{}\t{}{}{}'.format(
-            first_col,
-            name.ljust(12),
-            api_key.ljust(84),
-            api_secret.ljust(36),
-            for_which_apis_print,
-            ))
+
         if header_row is True:
-            for _ in range(0, 160):
-                print('-', end='')
-            print('')
+            print(HORIZONTAL_LINE)
+            return
+
+        first_col = f'{colored(number_column, "yellow").ljust(3)}{is_default_print}'
+
+        print(f'{first_col}{name.ljust(12)}{colored("Key", "yellow")}: {api_key}')
+        print(f'                        {colored("Secret", "yellow")}: {api_secret}')
+        print(f'                        {colored("APIs", "yellow")}: {for_which_apis_print}')
+
+        print(HORIZONTAL_LINE)
 
     def check_if_key_works_with_search_api(self, api_key: str) -> str:
         if api_key and test_search_api(api_key) is True:
@@ -83,7 +87,6 @@ class ApiKeySetter:
         return ''
 
     def make_which_apis_work_with_key_print_string(self, name: str, api_key: str, api_secret) -> str:
-
         return_string_list = []
         if self.api_keys.api_keys[name]['SEARCH']:
             return_string_list.append(IS_SEARCH_API_KEY_VALUE)
@@ -113,9 +116,9 @@ class ApiKeySetter:
                 api_secret = self.api_keys.api_keys[name]['SECRET']
 
                 if self.api_keys.api_keys[name]['DEFAULT'] == '1':
-                    is_default_print = IS_DEFAULT_VALUE + '  '
+                    is_default_print = IS_DEFAULT_KEY_VALUE
                 else:
-                    is_default_print = '   '
+                    is_default_print = IS_NOT_DEFAULT_KEY_VALUE
 
                 which_apis_print = self.make_which_apis_work_with_key_print_string(name, api_key, api_secret)
 
