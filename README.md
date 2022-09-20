@@ -24,7 +24,7 @@ If the user has a subscription to data downloads from the ISSN Centre, the user 
 
 To install and use the CRL Serials Validator you will need:
 
-* One or more [WorldCat Search API keys](https://help.oclc.org/Discovery_and_Reference/WorldCat_Discovery/Troubleshooting/How_do_I_request_a_WSKey_for_the_WorldCat_Search_API?sl=en).
+* One or more [WorldCat Search API or Discovery API keys](https://help.oclc.org/Discovery_and_Reference/WorldCat_Discovery/Troubleshooting/How_do_I_request_a_WSKey_for_the_WorldCat_Search_API?sl=en).
 * Python (version 3.4 or later), with the ability to install extra Python libraries.
 * Input files in one of the following formats: xlsx, csv, tab-separated text, or MARC text (mrk).
 
@@ -49,9 +49,9 @@ The CRL Serials Validator can be run by typing `python crl_serials_validator.py`
 
 From here, running the CRL Serials Validator should be relatively straightforward.
 
-### Set up your WorldCat Search API keys
+### Set up your WorldCat API keys
 
-If you have used the CRL MARC Machine on this computer you might be able to skip this step. Otherwise, choose this option and enter a valid API key and a name for it.
+If you have used the CRL MARC Machine on this computer you might be able to skip this step. Otherwise, choose this option and enter a valid API key and a name for it. A secret is necessary only for the Discovery API.
 
 Choosing this option will cause a separate window to open. It might open under the command line window, so look for it on your taskbar if you don't see it. 
 
@@ -97,9 +97,9 @@ Output files will be in the `output` directory, with separate output files for e
 
 ### Data files
 
-Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.ini` (to store WorldCat Search API keys), and a general configuration file called `validator_config.ini`. The `validator_config.ini` will be put in the `data` folder in the CRL Serials Validator's main folder. The other two files will go in the user's data directory in a folder called `CRL`. On Windows this will usually be found at `C:\Users\USERNAME\AppData\Local\CRL\CRL`. On most Linux systems it will be at `/home/USERNAME/.local/share/CRL`.
+Beside its regular output files the Validator will create a file called `marc_database.db` (for storing downloaded MARC files), a file called `api_keys.yaml` (to store WorldCat API keys), and a general configuration file called `validator_config.ini`. The `validator_config.ini` will be put in the `data` folder in the CRL Serials Validator's main folder. The other two files will go in the user's data directory in a folder called `CRL`. On Windows this will usually be found at `C:\Users\USERNAME\AppData\Local\CRL\CRL`. On most Linux systems it will be at `/home/USERNAME/.local/share/CRL`.
 
-To create a "portable" version of the application, move the `marc_database.db` and `api_keys.ini` files to the `data` folder in the main application folder. After that the application will default to using those files and won't try to create files in other places on the user's drive.
+To create a "portable" version of the application, move the `marc_database.db` and `api_keys.yaml` files to the `data` folder in the main application folder. After that the application will default to using those files and won't try to create files in other places on the user's drive.
 
 If you hae a copy of the ISSN database, it should be put in the same directory that contains `marc_database.db`.
 
@@ -115,10 +115,6 @@ The project can use, but does not require, data from the ISSN International Cent
 
 There are test input files in the `test_inputs` folder. Copy some or all of them into the `input` folder to use them.
 
-### Planned updates
-
-* The next version of the CRL Serials Validator will have a full (non command line) GUI, and by default will run in graphical mode.
-* We will have a binary (.exe file) release of the CRL Serials Validator for Windows, so it can be run by clicking an icon rather than opening a command line.
 
 ### Other documentation
 
