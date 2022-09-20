@@ -188,7 +188,7 @@ class OclcApiKeys:
     def set_api_key_name(self, name_for_key: str = '') -> None:
         # No API keys read. The user will have to add some, or the base script will have to deal with the issue
         if not self.api_keys:
-            raise KeyError(f"No API keys set?")
+            return
         self.api_key_name = ''
         if name_for_key:
             if name_for_key not in self.api_keys:

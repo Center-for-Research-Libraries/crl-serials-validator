@@ -170,7 +170,7 @@ class ValidatorController:
 
         warning_messages = []
 
-        api_keys = OclcApiKeys(CRL_FOLDER)
+        api_keys = OclcApiKeys(api_key_config_file_location=CRL_FOLDER)
         if not api_keys.api_key:
             logging.error('No WorldCat Search API key set.')
             error_message = "Please set a WorldCat Search API key."
