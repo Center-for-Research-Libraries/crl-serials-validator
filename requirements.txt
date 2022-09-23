@@ -4,6 +4,7 @@ xlsxwriter
 openpyxl
 requests
 pyyaml
+pymarc
 termcolor
 colorama
 oauthlib
