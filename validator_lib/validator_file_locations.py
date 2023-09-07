@@ -97,6 +97,7 @@ def migrate_from_appdirs_directory():
     else:
         # CRL folder exists. Copy file-by-file.
         appdirs_contents = os.listdir(appdirs_directory)
+        appdirs_contents.sort()
         for my_file in appdirs_contents:
             source = os.path.join(appdirs_directory, my_file)
             destination = os.path.join(CRL_FOLDER, my_file)

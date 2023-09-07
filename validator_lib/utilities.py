@@ -136,6 +136,7 @@ def get_later_of_slash_year(year, data_segment):
 def get_jstor_issns():
     jstor = set()
     data_files = os.listdir(VALIDATOR_DATA_FOLDER)
+    data_files.sort()
     for data_file in data_files:
         if not data_file.lower().startswith('jstor'):
             continue

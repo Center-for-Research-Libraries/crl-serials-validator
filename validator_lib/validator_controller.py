@@ -82,6 +82,7 @@ class ValidatorController:
 
     def get_input_files(self):
         all_input_files = os.listdir(VALIDATOR_INPUT_FOLDER)
+        all_input_files.sort()
         for input_file in all_input_files:
             if input_file.startswith('~'):
                 continue
@@ -197,6 +198,7 @@ class ValidatorController:
                     cprint("I didn't understand that.", 'red')
                     print('')
         output_files = os.listdir(VALIDATOR_OUTPUT_FOLDER)
+        output_files.sort()
         for output_file in output_files:
             logging.info(
                 'Clearing output folder; deleting {}'.format(output_file))
