@@ -203,7 +203,8 @@ simple_file_reader.py
 spreadsheet_reader.py
 volume_transform.py
 
-# scripts used in development
+# scripts and other files used in development
 z_test*
 test.py
 test.txt
+*zip
