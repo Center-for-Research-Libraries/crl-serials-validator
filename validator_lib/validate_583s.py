@@ -54,7 +54,7 @@ class Line583Validator:
 
     def validate_583_line(self, line, record_dict):
         errors = []
-        self.check_for_ilLEGAL_583_SUBFIELDS(line, record_dict, errors)
+        self.check_for_illegal_583_subfields(line, record_dict, errors)
         delimiter_1 = line[6]
         delimiter_2 = line[7]
         self.validate_delimiters(delimiter_1, delimiter_2, errors)
@@ -142,12 +142,16 @@ class Line583Validator:
         except IndexError:
             output_row.append('')
 
-    def check_for_ilLEGAL_583_SUBFIELDS(self, line, record_dict, errors):
+    def check_for_illegal_583_subfields(self, line, record_dict, errors):
         seen_subfields = set()
         split_line = line.split('$')
         split_line.pop(0)
         for segment in split_line:
-            subfield = segment[0]
+            try:
+                subfield = segment[0]
+            except IndexError:
+                # will most likely be something like doing dollar signs in the field
+                subfield = ' '
             if subfield not in LEGAL_583_SUBFIELDS:
                 subfield = subfield.strip()
                 if subfield:
