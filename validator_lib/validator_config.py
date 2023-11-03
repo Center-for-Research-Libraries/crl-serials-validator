@@ -20,6 +20,7 @@ class ValidatorConfig:
 
         self.read_validator_config_file()
         self.check_that_all_issues_are_in_config()
+        self.make_input_fields_program_map()
 
     def read_validator_config_file(self):
         """
@@ -107,6 +108,7 @@ class ValidatorConfig:
             if not self.config[input_file][cat]:
                 continue
             cat_data = self.config[input_file][cat]
+            cat_data = str(cat_data)
             cat_data = cat_data.strip()
             if input_file.endswith('mrk'):
                 cat_data = self.zero_fill_marc_fields(cat_data)
@@ -129,8 +131,20 @@ class ValidatorConfig:
                 if input_file.endswith('mrk'):
                     cat_data = self.zero_fill_marc_fields(cat_data)
                 input_fields[cat] = cat_data
-
         return input_fields
+
+    def make_input_fields_program_map(self) -> None:
+        """
+        Make a map of bulk-entry programs and associated other programs.
+        """
+        if 'programs' not in self.config:
+            return
+        self.config['programs_map'] = {}
+        for program in self.config['programs']:
+            self.config['programs_map'][program] = program
+            if 'associated_names' in self.config['programs'][program]:
+                for subprogram in self.config['programs'][program]['associated_names']:
+                    self.config['programs_map'][subprogram] = program
 
     def get_disqualifying_issues(self, input_file=None):
         """

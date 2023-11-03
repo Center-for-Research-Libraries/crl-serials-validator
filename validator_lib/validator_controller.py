@@ -4,6 +4,7 @@ import datetime
 import webbrowser
 import sys
 import gc
+import re
 from termcolor import cprint
 
 from validator_lib.validator_data import (
@@ -81,7 +82,9 @@ class ValidatorController:
         cprint(break_line, 'yellow')
 
     def get_input_files(self):
+        validator_config_object = ValidatorConfig()
         all_input_files = os.listdir(VALIDATOR_INPUT_FOLDER)
+        all_input_files.sort()
         for input_file in all_input_files:
             if input_file.startswith('~'):
                 continue
@@ -89,6 +92,20 @@ class ValidatorController:
             if not file_extension.lower() in VIABLE_INPUT_FORMATS:
                 continue
             self.input_files.append(input_file)
+
+            m = re.search(r"^(\w\w\w\w*)\.", input_file)
+            try:
+                oclc_symbol = m.group(1).lower()
+                if oclc_symbol in validator_config_object.config['programs_map']:
+                    mapped_symbol = validator_config_object.config['programs_map'][oclc_symbol]
+                    try:
+                        validator_config_object.config[input_file] = validator_config_object.config['programs'][mapped_symbol]['input_fields']
+                        validator_config_object.write_validator_config_file()
+                    except IndexError:
+                        pass
+            except AttributeError:
+                pass
+
 
     def check_input_folder(self):
         if not self.input_files:
@@ -197,6 +214,7 @@ class ValidatorController:
                     cprint("I didn't understand that.", 'red')
                     print('')
         output_files = os.listdir(VALIDATOR_OUTPUT_FOLDER)
+        output_files.sort()
         for output_file in output_files:
             logging.info(
                 'Clearing output folder; deleting {}'.format(output_file))
