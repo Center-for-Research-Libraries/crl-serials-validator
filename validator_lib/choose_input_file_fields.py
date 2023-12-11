@@ -89,6 +89,9 @@ class InputFieldsChooser:
 
         self.make_gui()
 
+    def __del__(self):
+        self.validator_config.write_validator_config_file()
+
     def make_gui(self):
         while True:
             print_terminal_page_header("Choose Input File Fields")
