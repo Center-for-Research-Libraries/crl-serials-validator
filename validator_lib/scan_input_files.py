@@ -29,7 +29,7 @@ from crl_lib.marc_fields import MarcFields
 class InputFileScanner:
     def __init__(self, input_files):
         self.data = {}
-        self.input_dir = os.path.join(os.getcwd(), 'input')
+        self.input_dir = os.path.join(os.getcwd(), "input")
         self.input_files = input_files
         self.cats = [
             "Total records",
@@ -37,11 +37,12 @@ class InputFileScanner:
             "OCLC in 001",
             "Have 004 field",
             "OCLC in 004",
-            "Have 035", 
+            "Have 035",
             "OCLC in 035",
             "Have 583",
             "Have 863/864/865",
-            "Have 866/867/868"]
+            "Have 866/867/868",
+        ]
 
     def scan_input_files(self):
         logging.debug("Scanning input files.")
@@ -51,10 +52,16 @@ class InputFileScanner:
                 self.marc_scanner(input_file)
             elif input_file.endswith(".xlsx"):
                 logging.info("Skipping {}".format(input_file))
-            elif input_file.endswith(".txt") or input_file.endswith(".tsv") or input_file.endswith(".csv"):
+            elif (
+                input_file.endswith(".txt")
+                or input_file.endswith(".tsv")
+                or input_file.endswith(".csv")
+            ):
                 logging.info("Skipping {}".format(input_file))
             else:
-                logging.warning("Unknown file type in input directory: {}".format(input_file))
+                logging.warning(
+                    "Unknown file type in input directory: {}".format(input_file)
+                )
 
     def marc_scanner(self, input_file):
         input_file_loc = os.path.join(self.input_dir, input_file)
@@ -63,8 +70,8 @@ class InputFileScanner:
         for marc in mfr:
             file_data["Total records"] += 1
             mf = MarcFields(marc)
-            field_001 = get_field_subfield(marc, '001')
-            field_004 = get_field_subfield(marc, '004')
+            field_001 = get_field_subfield(marc, "001")
+            field_004 = get_field_subfield(marc, "004")
             if field_001:
                 file_data["Have 001 field"] += 1
             if self.check_001_004_for_oclc(field_001) is True:
@@ -87,28 +94,32 @@ class InputFileScanner:
 
         # skip blank file
         if file_data["Total records"] == 0:
-            logging.warning('No records found in {}. Blank file?'.format(input_file))
+            logging.warning("No records found in {}. Blank file?".format(input_file))
             return
         self.print_file_scan_results(input_file, file_data)
 
     @staticmethod
     def check_001_004_for_oclc(input_field):
-        if input_field and re.search(r'\d', input_field):
-            if 'ocm' in input_field.lower() or 'ocn' in input_field.lower():
+        if input_field and re.search(r"\d", input_field):
+            if "ocm" in input_field.lower() or "ocn" in input_field.lower():
                 return True
-            if 'ocolc' in input_field.lower():
+            if "ocolc" in input_field.lower():
                 return True
         return False
 
     def print_file_scan_results(self, input_file, file_data):
-        logging.info('Quick scan of file {}'.format(input_file))
-        print_terminal_page_header('Quick scan of file {}'.format(input_file))
+        logging.info("Quick scan of file {}".format(input_file))
+        print_terminal_page_header("Quick scan of file {}".format(input_file))
         for cat in self.cats:
-            output = [cat, file_data[cat], "{:.1%}".format(file_data[cat]/file_data["Total records"])]
-            output_string = '{}{}\t{}'.format(
-                colored(str(output[0]).ljust(20), 'yellow'), 
-                colored(str(output[1]).rjust(5), 'cyan'),
-                colored(str(output[2]).rjust(7), 'blue')
+            output = [
+                cat,
+                file_data[cat],
+                "{:.1%}".format(file_data[cat] / file_data["Total records"]),
+            ]
+            output_string = "{}{}\t{}".format(
+                colored(str(output[0]).ljust(20), "yellow"),
+                colored(str(output[1]).rjust(5), "cyan"),
+                colored(str(output[2]).rjust(7), "blue"),
             )
             logging.info(output_string)
             print(output_string)
@@ -116,10 +127,10 @@ class InputFileScanner:
     def text_scanner(self, input_file):
         # TODO:
         input_file_loc = os.path.join(self.input_dir, input_file)
-        if input_file.endswith('.csv'):
-            delimiter = ','
+        if input_file.endswith(".csv"):
+            delimiter = ","
         else:
-            delimiter = '\t'
+            delimiter = "\t"
 
         file_data = Counter()
         with open(input_file_loc, "r") as fin:

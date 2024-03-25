@@ -7,9 +7,10 @@ import logging
 
 from validator_lib.validator_data import VALIDATOR_DATA_FOLDER
 
+
 class ValidatorConfig:
 
-    config_file = os.path.join(VALIDATOR_DATA_FOLDER, 'config.yaml')
+    config_file = os.path.join(VALIDATOR_DATA_FOLDER, "config.yaml")
 
     def __init__(self):
         self.config = {}
@@ -24,9 +25,9 @@ class ValidatorConfig:
 
     def read_validator_config_file(self):
         """
-        Read the YAML config file. 
-        
-        First check if it exists and if it is valid YAML. If either of these is 
+        Read the YAML config file.
+
+        First check if it exists and if it is valid YAML. If either of these is
         false, write a blank file and load that.
         """
         config_changed_in_first_reading = False
@@ -41,63 +42,69 @@ class ValidatorConfig:
             self.config = {}
         except yaml.io.UnsupportedOperation:
             # means the file there is not a YAML file
-            # TODO: this will erase the config file entirely. We should make a 
-            # failure option, in case the user has (badly) edited the YAML file 
+            # TODO: this will erase the config file entirely. We should make a
+            # failure option, in case the user has (badly) edited the YAML file
             # by hand.
             self.config = {}
             config_changed_in_first_reading = True
 
         default_disqualifying_issues = self.get_default_disqualifying_issues()
-        if 'disqualifying_issues' not in self.config:
+        if "disqualifying_issues" not in self.config:
             disqualifying_issues = default_disqualifying_issues.copy()
             # YAML can't write an OrderdDict, so convert to dict
-            self.config['disqualifying_issues'] = dict(disqualifying_issues)
+            self.config["disqualifying_issues"] = dict(disqualifying_issues)
             config_changed_in_first_reading = True
 
-        # in case we've added or removed any disqualifying issues since the last 
+        # in case we've added or removed any disqualifying issues since the last
         # time the user has changed them, we'll compare against the defaults.
         for disqualifying_issue in default_disqualifying_issues:
-            if disqualifying_issue not in self.config['disqualifying_issues']:
-                self.config['disqualifying_issues'][disqualifying_issue] = default_disqualifying_issues[disqualifying_issue]
+            if disqualifying_issue not in self.config["disqualifying_issues"]:
+                self.config["disqualifying_issues"][disqualifying_issue] = (
+                    default_disqualifying_issues[disqualifying_issue]
+                )
         disqualifying_issues_to_remove = []
-        for disqualifying_issue in self.config['disqualifying_issues']:
+        for disqualifying_issue in self.config["disqualifying_issues"]:
             if disqualifying_issue not in default_disqualifying_issues:
                 disqualifying_issues_to_remove.append(disqualifying_issue)
         if disqualifying_issues_to_remove:
             config_changed_in_first_reading = True
             for disqualifying_issue in disqualifying_issues_to_remove:
-                del(self.config['disqualifying_issues'][disqualifying_issue])
+                del self.config["disqualifying_issues"][disqualifying_issue]
 
-        if 'programs' not in self.config:
-            self.config['programs'] = {}
+        if "programs" not in self.config:
+            self.config["programs"] = {}
             config_changed_in_first_reading = True
-        
-        for program in self.config['programs']:
+
+        for program in self.config["programs"]:
             program = program.lower()
             if not program:
                 continue
             try:
-                for associated_name in self.config['programs'][program]['associated_names']:
+                for associated_name in self.config["programs"][program][
+                    "associated_names"
+                ]:
                     if not associated_name:
                         continue
-                    self.names_associated_to_programs_map[associated_name.lower()] = program
+                    self.names_associated_to_programs_map[associated_name.lower()] = (
+                        program
+                    )
             except KeyError:
                 pass
         if config_changed_in_first_reading:
             self.write_validator_config_file()
 
     def _read_config(self):
-        with open(self.config_file, 'r', encoding='utf8') as fin:
+        with open(self.config_file, "r", encoding="utf8") as fin:
             config = yaml.safe_load(fin)
         return config
 
     @staticmethod
     def _get_short_input_filename(input_file):
-        input_file_parts = input_file.split('.')
+        input_file_parts = input_file.split(".")
         return input_file_parts[0].lower()
 
     def write_validator_config_file(self):
-        with open(self.config_file, 'w', encoding='utf8') as fout:
+        with open(self.config_file, "w", encoding="utf8") as fout:
             yaml.safe_dump(self.config, fout)
 
     def get_input_fields(self, input_file):
@@ -110,7 +117,7 @@ class ValidatorConfig:
             cat_data = self.config[input_file][cat]
             cat_data = str(cat_data)
             cat_data = cat_data.strip()
-            if input_file.endswith('mrk'):
+            if input_file.endswith("mrk"):
                 cat_data = self.zero_fill_marc_fields(cat_data)
             input_fields[cat] = cat_data
         if not input_fields:
@@ -122,13 +129,16 @@ class ValidatorConfig:
         if short_filename in self.names_associated_to_programs_map:
             short_filename = self.names_associated_to_programs_map[short_filename]
 
-        if short_filename in self.config['programs'] and 'input_fields' in self.config['programs'][short_filename]:
-            for cat in self.config['programs'][short_filename]['input_fields']:
-                if not self.config['programs'][short_filename]['input_fields'][cat]:
+        if (
+            short_filename in self.config["programs"]
+            and "input_fields" in self.config["programs"][short_filename]
+        ):
+            for cat in self.config["programs"][short_filename]["input_fields"]:
+                if not self.config["programs"][short_filename]["input_fields"][cat]:
                     continue
-                cat_data = self.config['programs'][short_filename]['input_fields'][cat]
+                cat_data = self.config["programs"][short_filename]["input_fields"][cat]
                 cat_data = cat_data.strip()
-                if input_file.endswith('mrk'):
+                if input_file.endswith("mrk"):
                     cat_data = self.zero_fill_marc_fields(cat_data)
                 input_fields[cat] = cat_data
         return input_fields
@@ -137,19 +147,19 @@ class ValidatorConfig:
         """
         Make a map of bulk-entry programs and associated other programs.
         """
-        if 'programs' not in self.config:
+        if "programs" not in self.config:
             return
-        self.config['programs_map'] = {}
-        for program in self.config['programs']:
-            self.config['programs_map'][program] = program
-            if 'associated_names' in self.config['programs'][program]:
-                for subprogram in self.config['programs'][program]['associated_names']:
-                    self.config['programs_map'][subprogram] = program
+        self.config["programs_map"] = {}
+        for program in self.config["programs"]:
+            self.config["programs_map"][program] = program
+            if "associated_names" in self.config["programs"][program]:
+                for subprogram in self.config["programs"][program]["associated_names"]:
+                    self.config["programs_map"][subprogram] = program
 
     def get_disqualifying_issues(self, input_file=None):
         """
-        Look for appropriate issues from the bulk config when presented with an 
-        individual file. Otherwise, return the regular disqualifying issues. If 
+        Look for appropriate issues from the bulk config when presented with an
+        individual file. Otherwise, return the regular disqualifying issues. If
         none have been set then these will be the defaults.
         """
         if input_file:
@@ -160,17 +170,24 @@ class ValidatorConfig:
             else:
                 program_name = inst_name
             try:
-                disqualifying_issues = self.config['programs'][program_name]['disqualifying_issues']
+                disqualifying_issues = self.config["programs"][program_name][
+                    "disqualifying_issues"
+                ]
                 if program_name == inst_name:
-                    logging.info('Using disqualifying issues set for {}'.format(
-                        program_name))
+                    logging.info(
+                        "Using disqualifying issues set for {}".format(program_name)
+                    )
                 else:
-                    logging.info('Using disqualifying issues set for {} in program {}'.format(inst_name, program_name))
+                    logging.info(
+                        "Using disqualifying issues set for {} in program {}".format(
+                            inst_name, program_name
+                        )
+                    )
                 return disqualifying_issues
             except KeyError:
                 pass
 
-        return self.config['disqualifying_issues']
+        return self.config["disqualifying_issues"]
 
     def get_disqualifying_issue_categories(self, input_file=None):
         disqualifying_issue_categories = set()
@@ -184,12 +201,12 @@ class ValidatorConfig:
         default_issues = self.get_default_disqualifying_issues()
         changed_issues = False
         for issue in default_issues:
-            if issue not in self.config['disqualifying_issues']:
-                self.config['disqualifying_issues'][issue] = False
+            if issue not in self.config["disqualifying_issues"]:
+                self.config["disqualifying_issues"][issue] = False
                 changed_issues = True
         for issue in self.issue_categories:
             if issue not in default_issues:
-                self.config['disqualifying_issues'].pop(issue)
+                self.config["disqualifying_issues"].pop(issue)
                 changed_issues = True
         if changed_issues:
             self.write_validator_config_file()
@@ -202,10 +219,10 @@ class ValidatorConfig:
     @staticmethod
     def zero_fill_marc_fields(field):
         if not field:
-            return ''
+            return ""
         if str(field).isdigit():
             return str(field).zfill(3)
-        m = re.search(r'^ *(\d+)([a-z]) *$', str(field).lower())
+        m = re.search(r"^ *(\d+)([a-z]) *$", str(field).lower())
         if not m:
             return field
         field_digits = m.group(1)
@@ -215,43 +232,38 @@ class ValidatorConfig:
 
     @staticmethod
     def get_default_disqualifying_issues():
-        disqualifying_issues = OrderedDict({
-            'bib_lvl_not_serial': True,
-            'form_not_print': True,
-            'record_type_not_language_material': True,
-            'serial_type_not_periodical': True,
-            'invalid_carrier_type': True,
-            'invalid_media_type': True,
-            'issn_db_form_not_print': True,
-            'issn_db_serial_type_not_periodical': True,
-            'no_oclc_number': True,
-            'no_worldcat_record': True,
-
-            'binding_words_in_holdings': True,
-            'completeness_words_in_holdings': True,
-            'nonprint_words_in_holdings': True,
-
-            'title_in_jstor': False,
-
-            'bib_id_repeated': True,
-            'holdings_id_repeated': True,
-            'local_oclc_repeated': True,
-            'wc_oclc_repeated': True,
-
-            'holdings_out_of_range': True,
-            'holdings_out_of_issn_db_date_range': True,
-
-            'invalid_local_issn': True,
-            'local_issn_does_not_match_wc_issn_a': False,
-            'local_issn_does_not_match_issn_db': False,
-            'wc_issn_does_not_match_issn_db': False,
-            'no_issn_matches_issn_db': True,
-
-            'oclc_mismatch': True,
-            'title_mismatch': True,
-
-            'line_583_error': True,
-            'marc_validation_error': True,
-            'missing_field_852a': True,
-        })
+        disqualifying_issues = OrderedDict(
+            {
+                "bib_lvl_not_serial": True,
+                "form_not_print": True,
+                "record_type_not_language_material": True,
+                "serial_type_not_periodical": True,
+                "invalid_carrier_type": True,
+                "invalid_media_type": True,
+                "issn_db_form_not_print": True,
+                "issn_db_serial_type_not_periodical": True,
+                "no_oclc_number": True,
+                "no_worldcat_record": True,
+                "binding_words_in_holdings": True,
+                "completeness_words_in_holdings": True,
+                "nonprint_words_in_holdings": True,
+                "title_in_jstor": False,
+                "bib_id_repeated": True,
+                "holdings_id_repeated": True,
+                "local_oclc_repeated": True,
+                "wc_oclc_repeated": True,
+                "holdings_out_of_range": True,
+                "holdings_out_of_issn_db_date_range": True,
+                "invalid_local_issn": True,
+                "local_issn_does_not_match_wc_issn_a": False,
+                "local_issn_does_not_match_issn_db": False,
+                "wc_issn_does_not_match_issn_db": False,
+                "no_issn_matches_issn_db": True,
+                "oclc_mismatch": True,
+                "title_mismatch": True,
+                "line_583_error": True,
+                "marc_validation_error": True,
+                "missing_field_852a": True,
+            }
+        )
         return disqualifying_issues
