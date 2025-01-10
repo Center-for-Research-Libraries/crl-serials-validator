@@ -124,7 +124,10 @@ class ValidatorController:
     def set_api_keys(self):
         self.print_break_line()
         api_setter_obj = ApiKeySetter()
-        del api_setter_obj.api_keys
+        try:
+            del api_setter_obj.api_keys
+        except AttributeError:
+            pass
         gc.collect()
         self.print_break_line(line_before=True)
 
@@ -187,7 +190,7 @@ class ValidatorController:
 
         warning_messages = []
 
-        api_keys = OclcApiKeys(api_key_config_file_location=CRL_FOLDER)
+        api_keys = OclcApiKeys()
         if not api_keys.api_key:
             logging.error('No WorldCat Search API key set.')
             error_message = "Please set a WorldCat Search API key."
