@@ -1,20 +1,20 @@
 import datetime
 import bookops_worldcat
+import bookops_worldcat.errors
 import pymarc
 from bookops_worldcat import WorldcatAccessToken, MetadataSession
 from typing import Dict, Tuple, Union, List
 import crl_lib.api_keys
 
 JSON_HEADER = {"Accept": "application/atom+json"}
-SCOPES = {
-    "metadata": "WorldCatMetadataAPI",
-    "search": "wcapi"
-}
+SCOPES = {"metadata": "WorldCatMetadataAPI", "search": "wcapi"}
 
 
 class WorldcatApiToken:
 
-    def __init__(self, api: str="metadata", api_key: str = "", api_secret: str = "") -> None:
+    def __init__(
+        self, api: str = "metadata", api_key: str = "", api_secret: str = ""
+    ) -> None:
         if not api_key:
             api_key, api_secret = get_metadata_api_key()
         self.api = api
@@ -96,3 +96,19 @@ def get_metadata_api_key() -> Tuple[str, str]:
             )
             return api_key_tuple
     raise Exception("No API key for the Metadata API defined.")
+
+
+def test_metadata_api_key(api_key: str, api_secret: str) -> bool:
+    try:
+        token = WorldcatAccessToken(api_key, api_secret, scopes=SCOPES["metadata"])
+        return True
+    except bookops_worldcat.errors.WorldcatAuthorizationError:
+        return False
+
+
+def test_search_api_key(api_key: str, api_secret: str) -> bool:
+    try:
+        token = WorldcatAccessToken(api_key, api_secret, scopes=SCOPES["search"])
+        return True
+    except bookops_worldcat.errors.WorldcatAuthorizationError:
+        return False
