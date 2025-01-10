@@ -9,3 +9,4 @@ termcolor
 colorama
 oauthlib
 requests_oauthlib
+bookops_worldcat
