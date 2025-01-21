@@ -4,74 +4,83 @@ Various small utilities.
 
 import re
 import datetime
-import sys
+import unidecode
+from typing import Union, Optional
 
 
-def get_eol():
-    """
-    End of line based on current OS. This generally won't be needed.
-    """
-    import platform
-    os = platform.system()
-    if os == "Windows":
-        return "\r\n"
-    return "\n"
-
-
-def unidecode_string(string):
-    """
-    unicode input string to ASCII characters (though in utf-8)
-    """
-    import unicodedata
-    out_string = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
-    # normalize produces bytes; return as utf-8
-    return out_string.decode("utf-8")
-
-
-def punctuation_to_underscores(string):
+def punctuation_to_underscores(my_string: str) -> str:
     """
     Convert most punctuation and spaces to underscores, to help make bland strings.
+
+    Args:
+        my_string: The string to be converted.
+
+    Returns:
+        The converted string.
     """
-    string = string.replace('.', '_')
-    string = string.replace(',', '_')
-    string = string.replace(':', '_')
-    string = string.replace(';', '_')
-    string = string.replace('/', '_')
-    string = string.replace('"', '_')
-    string = string.replace('…', '_')
-    string = string.replace('-', '_')
-    string = string.replace('[', '_')
-    string = string.replace(']', '_')
-    string = string.replace('(', '_')
-    string = string.replace(')', '_')
-    string = string.replace("'", '_')
-    string = string.replace(' ', '_')
-    string = re.sub("__+", "_", string)
-    string = string.strip('_')
-    return string
+    my_string = my_string.replace(".", "_")
+    my_string = my_string.replace(",", "_")
+    my_string = my_string.replace(":", "_")
+    my_string = my_string.replace(";", "_")
+    my_string = my_string.replace("/", "_")
+    my_string = my_string.replace('"', "_")
+    my_string = my_string.replace("…", "_")
+    my_string = my_string.replace("-", "_")
+    my_string = my_string.replace("[", "_")
+    my_string = my_string.replace("]", "_")
+    my_string = my_string.replace("(", "_")
+    my_string = my_string.replace(")", "_")
+    my_string = my_string.replace("'", "_")
+    my_string = my_string.replace(" ", "_")
+    my_string = re.sub("__+", "_", my_string)
+    my_string = my_string.strip("_")
+    return my_string
 
 
-def make_bland_string(string):
+def make_bland_string(my_string: str) -> str:
     """
     Takes a string renders it lower case & without punctuation or unicode, and
     converts spaces to underscores.
+
+    Args:
+        my_string (str): The string to be converted.
+
+    Returns:
+        str: The converted string.
     """
-    string = unidecode_string(string)
-    string = string.lower()
-    string = re.sub("[^a-z0-9_ ]", "", string)
-    string = re.sub(r"^[\s_]*", '', string)
-    string = re.sub(r"[\s_]*$", '', string)
-    string = re.sub(" +", '_', string)
-    return string
+    my_string = unidecode.unidecode(my_string)
+    my_string = my_string.lower()
+    my_string = re.sub("[^a-z0-9_ ]", "", my_string)
+    my_string = re.sub(r"^[\s_]*", "", my_string)
+    my_string = re.sub(r"[\s_]*$", "", my_string)
+    my_string = re.sub(" +", "_", my_string)
+    return my_string
 
 
-def clean_oclc(oclc):
+def clean_oclc(oclc: Union[int, str]) -> str:
     """
     Removes junk commonly seen around OCLC numbers.
+
+    "Junk" includes:
+        - Leading/trailing spaces
+        - Leading/trailing parentheses
+        - "OCLC", "OCoLC", or the like (case insensitive)
+        - "ocm" or "ocn" (case insensitive)
+        - Leading zeroes
+        - Forward slashes
+        - Backslashes
+        - Non-numeric characters
+
     Also converts int to str.
+
+        Args:
+        oclc (Union[int, str]): The string or integer to be cleaned.
+
+    Returns:
+        str: The cleaned OCLC number.
     """
     oclc = str(oclc)
-    oclc = oclc.replace('"', '')
+    oclc = oclc.replace('"', "")
     oclc = re.sub("^ *", "", oclc)
     oclc = re.sub(r"\(?OCo?LC\)?", "", oclc, flags=re.I)
     oclc = re.sub("oc?[mn]", "", oclc, flags=re.I)
@@ -79,55 +88,82 @@ def clean_oclc(oclc):
     oclc = re.sub(r"\s", "", oclc)
     oclc = re.sub("/+$", "", oclc)
     oclc = re.sub("\\\\+$", "", oclc)
-    oclc = re.sub(r'\D', '', oclc)
+    oclc = re.sub(r"\D", "", oclc)
     return oclc
 
 
-def validate_oclc(oclc):
+def validate_oclc(oclc: str) -> bool:
     """
     Returns True on valid-seeming OCLC number.
+
+    Args:
+        oclc (str): The string to be validated.
+
+    Returns:
+        bool: True if the OCLC number is valid, False otherwise.
     """
-    try:
-        oclc = int(oclc)
-    except ValueError:
+    if not oclc.isdigit():
         return False
-    # This used to have a maximum of 400000000, but I've found 019 OCLCs that are much higher than that
-    if (oclc < 0) or (oclc > 40000000000):
+    oclc_int = int(oclc)
+    if oclc_int < 1 or oclc_int > 40000000000:
         return False
     return True
 
 
-def validate_and_clean_oclc(oclc):
+def validate_and_clean_oclc(oclc: str) -> str:
     """
     Combines OCLC validation and junk removal.
+
     Returns None on failure.
+
+    Args:
+        oclc (str): The string to be cleaned and validated.
+
+    Returns:
+        str: The cleaned and validated string, empty if the string is not a valid OCLC.
     """
     oclc = clean_oclc(oclc)
     if validate_oclc(oclc):
         return oclc
-    return None
+    return ""
 
 
-def fix_issn(issn):
+def fix_issn(issn: str) -> str:
     """
-    Fix an ISSN without a dash or with leading zeros not included.
-    "12345" to "0001-2345" and the like.
+    Cleans and formats an ISSN string to standard ISSN format (e.g., '1234-5678').
+    Does *not* check the algorithmic validity of the ISSN.
+
+    This function performs several operations to ensure that the input string is a valid ISSN:
+        - Converts the input to a string if it isn't already.
+        - Removes non-numeric characters and subfield notes.
+        - Extracts the first sequence that resembles an ISSN if the input contains multiple ISSNs.
+        - Ensures the ISSN does not exceed 8 characters, with digits in all but the last position.
+        - Pads the ISSN with leading zeros if necessary to reach 8 characters.
+        - Formats the ISSN with a dash between the fourth and fifth digits.
+
+    Args:
+        issn (str): The ISSN string to be cleaned and formatted.
+
+    Returns:
+        str: The cleaned and formatted ISSN string, or an empty string if the input
+             is invalid or cannot be formatted to an ISSN.
     """
+
     if not issn:
-        return None
+        return ""
 
     # ISSNs without dash or x in last spot might appear as int
     issn = str(issn)
 
     if not re.search(r"\d", issn):
-        return None
+        return ""
     # cut out starting subfield note
     issn = re.sub("^ *[$|]?a", "", issn)
     # might be a long string, like "1234-5678 $z4324-2342". Cut out all but first ISSN
-    issn = re.sub(r"^ *(\d\d\d\d-\d\d\d.).*", r'\1', issn)
+    issn = re.sub(r"^ *(\d\d\d\d-\d\d\d.).*", r"\1", issn)
 
-    issn = issn.replace('"', '')
-    issn = re.sub(r'^(\d\d\d\d-\d\d\d[\dXx]).*', '\\1', issn)
+    issn = issn.replace('"', "")
+    issn = re.sub(r"^(\d\d\d\d-\d\d\d[\dXx]).*", "\\1", issn)
     issn = issn.replace("-", "")
     issn = re.sub(r"\s", "", issn)
 
@@ -141,19 +177,33 @@ def fix_issn(issn):
 
     # leading zeros sometimes stripped from ISSNs
     while len(issn) < 8:
-        issn = '0' + issn
+        issn = "0" + issn
 
     issn = re.sub("(....)(....)", "\\1-\\2", issn)
     return issn
 
 
-def check_for_valid_issn(issn):
+def check_for_valid_issn(issn: str) -> bool:
     """
-    The last character is a check digit. Algorithm:
-        1. Multiply first digit by 8, second by 7, etc to seventh by 2. Add the sums up.
-        2. Take modulus 11 of the total. If modulus is 0 then check digit should be 0.
-        3. Otherwise subtract the modulus from 11. This will be check digit, with 'X' standing for 10.
+    Validates an ISSN (International Standard Serial Number) by checking its check digit.
+
+    This function performs the following steps:
+        1. Attempts to format the input string as a valid ISSN.
+        2. If the ISSN is valid, calculates a check digit based on the first seven digits.
+        3. Compares the calculated check digit with the provided check digit (eighth character).
+
+    The algorithm for ISSN validation involves multiplying the first digit by 8, the second by 7,
+    and so on until the seventh digit, which is multiplied by 2. The sum of these products is
+    taken modulo 11. If the result is 0, the check digit should be 0. Otherwise, the check
+    digit is 11 minus the result, with 'X' representing a check digit of 10.
+
+    Args:
+        issn (str): The ISSN string to be validated.
+
+    Returns:
+        bool: True if the ISSN is valid, False otherwise.
     """
+
     issn = fix_issn(issn)
     if not issn:
         return False
@@ -161,23 +211,24 @@ def check_for_valid_issn(issn):
     check_total = 0
     digit_string = issn[:4] + issn[5:8]
     for digit in digit_string:
-        digit = int(digit)
-        add_to_check = digit * n
+        checking_digit = int(digit)
+        add_to_check = checking_digit * n
         check_total += add_to_check
         n -= 1
     check_modulus = check_total % 11
-    if check_modulus == 0 and str(issn[8]) == '0':
+    if check_modulus == 0 and str(issn[8]) == "0":
         return True
     check_digit = 11 - (check_modulus)
-    if check_digit == 10 and issn[8].upper() == 'X':
+    if check_digit == 10 and issn[8].upper() == "X":
         return True
     elif str(check_digit) == str(issn[8]):
         return True
     return False
 
 
-def fix_lccn(lccn):
+def fix_lccn(lccn: str) -> str:
     """
+    Attempt to fix an LCCN (Library of Congress Control Number) string.
     LCCNs come in a variety of forms and there seems to be very little standardization.
     LCCN should be of the form:
 
@@ -186,7 +237,7 @@ def fix_lccn(lccn):
     Years before 2000 are two digit, after 2000 are four digit.
 
     Examples of proper LCCNs:
-    (API doesn't need spaces or hyphens in LCCN, so we'll discard those to expose more errors)
+    (WorldCat APIs don't need spaces or hyphens in LCCN, so we'll discard those to expose more errors)
 
         78-914259
         SA 68-16155
@@ -194,17 +245,32 @@ def fix_lccn(lccn):
 
     If LCCN starts with a long string of numbers with no more than two letters,
     capture that & delete all after, to get around weird multi-LCCN strings and so forth
+
+    This function performs the following steps:
+
+        1. If the LCCN is empty, return an empty string.
+        2. If the LCCN is not empty, attempt to extract the LCCN from the start of the string.
+        3. Remove any whitespace from the LCCN.
+        4. Remove any hyphens from the LCCN.
+        5. Remove any parentheses and their contents from the LCCN.
+        6. If the LCCN contains any letters after the main number string, remove them.
+        7. If the LCCN contains a "//" and any characters after it, remove them.
+        8. Rebuild the LCCN with the correct number of digits, preserving any leading alphabetical characters.
+
+    Args:
+        lccn (str): The LCCN string to be fixed.
+
+    Returns:
+        str: The fixed LCCN string.
     """
+
     if not lccn:
-        return
+        return ""
 
     lccn = str(lccn)
 
-    m = re.search(r"^([a-z0-9]{2}\d{5}\d*)", lccn)
-    try:
+    if m := re.search(r"^([a-z0-9]{2}\d{5}\d*)", lccn):
         lccn = m.group(1)
-    except AttributeError:
-        pass
 
     lccn = re.sub(r"\s*", "", lccn)
     lccn = re.sub("-", "", lccn)
@@ -215,27 +281,21 @@ def fix_lccn(lccn):
     lccn = re.sub(r"(\d{3}\d*)[a-z].*$", "\\1", lccn)
 
     # something fairly common like agr07000531 //r872
-    lccn = re.sub(' *//.*', '', lccn)
+    lccn = re.sub(" *//.*", "", lccn)
 
     # rebuild the LCCN with the correct number of digits
     # remove & save leading alphabetical characters -- when present, usually 2, but can be 1 or 3
     leading_characters = ""
-    m = re.search("^([a-z]{1,3})", lccn, flags=re.IGNORECASE)
-    try:
+    if m := re.search("^([a-z]{1,3})", lccn, flags=re.IGNORECASE):
         leading_characters = m.group(1)
         lccn = lccn.replace(leading_characters, "", 1)
-    except AttributeError:
-        pass
 
-    m = re.search(r"^(\d\d)(\d\d)\d+", lccn)
     year = ""
-    try:
+    if m := re.search(r"^(\d\d)(\d\d)\d+", lccn):
         year = m.group(1)
         if year == "20":
             year = year + m.group(2)
         lccn = lccn.replace(year, "", 1)
-    except AttributeError:
-        pass
 
     # add leading zeros to reach proper length of post-year string
     while len(lccn) < 6:
@@ -245,130 +305,4 @@ def fix_lccn(lccn):
         new_lccn = leading_characters + year + lccn
         return new_lccn
 
-
-def compare_two(a, b):
-    """
-    Compare two inputs of any type, treating None as "" and all non-None as str.
-    Useful to make 1999 (int) and "1999" (str) equal.
-    True for equal, False for unequal.
-    """
-    if not a and not b:
-        return True
-    if not a or not b:
-        return False
-    if str(a) != str(b):
-        return False
-    return True
-
-
-def make_timestamp():
-    """
-    Timestamp, of form 20170922101209
-    """
-    stamp = '{:%Y%m%d%H%M%S}'.format(datetime.datetime.now())
-    return stamp
-
-
-def make_day_timestamp():
-    import time
-    """Timestamp of form 20181205"""
-    timestamp_tuple = time.localtime()
-    timestamp = "{}{mon:02d}{day:02d}".format(
-        timestamp_tuple[0], mon=timestamp_tuple[1], day=timestamp_tuple[2])
-    return timestamp
-
-
-def make_year_month_day_timestamp():
-    """Get a timestamp in the form YYYY-MM-DD"""
-    d = datetime.datetime.now()
-    timestamp = d.strftime("%Y-%m-%d")
-    return timestamp
-
-
-def get_lowest_and_highest_years(*args):
-    """Get the lowest and highest years, given a list of years (that can include slash years, like "1999/2000")"""
-    # TODO: Do we throw an exception or return None when we see something like "1972/1937"?
-    low_year = {"int": 9999,  "str": None}
-    high_year = {"int": 0, "str": None}
-
-    for year_str in args:
-        print(year_str)
-        year_list = str(year_str).split("/")
-        for year in year_list:
-            if int(year) < low_year["int"]:
-                low_year["int"] = int(year)
-                low_year["str"] = year_str
-            if int(year) > high_year["int"]:
-                high_year["int"] = int(year)
-                high_year["str"] = year_str
-
-    return low_year["str"], high_year["str"]
-
-
-def get_lowest_year(*args):
-    """Get the lowest year, given a list of years (that can include slash years, like "1999/2000")"""
-    low_year, _ = get_lowest_and_highest_years(*args)
-    return low_year
-
-
-def get_highest_year(*args):
-    """Get the highest year, given a list of years (that can include slash years, like "1999/2000")"""
-    _, high_year = get_lowest_and_highest_years(*args)
-    return high_year
-
-
-def fuzzy_year_match(year_1, year_2):
-    """
-    Do two years match within a single year, also allowing matches with either year in a slash year. Though explicitly
-    disallow unalike slash years matching. so "1971/1972" will match with "1972", but not with "1972/1973".
-
-    Numbers off by up to 1 either way will match.
-    """
-    year_1 = str(year_1)
-    year_2 = str(year_2)
-    if '/' in year_1 and '/' in year_2:
-        if year_1 == year_2:
-            return True
-        return False
-    years_1 = year_1.split('/')
-    years_2 = year_2.split('/')
-    years_1_set = set(years_1)
-    for year in years_1:
-        years_1_set.add(str(int(year) + 1))
-        years_1_set.add(str(int(year) - 1))
-    for year in years_2:
-        if year in years_1_set:
-            return True
-    return False
-
-
-def mixed_list_to_concatenated_str(input_list, delimiter='\t'):
-    """
-    Take a list with various types and convert to tab separated string.
-    
-    None is converted to blank space, tuples and sub-lists to semicolon concatenated strings.
-    Everything else is converted to a string. Note that dicts and other types will fail.
-    """
-    for i in range(0, len(input_list)):
-        if isinstance(input_list[i], (tuple, list)):
-            input_list[i] = mixed_list_to_concatenated_str(input_list[i], delimiter='; ')
-        # expressly convert int to str so that 0 doesn't become a blank in the next section
-        elif isinstance(input_list[i], (int, float, bool)):
-            input_list[i] = str(input_list[i])
-        elif not input_list[i]:
-            input_list[i] = ""
-        else:
-            input_list[i] = str(input_list[i])
-    concatenated_str = delimiter.join(input_list)
-    return concatenated_str
-
-
-def remove_nones_from_dict(input_dict):
-    """
-    None values in dict to blank str.
-    """
-    if type(input_dict) is not dict:
-        raise Exception("Input is not dict.")
-    for k in input_dict.keys():
-        if input_dict[k] is None:
-            input_dict[k] = ''
+    return ""
