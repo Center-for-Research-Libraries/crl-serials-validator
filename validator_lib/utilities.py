@@ -4,7 +4,7 @@ from termcolor import cprint, colored
 
 from crl_lib.year_utilities import find_years_first_last
 
-from validator_lib import VALIDATOR_DATA_FOLDER
+from validator_lib import CRL_FOLDER
 
 
 def get_unused_filename(file_location):
@@ -135,13 +135,13 @@ def get_later_of_slash_year(year, data_segment):
 
 def get_jstor_issns():
     jstor = set()
-    data_files = os.listdir(VALIDATOR_DATA_FOLDER)
+    data_files = os.listdir(CRL_FOLDER)
     for data_file in data_files:
         if not data_file.lower().startswith('jstor'):
             continue
         if data_file.lower().endswith('xlsx'):
             continue
-        jstor_file = os.path.join(VALIDATOR_DATA_FOLDER, data_file)
+        jstor_file = os.path.join(CRL_FOLDER, data_file)
         try:
             with open(jstor_file, 'r', encoding='utf8') as fin:
                 raw_issns = [line.rstrip() for line in fin]
