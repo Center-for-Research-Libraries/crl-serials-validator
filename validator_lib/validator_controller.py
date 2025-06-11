@@ -5,7 +5,7 @@ import webbrowser
 import sys
 import gc
 import re
-from termcolor import cprint
+from termcolor import cprint, colored
 
 from validator_lib import (
     CRL_FOLDER, ISSN_DB_LOCATION, MARC_DB_LOCATION, DOCS_URL, 
@@ -20,9 +20,6 @@ from validator_lib.validator_config import ValidatorConfig
 from crl_lib.api_key_setter import ApiKeySetter
 from crl_lib.api_keys import OclcApiKeys
 
-
-# Set the variable below to True to force debug logging
-DEBUG_MODE = False
 
 # List of input file extensions the process can currently handle
 VIABLE_INPUT_FORMATS = {'txt', 'xlsx', 'tsv', 'csv', 'mrk'}
@@ -41,7 +38,6 @@ class ValidatorController:
         self.headless_mode = headless_mode
         self.papr_output = papr_output
 
-        self.set_logging()
         self.log_file_location_results()
 
         self.input_files_seen = False
@@ -55,23 +51,6 @@ class ValidatorController:
         if self.headless_mode is True and DEBUG_MODE is False:
             # self.log_to_screen = False
             logging.info('Running in headless mode.')
-
-    def set_logging(self):
-        """
-        Initialize logging for the process.
-        """
-        if DEBUG_MODE is True:
-            log_level = logging.DEBUG
-        elif self.headless_mode is True:
-            log_level = logging.WARNING
-        else:
-            log_level = logging.INFO
-
-        logging.basicConfig(
-            filename=LOG_FILE_LOCATION, 
-            level=log_level, 
-            filemode='a', 
-            format='%(asctime)s\t%(message)s', datefmt="%Y-%m-%d %H:%M:%S")
 
     def print_break_line(self, line_before=False, line_length=120):
         if line_before is True:
@@ -161,6 +140,7 @@ class ValidatorController:
             if not input_fields:
                 warning_message = 'No input fields set for file {}. Skipping.'.format(input_file)
                 logging.warning(warning_message)
+                input(colored(warning_message, 'yellow'))
                 continue
             del(validator_config_object)
 
