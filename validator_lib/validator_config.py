@@ -5,11 +5,11 @@ from collections import OrderedDict
 from pprint import pprint
 import logging
 
-from validator_lib import VALIDATOR_DATA_FOLDER
+from validator_lib import VALIDATOR_CONFIG_FOLDER
 
 class ValidatorConfig:
 
-    config_file = os.path.join(VALIDATOR_DATA_FOLDER, 'config.yaml')
+    config_file = os.path.join(VALIDATOR_CONFIG_FOLDER, 'config.yaml')
 
     def __init__(self):
         self.config = {}
