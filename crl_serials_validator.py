@@ -63,8 +63,6 @@ def bulk_preferences():
 if __name__ == "__main__":
     args = parse_command_line_args()        
 
-    validator_lib.validator_file_locations.initialize_validator_folders()
-
     if args.file_locations is True:
         validator_lib.validator_file_locations.print_validator_file_locations()
         sys.exit()
