@@ -7,7 +7,7 @@ import gc
 import re
 from termcolor import cprint
 
-from validator_lib.validator_data import (
+from validator_lib import (
     CRL_FOLDER, ISSN_DB_LOCATION, MARC_DB_LOCATION, DOCS_URL, 
     VALIDATOR_INPUT_FOLDER, VALIDATOR_DATA_FOLDER, 
     VALIDATOR_OUTPUT_FOLDER, LOG_FILE_LOCATION)

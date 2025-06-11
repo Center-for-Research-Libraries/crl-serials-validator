@@ -22,7 +22,7 @@ from crl_lib.date_utilities import check_year_between
 from crl_lib.validation_utilities import check_for_print_carrier_type, check_for_print_media_type
 
 import validator_lib.utilities
-from validator_lib.validator_data import ISSN_DB_LOCATION
+from validator_lib import ISSN_DB_LOCATION
 
 
 class InputDataProcessor:

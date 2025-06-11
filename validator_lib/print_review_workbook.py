@@ -8,7 +8,7 @@ import re
 from crl_lib.crl_xlsxwriter import CRLXlsxWriter
 
 import validator_lib.utilities
-from validator_lib.validator_data import ISSN_DB_LOCATION
+from validator_lib import ISSN_DB_LOCATION
 
 
 class ReviewWorkbookPrinter:

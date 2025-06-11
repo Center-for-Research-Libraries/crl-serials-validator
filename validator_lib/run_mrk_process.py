@@ -14,7 +14,7 @@ from validator_lib.validate_583s import Line583Validator
 from validator_lib.utilities import get_first_last_year_from_regular_holdings
 from validator_lib.supplements_and_indexes_functions import remove_supplements_from_holdings, remove_indexes_from_holdings
 from validator_lib.validator_title_dict import get_immutable_title_dict
-from validator_lib.validator_data import VALIDATOR_INPUT_FOLDER
+from validator_lib import VALIDATOR_INPUT_FOLDER
 
 
 class MrkProcessRunner:

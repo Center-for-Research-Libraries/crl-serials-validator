@@ -5,7 +5,7 @@ from collections import OrderedDict
 from pprint import pprint
 import logging
 
-from validator_lib.validator_data import VALIDATOR_DATA_FOLDER
+from validator_lib import VALIDATOR_DATA_FOLDER
 
 class ValidatorConfig:
 

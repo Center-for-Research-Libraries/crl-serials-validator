@@ -9,7 +9,7 @@ import shutil
 from termcolor import cprint, colored
 import colorama
 
-from validator_lib.validator_data import (
+from validator_lib import (
     VALIDATOR_INPUT_FOLDER, VALIDATOR_OUTPUT_FOLDER, VALIDATOR_DATA_FOLDER, 
     VALIDATOR_LOGS_FOLDER, CRL_FOLDER, MARC_DB_LOCATION, ISSN_DB_LOCATION)
 

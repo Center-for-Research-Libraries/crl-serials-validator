@@ -3,7 +3,7 @@ import logging
 from crl_lib.wc_api import WcApi
 from crl_lib.marc_fields import MarcFields, WorldCatMarcFields
 
-from validator_lib.validator_data import CRL_FOLDER
+from validator_lib import CRL_FOLDER
 
 
 WANTED_WORLDCAT_DATA_CATEGORIES = [
@@ -29,7 +29,7 @@ class WorldCatMarcDataExtractor:
     """
     def __init__(self):
         logging.info('Getting WorldCat data.')
-        self.wc_api = WcApi(data_folder=CRL_FOLDER)
+        self.wc_api = WcApi()
         self.no_worldcat_data_found = []
         self.no_oclc_in_input = 0
 

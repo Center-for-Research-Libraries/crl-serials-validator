@@ -4,7 +4,7 @@ from termcolor import cprint, colored
 
 from crl_lib.year_utilities import find_years_first_last
 
-from validator_lib.validator_data import VALIDATOR_DATA_FOLDER
+from validator_lib import VALIDATOR_DATA_FOLDER
 
 
 def get_unused_filename(file_location):

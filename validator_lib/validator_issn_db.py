@@ -11,7 +11,7 @@ from crl_lib.date_utilities import check_year_between
 from crl_lib.marc_fields import MarcFields
 
 from validator_lib.utilities import get_valid_forms, get_valid_serial_types
-from validator_lib.validator_data import ISSN_DB_LOCATION
+from validator_lib import ISSN_DB_LOCATION
 
 
 class ValidatorIssnDb:
