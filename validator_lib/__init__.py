@@ -13,9 +13,31 @@ LOG_FILE_NAME = "validator_log_{:%Y-%m-%d}.log".format(datetime.datetime.now())
 # Set the variable below to True to force debug logging
 DEBUG_MODE = True
 
+CRL_FOLDER = os.path.join(os.path.expanduser("~"), "CRL")
+VALIDATOR_INPUT_FOLDER = os.path.join(os.getcwd(), "input")
+VALIDATOR_OUTPUT_FOLDER = os.path.join(os.getcwd(), "output")
 
 VALIDATOR_LOGS_FOLDER = os.path.join(os.getcwd(), "logs")
 LOG_FILE_LOCATION = os.path.join(VALIDATOR_LOGS_FOLDER, LOG_FILE_NAME)
+
+
+def instantiate_folders() -> None:
+    """
+    Create the necessary folders for the validator.
+    This includes the input, output, and logs folders.
+    """
+    for my_directory in [
+        VALIDATOR_INPUT_FOLDER,
+        VALIDATOR_OUTPUT_FOLDER,
+        VALIDATOR_LOGS_FOLDER,
+        CRL_FOLDER,
+    ]:
+        if not os.path.isdir(my_directory):
+            logging.info("Creating directory {}".format(my_directory))
+            os.mkdir(my_directory)
+
+
+instantiate_folders()
 
 
 def set_logging() -> None:
@@ -71,7 +93,22 @@ def copy_old_validator_config_file() -> None:
             if os.path.isfile(gitkeep):
                 os.remove(gitkeep)
                 logging.info(f"Deleted old .gitkeep file at {gitkeep}")
+
+            jstor_files = os.listdir(old_folder)
+            for jstor_file in jstor_files:
+                if jstor_file.lower().startswith("jstor_"):
+                    jstor_file_path = os.path.join(old_folder, jstor_file)
+                    new_jstor_file_path = os.path.join(CRL_FOLDER, jstor_file)
+
+                    if not os.path.isfile(new_jstor_file_path):
+                        os.rename(jstor_file_path, new_jstor_file_path)
+                        msg = f"Migrated old JSTOR file from {jstor_file_path} to {new_jstor_file_path}"
+                        logging.info(msg)
+                        cprint(msg, "green")
+                        print("")
+
             myfiles = os.listdir(old_folder)
+
             if myfiles:
                 cprint(
                     "The old configuration data folder is not empty so it will not be deleted.",
@@ -121,13 +158,8 @@ DOCS_URL = (
 )
 ERROR_GLOSSARY_URL = "https://github.com/Center-for-Research-Libraries/validator/blob/main/docs/disqualifying_issues.md"
 
-CRL_FOLDER = os.path.join(os.path.expanduser("~"), "CRL")
-
-VALIDATOR_INPUT_FOLDER = os.path.join(os.getcwd(), "input")
-VALIDATOR_OUTPUT_FOLDER = os.path.join(os.getcwd(), "output")
-
 copy_old_validator_config_file()
-VALIDATOR_DATA_FOLDER = find_validator_config_folder()
+VALIDATOR_CONFIG_FOLDER = find_validator_config_folder()
 
 API_KEY_CONFIG_LOCATION = os.path.join(CRL_FOLDER, API_KEY_CONFIG_NAME)
 
