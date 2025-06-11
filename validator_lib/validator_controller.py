@@ -9,7 +9,7 @@ from termcolor import cprint, colored
 
 from validator_lib import (
     CRL_FOLDER, ISSN_DB_LOCATION, MARC_DB_LOCATION, DOCS_URL, 
-    VALIDATOR_INPUT_FOLDER, VALIDATOR_DATA_FOLDER, 
+    VALIDATOR_INPUT_FOLDER, VALIDATOR_CONFIG_FOLDER, 
     VALIDATOR_OUTPUT_FOLDER, LOG_FILE_LOCATION)
 from validator_lib.choose_input_file_fields import InputFieldsChooser
 from validator_lib.scan_input_files import InputFileScanner
