@@ -3,6 +3,7 @@ import sys
 from unicodedata import name
 from termcolor import colored, cprint
 import typing
+import argparse
 
 import crl_lib.api_keys
 
@@ -17,6 +18,26 @@ FAILURE_LINE = "Key " + colored("does not work", "red") + " with {} API."
 NOT_SET_LINE = FAILURE_LINE + " " + colored("{} not set.", "red")
 
 HORIZONTAL_LINE = "".join(["-" for i in range(0, 109)])
+
+
+def parse_args() -> argparse.Namespace:
+    """
+    Parses command line arguments for the ApiKeySetter class.
+
+    Returns:
+        argparse.Namespace: The parsed command line arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="Set API keys for OCLC APIs using a terminal GUI."
+    )
+    parser.add_argument(
+        "-c",
+        "--config",
+        type=str,
+        default="",
+        help="Location of the API key configuration file.",
+    )
+    return parser.parse_args()
 
 
 def print_terminal_page_header(header_str: str) -> None:
@@ -37,15 +58,16 @@ def print_terminal_page_header(header_str: str) -> None:
 
 class ApiKeySetter:
     """
-    A class to manage API keys through a terminal-based GUI. 
+    A class to manage API keys through a terminal-based GUI.
     The ApiKeySetter class provides functionality to read, write, and manage API keys
     using a terminal-based graphical user interface. It allows users to add, remove,
     set default, and test API keys. The class interacts with the OclcApiKeys library
     to perform these operations.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, api_config_directory: str = "") -> None:
         self.api_key_names: typing.List[str] = []
+        self.api_config_directory = api_config_directory
         self.create_gui()
 
     @staticmethod
@@ -119,7 +141,9 @@ class ApiKeySetter:
         or quit the program.
         """
         while True:
-            self.api_key_manager = crl_lib.api_keys.OclcApiKeys()
+            self.api_key_manager = crl_lib.api_keys.OclcApiKeys(
+                config_folder_location=self.api_config_directory
+            )
 
             os.system("cls" if os.name == "nt" else "clear")
 
@@ -350,4 +374,5 @@ class ApiKeySetter:
 
 
 if __name__ == "__main__":
-    a = ApiKeySetter()
+    args = parse_args()
+    a = ApiKeySetter(api_config_directory=args.config)

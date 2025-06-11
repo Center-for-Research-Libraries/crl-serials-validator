@@ -1,5 +1,5 @@
 import random
-from pathlib import Path
+import os
 import yaml
 import sys
 from typing import Dict, Union
@@ -8,7 +8,8 @@ from bookops_worldcat.errors import WorldcatAuthorizationError
 
 from crl_lib import CRL_FOLDER, check_for_crl_directory
 
-API_KEY_CONFIG_FILE_PATH = Path.joinpath(CRL_FOLDER, "api_keys.yaml")
+API_CONFIG_FILENAME = "api_keys.yaml"
+API_KEY_CONFIG_FILE_PATH = os.path.join(CRL_FOLDER, API_CONFIG_FILENAME)
 
 
 def check_key_on_search_api(api_key: str, api_key_secret: str) -> bool:
@@ -76,9 +77,13 @@ class OclcApiKeys:
 
     """
 
-    api_keys: Dict[str, Dict[str, str]] = {}
+    api_keys: Dict[str, dict] = {}
 
-    def __init__(self, name_for_key: str = "") -> None:
+    def __init__(
+        self,
+        name_for_key: str = "",
+        config_folder_location: str = "",
+    ) -> None:
         """
         Initializes an instance of the OclcApiKeys class.
 
@@ -97,7 +102,22 @@ class OclcApiKeys:
         self.api_key_name = ""
         self.config = ""
 
-        check_for_crl_directory()
+        if config_folder_location:
+            if not os.path.isdir(config_folder_location):
+                print(f"Folder {config_folder_location} does not exist.")
+                user_choice = input("Create now? (y/n) ")
+                if user_choice.lower().startswith("y"):
+                    os.makedirs(config_folder_location)
+                    self.config_file_location = os.path.join(
+                        config_folder_location, API_CONFIG_FILENAME
+                    )
+                else:
+                    print("Quitting.")
+                    exit(0)
+        else:
+            check_for_crl_directory()
+            self.config_file_location = API_KEY_CONFIG_FILE_PATH
+
         self.read_config_file()
         self.convert_config_file()
 
@@ -111,10 +131,10 @@ class OclcApiKeys:
         Reads the API key configuration file into memory.
 
         This function attempts to read the configuration file defined
-        by the API_KEY_CONFIG_FILE_PATH variable.
+        by the self.config_file_location variable.
         """
         try:
-            with open(API_KEY_CONFIG_FILE_PATH, "r", encoding="utf8") as fin:
+            with open(self.config_file_location, "r", encoding="utf8") as fin:
                 self.api_keys = yaml.full_load(fin)
         except FileNotFoundError:
             pass
@@ -413,8 +433,8 @@ class OclcApiKeys:
                 if self.api_keys[name][cat] is None:
                     self.api_keys[name][cat] = ""
         try:
-            with open(API_KEY_CONFIG_FILE_PATH, "w", encoding="utf8") as fout:
+            with open(self.config_file_location, "w", encoding="utf8") as fout:
                 yaml.dump(self.api_keys, fout)
         except PermissionError:
             print("API config file could not be created due to PermissionError.")
-            sys.exit(f"Location is {API_KEY_CONFIG_FILE_PATH}")
+            sys.exit(f"Location is {self.config_file_location}")
