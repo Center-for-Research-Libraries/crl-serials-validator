@@ -23,7 +23,7 @@ from validator_lib.bulk_validator_preferences import run_bulk_config
 import validator_lib.validator_file_locations
 
 
-__version__ = '2022.9'  # Version released September 2022
+__version__ = '2025.6'
 
 
 def parse_command_line_args():
