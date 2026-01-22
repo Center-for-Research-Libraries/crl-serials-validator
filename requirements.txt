@@ -9,4 +9,5 @@ termcolor
 colorama
 oauthlib
 requests_oauthlib
+python-stdnum
 bookops_worldcat
