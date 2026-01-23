@@ -46,29 +46,6 @@ def get_abbrev_from_input_filename(input_file):
     return working_filename[0]
 
 
-def check_holdings_data_for_magic_words(
-    holdings, holdings_nonpublic_notes, holdings_public_notes, search_type
-):
-    search_data = {
-        "completeness": ["inc", "compl", "miss", "lack", "without", "w/o", "repr"],
-        "binding": ["bound", r"bd\.? w"],
-        "nonprint": [r"d\.?v\.?d\.?", r"\bc\.?d\.?\b"],
-    }
-    all_holdings_segments_to_check = [
-        holdings,
-        holdings_nonpublic_notes,
-        holdings_public_notes,
-    ]
-
-    for holdings_segment in all_holdings_segments_to_check:
-        if not holdings_segment:
-            continue
-        holdings_segment = str(holdings_segment)
-        for search_string in search_data[search_type]:
-            if re.search(search_string, holdings_segment.lower()):
-                return "1"
-    return ""
-
 
 def get_valid_serial_types():
     return {"m", "p", "\\", " ", "-", "|", "g", "j"}
